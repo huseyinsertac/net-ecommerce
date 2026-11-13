@@ -19,13 +19,17 @@ public static class DependencyInjection
         return services;
     }
 
-    /// <summary>Scans the assembly, including non-public types, for handlers and FluentValidation validators.</summary>
+    /// <summary>
+    /// Scans the assembly, including non-public types, for command/query/domain-event handlers and FluentValidation validators.
+    /// Integration-event handlers are deliberately NOT registered here: they must only ever run wrapped in the idempotent inbox,
+    /// so the module registers them with <c>AddInboxHandler</c>/<c>AddInboxHandlers</c> (Shop.Infrastructure.Common).
+    /// </summary>
     public static IServiceCollection AddApplicationHandlers(this IServiceCollection services, Assembly assembly)
     {
         Type[] scanned =
         [
             typeof(ICommandHandler<>), typeof(ICommandHandler<,>), typeof(IQueryHandler<,>),
-            typeof(IDomainEventHandler<>), typeof(IIntegrationEventHandler<>), typeof(IValidator<>),
+            typeof(IDomainEventHandler<>), typeof(IValidator<>),
         ];
 
         var types = assembly.GetTypes()

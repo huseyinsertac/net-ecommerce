@@ -1,4 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
+using Shop.Application.Abstractions.Events;
 using Shop.Application.Abstractions.Messaging;
 using Shop.SharedKernel;
 using Shouldly;
@@ -24,6 +25,13 @@ internal sealed record InternalCommand : ICommand<string>;
 internal sealed class InternalCommandHandler : ICommandHandler<InternalCommand, string>
 {
     public Task<Result<string>> Handle(InternalCommand command, CancellationToken ct) => Task.FromResult(Result.Success("internal"));
+}
+
+public sealed record SomethingHappened : IntegrationEvent;
+
+internal sealed class SomethingHappenedHandler : IIntegrationEventHandler<SomethingHappened>
+{
+    public Task Handle(SomethingHappened e, CancellationToken ct) => Task.CompletedTask;
 }
 
 public class DispatcherTests
@@ -69,5 +77,13 @@ public class DispatcherTests
         using var sp = Build();
         var result = await sp.CreateScope().ServiceProvider.GetRequiredService<IDispatcher>().Send(new InternalCommand(), TestContext.Current.CancellationToken);
         result.Value.ShouldBe("internal");
+    }
+
+    [Fact]
+    public void AddApplicationHandlers_SkipsIntegrationEventHandlers_TheyAreRegisteredThroughTheInbox()
+    {
+        var services = new ServiceCollection();
+        services.AddApplicationHandlers(typeof(DispatcherTests).Assembly);
+        services.ShouldNotContain(d => d.ServiceType == typeof(IIntegrationEventHandler<SomethingHappened>));
     }
 }
