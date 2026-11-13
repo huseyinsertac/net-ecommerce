@@ -15,6 +15,22 @@ public sealed class CreateThingValidator : AbstractValidator<CreateThing>
     public CreateThingValidator() => RuleFor(x => x.Name).NotEmpty();
 }
 
+public sealed record GetThing(string Id) : IQuery<string>;
+
+public sealed class GetThingValidator : AbstractValidator<GetThing>
+{
+    public GetThingValidator() => RuleFor(x => x.Id).NotEmpty();
+}
+
+public sealed class GetThingHandler(TestLog log) : IQueryHandler<GetThing, string>
+{
+    public Task<Result<string>> Handle(GetThing query, CancellationToken ct)
+    {
+        log.HandlerCalls++;
+        return Task.FromResult(Result.Success("found"));
+    }
+}
+
 public sealed class TestLog
 {
     public List<string> Entries { get; } = [];
@@ -65,7 +81,7 @@ public class ValidationBehaviorTests
         services.AddDispatcher();
         services.AddApplicationHandlers(typeof(ValidationBehaviorTests).Assembly);
         services.AddScoped<IPipelineBehavior<CreateThing, Result>, RecordingBehavior>();
-        return (services.BuildServiceProvider(), log);
+        return (services.BuildServiceProvider(validateScopes: true), log);
     }
 
     [Fact]
@@ -74,10 +90,25 @@ public class ValidationBehaviorTests
         var (sp, log) = Build();
         using (sp)
         {
-            var result = await sp.GetRequiredService<IDispatcher>().Send(new CreateThing(""), TestContext.Current.CancellationToken);
+            var result = await sp.CreateScope().ServiceProvider.GetRequiredService<IDispatcher>().Send(new CreateThing(""), TestContext.Current.CancellationToken);
             result.IsFailure.ShouldBeTrue();
             var error = result.Error.ShouldBeOfType<ValidationError>();
             error.Errors["Name"].ShouldNotBeEmpty();
+            log.HandlerCalls.ShouldBe(0);
+        }
+    }
+
+    [Fact]
+    public async Task Validation_InvalidGenericQuery_ReturnsFailedResultOfT_HandlerNotCalled()
+    {
+        var (sp, log) = Build();
+        using (sp)
+        {
+            var result = await sp.CreateScope().ServiceProvider.GetRequiredService<IDispatcher>()
+                .Query(new GetThing(""), TestContext.Current.CancellationToken);
+            result.IsFailure.ShouldBeTrue();
+            var error = result.Error.ShouldBeOfType<ValidationError>();
+            error.Errors["Id"].ShouldNotBeEmpty();
             log.HandlerCalls.ShouldBe(0);
         }
     }
@@ -88,7 +119,7 @@ public class ValidationBehaviorTests
         var (sp, log) = Build();
         using (sp)
         {
-            var result = await sp.GetRequiredService<IDispatcher>().Send(new CreateThing("x"), TestContext.Current.CancellationToken);
+            var result = await sp.CreateScope().ServiceProvider.GetRequiredService<IDispatcher>().Send(new CreateThing("x"), TestContext.Current.CancellationToken);
             result.IsSuccess.ShouldBeTrue();
             log.HandlerCalls.ShouldBe(1);
         }
@@ -100,7 +131,7 @@ public class ValidationBehaviorTests
         var (sp, log) = Build();
         using (sp)
         {
-            var dispatcher = sp.GetRequiredService<IDispatcher>();
+            var dispatcher = sp.CreateScope().ServiceProvider.GetRequiredService<IDispatcher>();
 
             // Invalid: validation (outside the test behavior) short-circuits; logging (outermost) still reports.
             await dispatcher.Send(new CreateThing(""), TestContext.Current.CancellationToken);

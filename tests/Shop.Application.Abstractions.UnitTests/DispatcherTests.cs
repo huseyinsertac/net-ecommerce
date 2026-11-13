@@ -34,14 +34,14 @@ public class DispatcherTests
         services.AddLogging();
         services.AddDispatcher();
         services.AddApplicationHandlers(typeof(DispatcherTests).Assembly);
-        return services.BuildServiceProvider();
+        return services.BuildServiceProvider(validateScopes: true);
     }
 
     [Fact]
     public async Task Send_RoutesCommandToItsHandler()
     {
         using var sp = Build();
-        var result = await sp.GetRequiredService<IDispatcher>().Send(new PingCommand(), TestContext.Current.CancellationToken);
+        var result = await sp.CreateScope().ServiceProvider.GetRequiredService<IDispatcher>().Send(new PingCommand(), TestContext.Current.CancellationToken);
         result.IsSuccess.ShouldBeTrue();
         result.Value.ShouldBe(42);
     }
@@ -50,7 +50,7 @@ public class DispatcherTests
     public async Task Query_RoutesQueryToItsHandler()
     {
         using var sp = Build();
-        var result = await sp.GetRequiredService<IDispatcher>().Query(new PingQuery(), TestContext.Current.CancellationToken);
+        var result = await sp.CreateScope().ServiceProvider.GetRequiredService<IDispatcher>().Query(new PingQuery(), TestContext.Current.CancellationToken);
         result.Value.ShouldBe("pong");
     }
 
@@ -59,7 +59,7 @@ public class DispatcherTests
     {
         using var sp = Build();
         var ex = await Should.ThrowAsync<InvalidOperationException>(
-            () => sp.GetRequiredService<IDispatcher>().Send(new UnhandledCommand(), TestContext.Current.CancellationToken));
+            () => sp.CreateScope().ServiceProvider.GetRequiredService<IDispatcher>().Send(new UnhandledCommand(), TestContext.Current.CancellationToken));
         ex.Message.ShouldContain(nameof(UnhandledCommand));
     }
 
@@ -67,7 +67,7 @@ public class DispatcherTests
     public async Task AddApplicationHandlers_RegistersInternalHandlers()
     {
         using var sp = Build();
-        var result = await sp.GetRequiredService<IDispatcher>().Send(new InternalCommand(), TestContext.Current.CancellationToken);
+        var result = await sp.CreateScope().ServiceProvider.GetRequiredService<IDispatcher>().Send(new InternalCommand(), TestContext.Current.CancellationToken);
         result.Value.ShouldBe("internal");
     }
 }

@@ -16,8 +16,14 @@ internal sealed class ValidationBehavior<TRequest, TResult>(IEnumerable<IValidat
         }
 
         var context = new ValidationContext<TRequest>(request);
-        var results = await Task.WhenAll(validatorList.Select(v => v.ValidateAsync(context, ct)));
-        var failures = results.SelectMany(r => r.Errors).ToList();
+        // Sequential on purpose: the context is not thread-safe and scoped validators may share a DbContext.
+        var failures = new List<FluentValidation.Results.ValidationFailure>();
+        foreach (var validator in validatorList)
+        {
+            var validationResult = await validator.ValidateAsync(context, ct);
+            failures.AddRange(validationResult.Errors);
+        }
+
         if (failures.Count == 0)
         {
             return await next();
