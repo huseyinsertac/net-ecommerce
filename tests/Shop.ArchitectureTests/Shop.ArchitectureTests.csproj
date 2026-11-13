@@ -5,10 +5,38 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Using Include="Xunit" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="xunit.v3" />
     <PackageReference Include="xunit.runner.visualstudio" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" />
     <PackageReference Include="Shouldly" />
+    <PackageReference Include="NetArchTest.Rules" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../../src/Modules/Catalog/Catalog.Domain/Catalog.Domain.csproj" />
+    <ProjectReference Include="../../src/Modules/Catalog/Catalog.Application/Catalog.Application.csproj" />
+    <ProjectReference Include="../../src/Modules/Catalog/Catalog.Infrastructure/Catalog.Infrastructure.csproj" />
+    <ProjectReference Include="../../src/Modules/Catalog/Catalog.Contracts/Catalog.Contracts.csproj" />
+    <ProjectReference Include="../../src/Modules/Basket/Basket.Domain/Basket.Domain.csproj" />
+    <ProjectReference Include="../../src/Modules/Basket/Basket.Application/Basket.Application.csproj" />
+    <ProjectReference Include="../../src/Modules/Basket/Basket.Infrastructure/Basket.Infrastructure.csproj" />
+    <ProjectReference Include="../../src/Modules/Basket/Basket.Contracts/Basket.Contracts.csproj" />
+    <ProjectReference Include="../../src/Modules/Ordering/Ordering.Domain/Ordering.Domain.csproj" />
+    <ProjectReference Include="../../src/Modules/Ordering/Ordering.Application/Ordering.Application.csproj" />
+    <ProjectReference Include="../../src/Modules/Ordering/Ordering.Infrastructure/Ordering.Infrastructure.csproj" />
+    <ProjectReference Include="../../src/Modules/Ordering/Ordering.Contracts/Ordering.Contracts.csproj" />
+    <ProjectReference Include="../../src/Modules/Payments/Payments.Domain/Payments.Domain.csproj" />
+    <ProjectReference Include="../../src/Modules/Payments/Payments.Application/Payments.Application.csproj" />
+    <ProjectReference Include="../../src/Modules/Payments/Payments.Infrastructure/Payments.Infrastructure.csproj" />
+    <ProjectReference Include="../../src/Modules/Payments/Payments.Contracts/Payments.Contracts.csproj" />
+    <ProjectReference Include="../../src/Modules/Identity/Identity.Domain/Identity.Domain.csproj" />
+    <ProjectReference Include="../../src/Modules/Identity/Identity.Application/Identity.Application.csproj" />
+    <ProjectReference Include="../../src/Modules/Identity/Identity.Infrastructure/Identity.Infrastructure.csproj" />
+    <ProjectReference Include="../../src/Modules/Identity/Identity.Contracts/Identity.Contracts.csproj" />
   </ItemGroup>
 
 </Project>
