@@ -41,7 +41,8 @@ public class LayerRulesTests
     public void Contracts_DependOnlyOnSharedKernel(string name)
     {
         var m = Modules.Get(name);
-        AssertNoDependency(m.Contracts, $"{name}.Domain", $"{name}.Application", $"{name}.Infrastructure", EfCore, AspNetCore);
+        AssertNoDependency(m.Contracts, $"{name}.Domain", $"{name}.Application", $"{name}.Infrastructure",
+            "Shop.Application.Abstractions", "Shop.Infrastructure.Common", EfCore, AspNetCore);
     }
 
     [Theory]

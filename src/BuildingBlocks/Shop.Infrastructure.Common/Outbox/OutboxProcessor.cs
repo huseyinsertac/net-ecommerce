@@ -25,6 +25,9 @@ public sealed class OutboxProcessor<TContext>(
     ILogger<OutboxProcessor<TContext>> logger) : BackgroundService
     where TContext : ModuleDbContext
 {
+    private static readonly TimeSpan InitialFailureDelay = TimeSpan.FromMilliseconds(250);
+    private static readonly TimeSpan MaxFailureDelay = TimeSpan.FromSeconds(30);
+
     private readonly OutboxOptions _options = options.Value;
 
     /// <summary>Processes one batch. Returns the number of messages attempted (0 when nothing is pending).</summary>
@@ -103,6 +106,7 @@ public sealed class OutboxProcessor<TContext>(
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         using var timer = new PeriodicTimer(_options.PollingInterval, clock);
+        var failureDelay = InitialFailureDelay;
         do
         {
             try
@@ -111,6 +115,8 @@ public sealed class OutboxProcessor<TContext>(
                 while (await ProcessBatchAsync(stoppingToken) == _options.BatchSize && !stoppingToken.IsCancellationRequested)
                 {
                 }
+
+                failureDelay = InitialFailureDelay;
             }
             catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
             {
@@ -118,10 +124,30 @@ public sealed class OutboxProcessor<TContext>(
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Outbox processing for {Context} failed", typeof(TContext).Name);
+                // The poll itself failed (e.g. database unreachable): back off exponentially instead of hammering it.
+                logger.LogError(ex, "Outbox processing for {Context} failed; backing off {Delay}", typeof(TContext).Name, failureDelay);
+                if (!await DelayAsync(failureDelay, stoppingToken))
+                {
+                    return;
+                }
+
+                failureDelay = TimeSpan.FromTicks(Math.Min(failureDelay.Ticks * 2, MaxFailureDelay.Ticks));
             }
         }
         while (await WaitAsync(timer, stoppingToken));
+    }
+
+    private async Task<bool> DelayAsync(TimeSpan delay, CancellationToken ct)
+    {
+        try
+        {
+            await Task.Delay(delay, clock, ct);
+            return true;
+        }
+        catch (OperationCanceledException)
+        {
+            return false;
+        }
     }
 
     private static async Task<bool> WaitAsync(PeriodicTimer timer, CancellationToken ct)
