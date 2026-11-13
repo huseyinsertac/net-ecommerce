@@ -119,7 +119,17 @@ In GitHub, under **Settings > Secrets and variables > Actions**, add:
 | Secret | `DEPLOY_HOST` | `<SERVER_IP>` |
 | Secret | `DEPLOY_USER` | `deploy` |
 | Secret | `DEPLOY_SSH_KEY` | full contents of the private key file `voltlane_deploy` |
+| Secret | `DEPLOY_HOST_FINGERPRINT` | server host key fingerprint, `SHA256:...` (command below the table) |
 | Variable | `SITE_URL` | `https://<YOUR_DOMAIN>` (no trailing slash) |
+
+Pin the server's SSH host key so the workflow cannot be tricked into deploying to an impostor.
+On the server, print its fingerprint and copy the whole `SHA256:...` value:
+
+```bash
+ssh-keygen -l -E sha256 -f /etc/ssh/ssh_host_ed25519_key.pub
+```
+
+Add it as secret `DEPLOY_HOST_FINGERPRINT` (listed in the table above).
 
 Then delete the local private key file once it is stored in GitHub.
 

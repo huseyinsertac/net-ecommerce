@@ -1,7 +1,7 @@
 # VoltLane
 
 A production-style e-commerce backend and storefront: a .NET 10 modular monolith with an Angular
-front end, deployed to a real server by CI on every merge.
+front end, with a CI/CD pipeline that deploys to a single server.
 
 [![CI](https://github.com/OWNER/REPO/actions/workflows/ci.yml/badge.svg)](https://github.com/OWNER/REPO/actions/workflows/ci.yml)
 
@@ -36,12 +36,17 @@ flowchart TB
     Ordering --> S3[("schema: ordering")]
     Payments --> S4[("schema: payments")]
     Identity --> S5[("schema: identity")]
-    Basket -.->|"Contracts / integration events"| Catalog
-    Ordering -.->|"Contracts / integration events"| Basket
-    Ordering -.->|"Contracts / integration events"| Payments
-    Payments -.->|"Contracts / integration events"| Ordering
-    Identity -.->|"Contracts / integration events"| Basket
+    Basket -.->|"Contracts query: prices"| Catalog
+    Ordering -.->|"OrderPlaced"| Catalog
+    Catalog -.->|"StockReserved / StockReservationFailed"| Payments
+    Catalog -.->|"StockReservationFailed"| Ordering
+    Payments -.->|"PaymentSucceeded / Failed / Expired"| Ordering
+    Payments -.->|"PaymentSucceeded / Failed / Expired"| Catalog
 ```
+
+Dashed arrows are Contracts-only communication (integration events via outbox/inbox, plus one
+Contracts query). The modules' business logic lands in Plans 2-4; the foundation and messaging
+infrastructure exist now.
 
 Decisions are recorded as ADRs:
 
@@ -78,13 +83,13 @@ cd web/shop-web && npm ci && npx ng test --no-watch
 
 ## CI/CD
 
-Pull requests and pushes to `main` run backend and frontend CI. After CI succeeds on `main`, the
-Deploy workflow builds and pushes images to GHCR, updates the server over SSH, and fails unless
+Pull requests and pushes to `main` run backend and frontend CI. Every merge to `main` is tested,
+built and deployed automatically: after CI succeeds, the Deploy workflow builds and pushes images to GHCR, updates the server over SSH, and fails unless
 `/health/ready` reports `Healthy`. Server setup: [deploy/SERVER_SETUP.md](deploy/SERVER_SETUP.md).
 
 ## Roadmap
 
-- [x] **Plan 1:** Foundation and walking skeleton (modules, CI/CD, first deploy)
+- [ ] **Plan 1:** Foundation and walking skeleton (modules, CI/CD, first deploy) - in progress
 - [ ] **Plan 2:** Catalog and storefront
 - [ ] **Plan 3:** Identity and Basket
 - [ ] **Plan 4:** Ordering and Payments (Stripe test mode)
