@@ -6,7 +6,7 @@ namespace Shop.Infrastructure.Common.IntegrationTests;
 /// <summary>One Postgres container shared by every test in the collection; each test gets its own database.</summary>
 public sealed class PostgresFixture : IAsyncLifetime
 {
-    private readonly PostgreSqlContainer _container = new PostgreSqlBuilder("postgres:17-alpine").Build();
+    private readonly PostgreSqlContainer _container = new PostgreSqlBuilder("postgres:18-alpine").Build();
 
     public async ValueTask InitializeAsync() => await _container.StartAsync();
 
