@@ -32,8 +32,9 @@ public static class ModuleDbContextRegistration
     public const string ConnectionStringName = "Shop";
 
     /// <summary>
-    /// Registers the module DbContext on PostgreSQL (snake_case, per-schema migrations history), the scoped
-    /// <see cref="IEventPublisher"/> that writes to its outbox, and the hosted <see cref="OutboxProcessor{TContext}"/>.
+    /// Registers the module DbContext on PostgreSQL (snake_case, per-schema migrations history) and the hosted
+    /// <see cref="OutboxProcessor{TContext}"/>. Published integration events reach this module's outbox through the
+    /// scoped <see cref="PendingIntegrationEvents"/> registered by <see cref="AddEventing"/>.
     /// </summary>
     public static IServiceCollection AddModuleDbContext<TContext>(this IServiceCollection services, IConfiguration configuration)
         where TContext : ModuleDbContext
@@ -45,9 +46,6 @@ public static class ModuleDbContextRegistration
         services.AddDbContext<TContext>(o => o
             .UseNpgsql(connectionString)
             .UseSnakeCaseNamingConvention());
-
-        services.AddScoped<OutboxEventPublisher<TContext>>();
-        services.AddScoped<IEventPublisher>(sp => sp.GetRequiredService<OutboxEventPublisher<TContext>>());
 
         services.AddOptions<OutboxOptions>();
         services.TryAddSingleton(TimeProvider.System);
@@ -101,7 +99,10 @@ public static class ModuleDbContextRegistration
         return services;
     }
 
-    /// <summary>Registers the in-process bus, the integration event type registry and the domain-event dispatcher.</summary>
+    /// <summary>
+    /// Registers the in-process bus, the integration event type registry, the domain-event dispatcher and the single scoped
+    /// <see cref="IEventPublisher"/> (<see cref="PendingIntegrationEvents"/>).
+    /// </summary>
     public static IServiceCollection AddEventing(this IServiceCollection services, params Assembly[] contractsAssemblies)
     {
         var registry = GetOrAddSingleton<IntegrationEventTypeRegistry>(services);
@@ -112,6 +113,8 @@ public static class ModuleDbContextRegistration
 
         services.TryAddSingleton<IEventBus, InProcessEventBus>();
         services.TryAddScoped<IDomainEventDispatcher, DomainEventDispatcher>();
+        services.TryAddScoped<PendingIntegrationEvents>();
+        services.TryAddScoped<IEventPublisher>(sp => sp.GetRequiredService<PendingIntegrationEvents>());
         services.TryAddSingleton(TimeProvider.System);
         return services;
     }

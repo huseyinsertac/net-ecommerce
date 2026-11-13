@@ -1,3 +1,4 @@
+using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using Shop.Infrastructure.Common.Events;
 using Shop.Infrastructure.Common.Inbox;
@@ -9,9 +10,13 @@ namespace Shop.Infrastructure.Common.Persistence;
 /// <summary>
 /// Base DbContext for a module: owns the module's schema plus its outbox and inbox tables, and dispatches domain events
 /// raised by tracked aggregates inside SaveChanges, before anything is written, so handler side effects (including
-/// outbox rows) commit or roll back together with the aggregate.
+/// outbox rows) commit or roll back together with the aggregate. Integration events published in the scope (by application
+/// code or by domain-event handlers) are then drained into THIS context's outbox in the same save.
 /// </summary>
-public abstract class ModuleDbContext(DbContextOptions options, IDomainEventDispatcher dispatcher) : DbContext(options)
+public abstract class ModuleDbContext(
+    DbContextOptions options,
+    IDomainEventDispatcher dispatcher,
+    PendingIntegrationEvents pendingEvents) : DbContext(options)
 {
     /// <summary>Guards against handlers that keep raising events forever.</summary>
     private const int MaxDispatchRounds = 10;
@@ -61,12 +66,28 @@ public abstract class ModuleDbContext(DbContextOptions options, IDomainEventDisp
     public override async Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess, CancellationToken cancellationToken = default)
     {
         await DispatchDomainEventsAsync(cancellationToken);
+        DrainPublishedIntegrationEvents();
         return await base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken);
     }
 
     /// <summary>Synchronous saves would skip domain-event dispatch, so they are not allowed.</summary>
     public override int SaveChanges(bool acceptAllChangesOnSuccess) =>
         throw new NotSupportedException($"Use {nameof(SaveChangesAsync)}; domain events are dispatched asynchronously.");
+
+    private void DrainPublishedIntegrationEvents()
+    {
+        foreach (var e in pendingEvents.Drain(GetType()))
+        {
+            var type = e.GetType();
+            OutboxMessages.Add(new OutboxMessage
+            {
+                Id = e.Id,
+                Type = type.FullName!,
+                Content = JsonSerializer.Serialize(e, type, EventSerializer.Options),
+                OccurredOnUtc = e.OccurredOnUtc,
+            });
+        }
+    }
 
     private async Task DispatchDomainEventsAsync(CancellationToken ct)
     {

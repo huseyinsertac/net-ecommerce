@@ -1,5 +1,7 @@
 using System.Collections.Concurrent;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Shop.Application.Abstractions.Events;
@@ -10,8 +12,9 @@ using Shop.SharedKernel;
 
 namespace Shop.Infrastructure.Common.IntegrationTests;
 
-public sealed class TestModuleDbContext(DbContextOptions<TestModuleDbContext> options, IDomainEventDispatcher dispatcher)
-    : ModuleDbContext(options, dispatcher)
+public sealed class TestModuleDbContext(
+    DbContextOptions<TestModuleDbContext> options, IDomainEventDispatcher dispatcher, PendingIntegrationEvents pending)
+    : ModuleDbContext(options, dispatcher, pending)
 {
     public override string Schema => "test";
 
@@ -27,6 +30,20 @@ public sealed class TestModuleDbContext(DbContextOptions<TestModuleDbContext> op
             b.Property(a => a.Name).HasMaxLength(100);
         });
     }
+}
+
+/// <summary>A second "module" with its own schema, for cross-module routing tests.</summary>
+public sealed class TestModule2DbContext(
+    DbContextOptions<TestModule2DbContext> options, IDomainEventDispatcher dispatcher, PendingIntegrationEvents pending)
+    : ModuleDbContext(options, dispatcher, pending)
+{
+    public override string Schema => "test2";
+}
+
+/// <summary>Scoped marker: a distinct Id per DI scope.</summary>
+public sealed class ScopeMarker
+{
+    public Guid Id { get; } = Guid.NewGuid();
 }
 
 public sealed class TestAggregate : AggregateRoot<Guid>
@@ -54,6 +71,7 @@ public sealed class HandlerProbe
     private int _maxInFlight;
 
     public ConcurrentQueue<(string Handler, Guid EventId)> Calls { get; } = new();
+    public ConcurrentDictionary<string, Guid> ScopeIds { get; } = new();
     public bool ThrowInDomainHandler { get; set; }
     public bool AlwaysThrow { get; set; }
     public int FailuresRemainingForB;
@@ -126,11 +144,33 @@ public sealed class HandlerB(HandlerProbe probe) : IIntegrationEventHandler<Test
     }
 }
 
+public sealed class Module1ScopeHandler(ScopeMarker marker, HandlerProbe probe) : IIntegrationEventHandler<TestEvent>
+{
+    public Task Handle(TestEvent e, CancellationToken ct)
+    {
+        probe.ScopeIds[nameof(Module1ScopeHandler)] = marker.Id;
+        return Task.CompletedTask;
+    }
+}
+
+public sealed class Module2ScopeHandler(ScopeMarker marker, HandlerProbe probe) : IIntegrationEventHandler<TestEvent>
+{
+    public Task Handle(TestEvent e, CancellationToken ct)
+    {
+        probe.ScopeIds[nameof(Module2ScopeHandler)] = marker.Id;
+        return Task.CompletedTask;
+    }
+}
+
 /// <summary>Builds a DI container wired exactly like a module, against a fresh database.</summary>
 public static class TestHost
 {
+    public static Task<ServiceProvider> BuildAsync(
+        PostgresFixture postgres, Action<IServiceCollection> configure, CancellationToken ct) =>
+        BuildAsync(postgres, (s, _) => configure(s), ct);
+
     public static async Task<ServiceProvider> BuildAsync(
-        PostgresFixture postgres, Action<IServiceCollection> configure, CancellationToken ct)
+        PostgresFixture postgres, Action<IServiceCollection, IConfiguration> configure, CancellationToken ct)
     {
         var connectionString = await postgres.CreateDatabaseAsync(ct);
         var configuration = new ConfigurationBuilder()
@@ -142,11 +182,17 @@ public static class TestHost
         services.AddSingleton<HandlerProbe>();
         services.AddEventing(typeof(TestEvent).Assembly);
         services.AddModuleDbContext<TestModuleDbContext>(configuration);
-        configure(services);
+        configure(services, configuration);
 
         var provider = services.BuildServiceProvider(new ServiceProviderOptions { ValidateScopes = true, ValidateOnBuild = true });
+        // The database already exists (fixture); create each registered module's schema and tables.
         await using var scope = provider.CreateAsyncScope();
-        await scope.ServiceProvider.GetRequiredService<TestModuleDbContext>().Database.EnsureCreatedAsync(ct);
+        foreach (var contextType in provider.GetRequiredService<ModuleDatabaseRegistry>().ContextTypes)
+        {
+            var context = (DbContext)scope.ServiceProvider.GetRequiredService(contextType);
+            await context.GetService<IRelationalDatabaseCreator>().CreateTablesAsync(ct);
+        }
+
         return provider;
     }
 

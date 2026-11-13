@@ -77,6 +77,8 @@ public sealed class InboxHandlerTests(PostgresFixture postgres)
                 typeof(Inbox.InboxHandler<TestEvent, RecordingHandler, TestModuleDbContext>),
                 typeof(Inbox.InboxHandler<TestEvent, HandlerA, TestModuleDbContext>),
                 typeof(Inbox.InboxHandler<TestEvent, HandlerB, TestModuleDbContext>),
+                typeof(Inbox.InboxHandler<TestEvent, Module1ScopeHandler, TestModuleDbContext>),
+                typeof(Inbox.InboxHandler<TestEvent, Module2ScopeHandler, TestModuleDbContext>),
             ],
             ignoreOrder: true);
     }

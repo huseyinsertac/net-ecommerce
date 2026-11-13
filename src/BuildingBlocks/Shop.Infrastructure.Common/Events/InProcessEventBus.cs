@@ -13,8 +13,9 @@ public interface IEventBus
 }
 
 /// <summary>
-/// Creates a fresh DI scope per event and runs EVERY <see cref="IIntegrationEventHandler{TEvent}"/> registered for the
-/// event's runtime type (in practice these are inbox-wrapped handlers). All handlers run even if one fails; failures are
+/// Runs EVERY <see cref="IIntegrationEventHandler{TEvent}"/> registered for the
+/// event's runtime type (in practice these are inbox-wrapped handlers), each in its OWN DI scope so handlers of different
+/// modules never share a DbContext or a <see cref="Outbox.PendingIntegrationEvents"/> collector. All handlers run even if one fails; failures are
 /// rethrown together as an <see cref="AggregateException"/> so the outbox retries the message. Handlers that already
 /// succeeded are protected from re-running by their inbox rows.
 /// </summary>
@@ -32,12 +33,20 @@ internal sealed class InProcessEventBus(IServiceScopeFactory scopeFactory) : IEv
         var invoke = Invokers.GetOrAdd(eventType, static t =>
             InvokeMethod.MakeGenericMethod(t).CreateDelegate<Func<object, IIntegrationEvent, CancellationToken, Task>>());
 
-        await using var scope = scopeFactory.CreateAsyncScope();
+        // Count the registrations once, then resolve handler #i in a fresh scope.
+        int handlerCount;
+        await using (var probeScope = scopeFactory.CreateAsyncScope())
+        {
+            handlerCount = probeScope.ServiceProvider.GetServices(handlerType).Count();
+        }
+
         List<Exception>? failures = null;
-        foreach (var handler in scope.ServiceProvider.GetServices(handlerType))
+        for (var i = 0; i < handlerCount; i++)
         {
             try
             {
+                await using var scope = scopeFactory.CreateAsyncScope();
+                var handler = scope.ServiceProvider.GetServices(handlerType).ElementAt(i);
                 await invoke(handler!, e, ct);
             }
             catch (OperationCanceledException) when (ct.IsCancellationRequested)
