@@ -1,3 +1,4 @@
+using Catalog.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
@@ -5,7 +6,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Shop.Application.Abstractions;
 using Shop.Infrastructure.Common.Modules;
 using Shop.Infrastructure.Common.Persistence;
-using Catalog.Infrastructure.Persistence;
 
 namespace Catalog.Infrastructure;
 

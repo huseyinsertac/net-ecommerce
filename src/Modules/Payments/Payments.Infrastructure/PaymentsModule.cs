@@ -2,10 +2,10 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Payments.Infrastructure.Persistence;
 using Shop.Application.Abstractions;
 using Shop.Infrastructure.Common.Modules;
 using Shop.Infrastructure.Common.Persistence;
-using Payments.Infrastructure.Persistence;
 
 namespace Payments.Infrastructure;
 

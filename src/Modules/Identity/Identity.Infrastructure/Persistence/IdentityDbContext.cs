@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Shop.Infrastructure.Common.Events;
-using Shop.Infrastructure.Common.Persistence;
 using Shop.Infrastructure.Common.Outbox;
+using Shop.Infrastructure.Common.Persistence;
 
 namespace Identity.Infrastructure.Persistence;
 

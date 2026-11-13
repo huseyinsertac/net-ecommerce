@@ -1,8 +1,8 @@
 using System.Reflection;
 using NetArchTest.Rules;
-using Shouldly;
 using Shop.Application.Abstractions.Events;
 using Shop.Application.Abstractions.Messaging;
+using Shouldly;
 
 namespace Shop.ArchitectureTests;
 
