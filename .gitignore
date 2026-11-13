@@ -1,0 +1,16 @@
+# .NET
+bin/
+obj/
+*.user
+.vs/
+.idea/
+TestResults/
+# Node / Angular
+node_modules/
+dist/
+.angular/
+# Env / secrets
+deploy/.env
+*.env.local
+# Tooling scratch
+.superpowers/
