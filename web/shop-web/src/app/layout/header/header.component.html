@@ -1,0 +1,31 @@
+<mat-toolbar class="header">
+  <button mat-icon-button class="menu-button" aria-label="Open menu" [matMenuTriggerFor]="menu">
+    <mat-icon fontSet="material-symbols-outlined">menu</mat-icon>
+  </button>
+  <mat-menu #menu="matMenu">
+    <a mat-menu-item routerLink="/">Shop</a>
+  </mat-menu>
+
+  <a class="wordmark" routerLink="/">
+    <mat-icon fontSet="material-symbols-outlined" class="bolt">bolt</mat-icon>{{ brand.name }}
+  </a>
+
+  <mat-form-field class="search" appearance="outline" subscriptSizing="dynamic">
+    <mat-icon matPrefix fontSet="material-symbols-outlined">search</mat-icon>
+    <input matInput disabled placeholder="Search products (coming soon)" aria-label="Search" />
+  </mat-form-field>
+
+  <span class="spacer"></span>
+
+  <a mat-button class="nav-link" routerLink="/">Shop</a>
+
+  <button mat-icon-button aria-label="Cart">
+    <mat-icon
+      fontSet="material-symbols-outlined"
+      [matBadge]="cartCount"
+      matBadgeSize="small"
+      [matBadgeHidden]="false"
+      >shopping_cart</mat-icon
+    >
+  </button>
+</mat-toolbar>

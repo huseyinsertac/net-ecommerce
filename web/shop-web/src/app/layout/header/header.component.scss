@@ -1,0 +1,47 @@
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  gap: 8px;
+  background: var(--mat-sys-surface);
+  border-bottom: 1px solid var(--mat-sys-outline-variant);
+}
+
+.wordmark {
+  display: inline-flex;
+  align-items: center;
+  color: var(--mat-sys-primary);
+  font: var(--mat-sys-title-large);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  text-decoration: none;
+}
+
+.bolt {
+  margin-right: 2px;
+}
+
+.search {
+  width: 360px;
+  margin-left: 24px;
+  --mat-form-field-container-height: 40px;
+  --mat-form-field-container-vertical-padding: 8px;
+}
+
+.spacer {
+  flex: 1;
+}
+
+.menu-button {
+  display: none;
+}
+
+@media (max-width: 599px) {
+  .menu-button {
+    display: inline-flex;
+  }
+  .search,
+  .nav-link {
+    display: none;
+  }
+}

@@ -1,0 +1,61 @@
+x-logging: &logging
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "3"
+
+services:
+  postgres:
+    logging: *logging
+    image: postgres:18-alpine
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: voltlane
+    volumes:
+      - pgdata:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d voltlane"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+  api:
+    logging: *logging
+    image: ghcr.io/${GHCR_OWNER}/voltlane-api:${IMAGE_TAG:-latest}
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ConnectionStrings__Shop: Host=postgres;Port=5432;Database=voltlane;Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+
+  web:
+    logging: *logging
+    image: ghcr.io/${GHCR_OWNER}/voltlane-web:${IMAGE_TAG:-latest}
+    restart: unless-stopped
+
+  caddy:
+    logging: *logging
+    image: caddy:2-alpine
+    environment:
+      SITE_ADDRESS: ${SITE_ADDRESS}
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - api
+      - web
+    restart: unless-stopped
+
+volumes:
+  pgdata:
+  caddy_data:
+  caddy_config:

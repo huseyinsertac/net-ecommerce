@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <PackageReference Include="FluentValidation" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="Shop.Application.Abstractions.UnitTests" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../Shop.SharedKernel/Shop.SharedKernel.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,12 @@
+<footer class="footer">
+  <span>© {{ year }} {{ brand.name }} · portfolio project</span>
+  <span class="api" [class.offline]="system.offline()">
+    @if (system.info(); as info) {
+      API {{ info.version }}
+    } @else if (system.offline()) {
+      API offline
+    } @else {
+      API …
+    }
+  </span>
+</footer>

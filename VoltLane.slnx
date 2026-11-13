@@ -1,0 +1,49 @@
+<Solution>
+  <Folder Name="/src/" />
+  <Folder Name="/src/Bootstrapper/">
+    <Project Path="src/Bootstrapper/Shop.Api/Shop.Api.csproj" />
+  </Folder>
+  <Folder Name="/src/BuildingBlocks/">
+    <Project Path="src/BuildingBlocks/Shop.Application.Abstractions/Shop.Application.Abstractions.csproj" />
+    <Project Path="src/BuildingBlocks/Shop.Infrastructure.Common/Shop.Infrastructure.Common.csproj" />
+    <Project Path="src/BuildingBlocks/Shop.SharedKernel/Shop.SharedKernel.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/" />
+  <Folder Name="/src/Modules/Basket/">
+    <Project Path="src/Modules/Basket/Basket.Application/Basket.Application.csproj" />
+    <Project Path="src/Modules/Basket/Basket.Contracts/Basket.Contracts.csproj" />
+    <Project Path="src/Modules/Basket/Basket.Domain/Basket.Domain.csproj" />
+    <Project Path="src/Modules/Basket/Basket.Infrastructure/Basket.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/Catalog/">
+    <Project Path="src/Modules/Catalog/Catalog.Application/Catalog.Application.csproj" />
+    <Project Path="src/Modules/Catalog/Catalog.Contracts/Catalog.Contracts.csproj" />
+    <Project Path="src/Modules/Catalog/Catalog.Domain/Catalog.Domain.csproj" />
+    <Project Path="src/Modules/Catalog/Catalog.Infrastructure/Catalog.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/Identity/">
+    <Project Path="src/Modules/Identity/Identity.Application/Identity.Application.csproj" />
+    <Project Path="src/Modules/Identity/Identity.Contracts/Identity.Contracts.csproj" />
+    <Project Path="src/Modules/Identity/Identity.Domain/Identity.Domain.csproj" />
+    <Project Path="src/Modules/Identity/Identity.Infrastructure/Identity.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/Ordering/">
+    <Project Path="src/Modules/Ordering/Ordering.Application/Ordering.Application.csproj" />
+    <Project Path="src/Modules/Ordering/Ordering.Contracts/Ordering.Contracts.csproj" />
+    <Project Path="src/Modules/Ordering/Ordering.Domain/Ordering.Domain.csproj" />
+    <Project Path="src/Modules/Ordering/Ordering.Infrastructure/Ordering.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/Payments/">
+    <Project Path="src/Modules/Payments/Payments.Application/Payments.Application.csproj" />
+    <Project Path="src/Modules/Payments/Payments.Contracts/Payments.Contracts.csproj" />
+    <Project Path="src/Modules/Payments/Payments.Domain/Payments.Domain.csproj" />
+    <Project Path="src/Modules/Payments/Payments.Infrastructure/Payments.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Shop.Application.Abstractions.UnitTests/Shop.Application.Abstractions.UnitTests.csproj" />
+    <Project Path="tests/Shop.ArchitectureTests/Shop.ArchitectureTests.csproj" />
+    <Project Path="tests/Shop.Infrastructure.Common.IntegrationTests/Shop.Infrastructure.Common.IntegrationTests.csproj" />
+    <Project Path="tests/Shop.IntegrationTests/Shop.IntegrationTests.csproj" />
+    <Project Path="tests/Shop.SharedKernel.UnitTests/Shop.SharedKernel.UnitTests.csproj" />
+  </Folder>
+</Solution>
