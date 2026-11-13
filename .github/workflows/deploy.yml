@@ -1,0 +1,108 @@
+name: Deploy
+
+on:
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  packages: write
+  contents: read
+
+# Never run two deploys at once; queue the newer one.
+concurrency:
+  group: deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    env:
+      # For workflow_run, deploy the commit CI validated; otherwise the dispatched commit.
+      SHA: ${{ github.event.workflow_run.head_sha || github.sha }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ env.SHA }}
+
+      - name: Compute lowercase GHCR owner
+        id: owner
+        run: echo "owner=${GITHUB_REPOSITORY_OWNER,,}" >> "$GITHUB_OUTPUT"
+
+      - uses: docker/setup-buildx-action@v3
+
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push API image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: src/Bootstrapper/Shop.Api/Dockerfile
+          push: true
+          build-args: |
+            APP_VERSION=${{ env.SHA }}
+          tags: |
+            ghcr.io/${{ steps.owner.outputs.owner }}/voltlane-api:${{ env.SHA }}
+            ghcr.io/${{ steps.owner.outputs.owner }}/voltlane-api:latest
+          cache-from: type=gha,scope=api
+          cache-to: type=gha,scope=api,mode=max
+
+      - name: Build and push web image
+        uses: docker/build-push-action@v6
+        with:
+          context: web/shop-web
+          file: web/shop-web/Dockerfile
+          push: true
+          tags: |
+            ghcr.io/${{ steps.owner.outputs.owner }}/voltlane-web:${{ env.SHA }}
+            ghcr.io/${{ steps.owner.outputs.owner }}/voltlane-web:latest
+          cache-from: type=gha,scope=web
+          cache-to: type=gha,scope=web,mode=max
+
+      - name: Copy compose files to server
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: ${{ secrets.DEPLOY_USER }}
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          source: deploy/docker-compose.prod.yml,deploy/Caddyfile
+          target: /opt/voltlane
+          strip_components: 1
+
+      - name: Pull and restart on server
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: ${{ secrets.DEPLOY_USER }}
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          script: |
+            set -e
+            cd /opt/voltlane
+            export GHCR_OWNER=${{ steps.owner.outputs.owner }}
+            export IMAGE_TAG=${{ env.SHA }}
+            docker compose -f docker-compose.prod.yml pull
+            docker compose -f docker-compose.prod.yml up -d
+            docker image prune -f
+
+      - name: Wait for /health/ready
+        env:
+          SITE_URL: ${{ vars.SITE_URL }}
+        run: |
+          for i in $(seq 1 12); do
+            body=$(curl -fsS --max-time 10 "${SITE_URL%/}/health/ready" || true)
+            if [ "$body" = "Healthy" ]; then
+              echo "Healthy after attempt $i"
+              exit 0
+            fi
+            echo "Attempt $i: got '${body}', retrying in 5s"
+            sleep 5
+          done
+          echo "Site did not report Healthy within 60s" >&2
+          exit 1
