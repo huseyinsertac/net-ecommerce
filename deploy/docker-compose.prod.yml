@@ -1,5 +1,12 @@
+x-logging: &logging
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "3"
+
 services:
   postgres:
+    logging: *logging
     image: postgres:18-alpine
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
@@ -15,6 +22,7 @@ services:
     restart: unless-stopped
 
   api:
+    logging: *logging
     image: ghcr.io/${GHCR_OWNER}/voltlane-api:${IMAGE_TAG:-latest}
     environment:
       ASPNETCORE_ENVIRONMENT: Production
@@ -25,10 +33,12 @@ services:
     restart: unless-stopped
 
   web:
+    logging: *logging
     image: ghcr.io/${GHCR_OWNER}/voltlane-web:${IMAGE_TAG:-latest}
     restart: unless-stopped
 
   caddy:
+    logging: *logging
     image: caddy:2-alpine
     environment:
       SITE_ADDRESS: ${SITE_ADDRESS}

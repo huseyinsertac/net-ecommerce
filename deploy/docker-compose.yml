@@ -1,12 +1,19 @@
+x-logging: &logging
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "3"
+
 services:
   postgres:
+    logging: *logging
     image: postgres:18-alpine
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: voltlane
     ports:
-      - "5433:5432"
+      - "127.0.0.1:5433:5432"
     volumes:
       - pgdata:/var/lib/postgresql
     healthcheck:
@@ -17,6 +24,7 @@ services:
     restart: unless-stopped
 
   api:
+    logging: *logging
     build:
       context: ..
       dockerfile: src/Bootstrapper/Shop.Api/Dockerfile
@@ -29,11 +37,13 @@ services:
     restart: unless-stopped
 
   web:
+    logging: *logging
     build:
       context: ../web/shop-web
     restart: unless-stopped
 
   caddy:
+    logging: *logging
     image: caddy:2-alpine
     environment:
       SITE_ADDRESS: ${SITE_ADDRESS:-:80}

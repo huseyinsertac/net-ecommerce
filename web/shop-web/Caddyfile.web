@@ -1,5 +1,8 @@
 :80 {
 	root * /srv
+	# index.html (served for / and every SPA route) must revalidate; hashed assets can be cached.
+	@index not path *.js *.css *.png *.jpg *.svg *.ico *.woff *.woff2 *.json *.txt
+	header @index Cache-Control "no-cache"
 	try_files {path} /index.html
 	file_server
 	encode zstd gzip
