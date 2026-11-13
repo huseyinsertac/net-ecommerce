@@ -5,7 +5,7 @@ After it is done, every merge to `main` deploys automatically: CI passes, images
 server pulls them, and a health check confirms the site is up.
 
 Assumptions: a fresh Ubuntu 24.04 server (for example Hetzner Cloud CX22) and a GitHub repository
-with this code on `main`. Replace `<SERVER_IP>`, `<YOUR_DOMAIN>` and `<owner-in-lowercase>` throughout.
+with this code on `main`. Replace `<SERVER_IP>`, `<YOUR_DOMAIN>` and `<owner-in-lowercase>` in prose and in the variables at the top of each command block.
 
 ## 1. Create the GitHub repository
 
@@ -74,19 +74,24 @@ ufw status
 
 ### 4.4 Create the production `.env`
 
-Generate a strong database password and write the file as the `deploy` user:
+Still as root, set your two values, then paste the whole block. It writes the file as root and
+hands it to `deploy`, so the deploy user can read it:
 
 ```bash
-su - deploy
+DOMAIN=your-domain.example      # bare domain, no https://
+OWNER=your-github-owner         # lowercase
+
+install -m 600 -o deploy -g deploy /dev/null /opt/voltlane/.env
 cat > /opt/voltlane/.env <<ENV
 POSTGRES_USER=voltlane
 POSTGRES_PASSWORD=$(openssl rand -base64 24 | tr -d '/+=')
-SITE_ADDRESS=<YOUR_DOMAIN>
-GHCR_OWNER=<owner-in-lowercase>
+SITE_ADDRESS=${DOMAIN}
+GHCR_OWNER=${OWNER}
 IMAGE_TAG=latest
 ENV
+chown deploy:deploy /opt/voltlane/.env
 chmod 600 /opt/voltlane/.env
-exit
+ls -l /opt/voltlane/.env       # expect: -rw------- 1 deploy deploy
 ```
 
 `SITE_ADDRESS` must be the bare domain (no `https://`); Caddy then obtains a Let's Encrypt
@@ -103,9 +108,13 @@ ssh-keygen -t ed25519 -C "voltlane-deploy" -f ./voltlane_deploy -N ""
 
 Install the public key for the `deploy` user (run on the server as root):
 
+Replace the placeholder on the first line with the single line from `voltlane_deploy.pub`, then
+paste the block:
+
 ```bash
+PUBKEY="ssh-ed25519 AAAA... voltlane-deploy"
 install -d -m 700 -o deploy -g deploy /home/deploy/.ssh
-echo "<contents of voltlane_deploy.pub>" >> /home/deploy/.ssh/authorized_keys
+echo "$PUBKEY" >> /home/deploy/.ssh/authorized_keys
 chown deploy:deploy /home/deploy/.ssh/authorized_keys
 chmod 600 /home/deploy/.ssh/authorized_keys
 ```
