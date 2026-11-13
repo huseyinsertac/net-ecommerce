@@ -68,6 +68,16 @@ docker compose up -d --build
 
 Then open http://localhost:8080.
 
+## Develop from source
+
+```bash
+docker compose -f deploy/docker-compose.yml up -d postgres   # PostgreSQL on localhost:5433
+dotnet run --project src/Bootstrapper/Shop.Api               # API on http://localhost:5080
+cd web/shop-web && npm ci && npx ng serve                    # UI on http://localhost:4200 (proxies /api)
+```
+
+(`deploy/.env` must exist first: `cp deploy/.env.example deploy/.env`.)
+
 ## Testing
 
 ```bash
@@ -81,11 +91,16 @@ cd web/shop-web && npm ci && npx ng test --no-watch
   database).
 - Frontend unit tests run through the Angular test runner.
 
+`TreatWarningsAsErrors` is on by design, including NuGet audit warnings: a newly published
+vulnerability advisory for a dependency fails CI until it is addressed.
+
 ## CI/CD
 
-Pull requests and pushes to `main` run backend and frontend CI. Every merge to `main` is tested,
-built and deployed automatically: after CI succeeds, the Deploy workflow builds and pushes images to GHCR, updates the server over SSH, and fails unless
-`/health/ready` reports `Healthy`. Server setup: [deploy/SERVER_SETUP.md](deploy/SERVER_SETUP.md).
+Pull requests and pushes to `main` run backend and frontend CI, and build both Docker images
+(without pushing) so a broken Dockerfile fails before merge. Every merge to `main` is tested,
+built and deployed automatically: after CI succeeds, the Deploy workflow builds and pushes images
+to GHCR, updates the server over SSH, and fails unless `/health/ready` reports `Healthy`.
+Server setup: [deploy/SERVER_SETUP.md](deploy/SERVER_SETUP.md).
 
 ## Roadmap
 
