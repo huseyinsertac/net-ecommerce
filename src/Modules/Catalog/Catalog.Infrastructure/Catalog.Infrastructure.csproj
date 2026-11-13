@@ -1,0 +1,8 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="../Catalog.Application/Catalog.Application.csproj" />
+    <ProjectReference Include="../../../BuildingBlocks/Shop.Infrastructure.Common/Shop.Infrastructure.Common.csproj" />
+  </ItemGroup>
+
+</Project>
