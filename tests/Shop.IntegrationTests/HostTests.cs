@@ -68,8 +68,35 @@ public sealed class HostTests(ShopApiFactory factory)
         var body = await response.Content.ReadAsStringAsync(Ct);
         using var json = JsonDocument.Parse(body);
         json.RootElement.GetProperty("title").GetString().ShouldBe("An unexpected error occurred.");
+        json.RootElement.TryGetProperty("traceId", out _).ShouldBeTrue();
         body.ShouldNotContain("secret detail");
         body.ShouldNotContain("   at ");
+    }
+
+    [Fact]
+    public async Task UnknownApiRoute_ReturnsProblemDetails404()
+    {
+        var client = factory.CreateClient();
+        var response = await client.GetAsync("/api/does-not-exist", Ct);
+
+        response.StatusCode.ShouldBe(HttpStatusCode.NotFound);
+        response.Content.Headers.ContentType!.MediaType.ShouldBe("application/problem+json");
+    }
+
+    [Fact]
+    public async Task OpenApi_BehindProxy_UsesForwardedScheme()
+    {
+        var client = factory.CreateClient();
+        using var request = new HttpRequestMessage(HttpMethod.Get, "/openapi/v1.json");
+        request.Headers.Host = "shop.example.com";
+        request.Headers.Add("X-Forwarded-Proto", "https");
+
+        var response = await client.SendAsync(request, Ct);
+        response.StatusCode.ShouldBe(HttpStatusCode.OK);
+        var doc = await response.Content.ReadFromJsonAsync<JsonElement>(Ct);
+
+        var url = doc.GetProperty("servers")[0].GetProperty("url").GetString();
+        url.ShouldNotBeNull().ShouldStartWith("https://shop.example.com");
     }
 
     [Fact]

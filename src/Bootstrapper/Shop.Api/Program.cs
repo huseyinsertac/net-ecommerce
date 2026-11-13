@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Scalar.AspNetCore;
@@ -27,6 +28,15 @@ builder.Host.UseSerilog((context, services, logger) =>
     }
 });
 
+// The API is only reachable from Caddy over the private Docker network (no published port in production),
+// so trusting every proxy is safe: the only possible sender of X-Forwarded-* is our own reverse proxy.
+builder.Services.Configure<ForwardedHeadersOptions>(options =>
+{
+    options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+    options.KnownIPNetworks.Clear();
+    options.KnownProxies.Clear();
+});
+
 builder.Services.AddProblemDetails();
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddOpenApi();
@@ -50,8 +60,10 @@ builder.Services.AddHealthChecks().AddNpgSql(connectionString, name: "postgres",
 
 var app = builder.Build();
 
+app.UseForwardedHeaders();
 app.UseSerilogRequestLogging();
 app.UseExceptionHandler();
+app.UseStatusCodePages();
 
 app.MapOpenApi();
 app.MapScalarApiReference();
@@ -66,8 +78,7 @@ foreach (var module in ModuleCatalog.All)
 }
 
 // dotnet-ef builds the host to discover DbContexts; it must not touch the database while doing so.
-var isEfTooling = string.Equals(System.Reflection.Assembly.GetEntryAssembly()?.GetName().Name, "ef", StringComparison.Ordinal);
-if (!isEfTooling && app.Configuration.GetValue("Database:MigrateOnStartup", false))
+if (!EF.IsDesignTime && app.Configuration.GetValue("Database:MigrateOnStartup", false))
 {
     await MigrateAsync(app);
 }
