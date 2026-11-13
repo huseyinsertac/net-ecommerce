@@ -1,0 +1,19 @@
+<section class="hero">
+  <h1>{{ brand.tagline }}</h1>
+  <p>Phones, laptops, audio and more, picked for people who care how their gear performs.</p>
+  <a mat-flat-button routerLink="/">Browse products</a>
+</section>
+
+<section class="featured">
+  <h2>Featured categories</h2>
+  <div class="grid">
+    @for (category of categories; track category.name) {
+      <mat-card appearance="outlined" class="category">
+        <mat-card-content>
+          <mat-icon fontSet="material-symbols-outlined">{{ category.icon }}</mat-icon>
+          <span>{{ category.name }}</span>
+        </mat-card-content>
+      </mat-card>
+    }
+  </div>
+</section>
