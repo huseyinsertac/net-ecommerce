@@ -33,6 +33,11 @@ public sealed record SearchProducts(
 
 internal sealed class SearchProductsValidator : AbstractValidator<SearchProducts>
 {
+    private const int MaxBrands = 20;
+    private const int MaxSpecs = 20;
+    private const int MaxSpecValues = 50;
+    private const int MaxValueLength = 100;
+
     public SearchProductsValidator()
     {
         RuleFor(x => x.Page).GreaterThanOrEqualTo(1);
@@ -44,8 +49,21 @@ internal sealed class SearchProductsValidator : AbstractValidator<SearchProducts
             .Must((x, max) => x.MinPrice <= max)
             .When(x => x.MinPrice.HasValue && x.MaxPrice.HasValue)
             .WithMessage("'Max Price' must be greater than or equal to 'Min Price'.");
-        RuleFor(x => x.Brands).Must(b => b is null || b.Count <= 20).WithMessage("At most 20 brands are allowed.");
-        RuleFor(x => x.Specs).Must(s => s is null || s.Count <= 20).WithMessage("At most 20 spec filters are allowed.");
+        // Bounded so a request can never get near PostgreSQL's 65535-parameter limit or carry huge strings.
+        RuleFor(x => x.Brands)
+            .Must(b => b is null || b.Count <= MaxBrands).WithMessage($"At most {MaxBrands} brands are allowed.")
+            .Must(b => b is null || b.All(v => v is null || v.Length <= MaxValueLength))
+            .WithMessage($"Brands must be at most {MaxValueLength} characters.")
+            .OverridePropertyName("brands");
+        RuleFor(x => x.Specs)
+            .Must(s => s is null || s.Count <= MaxSpecs).WithMessage($"At most {MaxSpecs} spec filters are allowed.")
+            .Must(s => s is null || s.All(f => f?.Values is null || f.Values.Count <= MaxSpecValues))
+            .WithMessage($"A spec filter may have at most {MaxSpecValues} values.")
+            .Must(s => s is null || s.All(f => f is null
+                || ((f.Key is null || f.Key.Length <= MaxValueLength)
+                    && (f.Values is null || f.Values.All(v => v is null || v.Length <= MaxValueLength)))))
+            .WithMessage($"Spec keys and values must be at most {MaxValueLength} characters.")
+            .OverridePropertyName("spec");
     }
 }
 

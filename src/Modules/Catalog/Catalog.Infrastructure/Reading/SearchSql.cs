@@ -26,10 +26,12 @@ internal static class SearchSql
             parameters.Add("categoryIds", criteria.CategoryIds.ToArray());
         }
 
+        var textJoin = string.Empty;
         if (tsQuery is not null)
         {
-            where.Append(" AND p.search_vector @@ to_tsquery('english', @tsQuery)");
-            parameters.Add("tsQuery", tsQuery);
+            textJoin = $"CROSS JOIN (SELECT {TextQuery(tsQuery, parameters)} AS q) t";
+            // A query that is empty after stop-word removal ("the") means no text filter.
+            where.Append(" AND (numnode(t.q) = 0 OR p.search_vector @@ t.q)");
         }
 
         if (criteria.Brands.Count > 0)
@@ -72,11 +74,14 @@ internal static class SearchSql
             AppendSpec(where, parameters, i, criteria.Specs[i].Def, criteria.Specs[i].Filter);
         }
 
-        var rank = tsQuery is null ? "0::real" : "ts_rank(p.search_vector, to_tsquery('english', @tsQuery))";
+        var rank = tsQuery is null
+            ? "0::real"
+            : "CASE WHEN numnode(t.q) = 0 THEN 0::real ELSE ts_rank(p.search_vector, t.q) END";
         var sort = criteria.Sort == ProductSort.Relevance && tsQuery is null ? ProductSort.Featured : criteria.Sort;
         var orderBy = sort switch
         {
-            ProductSort.Relevance => "rank DESC",
+            // Equal ranks (all 0 for a stop-word-only query) fall back to the Featured order.
+            ProductSort.Relevance => "rank DESC, p.is_featured DESC",
             ProductSort.PriceAsc => "pricefrom ASC",
             ProductSort.PriceDesc => "pricefrom DESC",
             ProductSort.Newest => "p.created_at_utc DESC",
@@ -87,13 +92,14 @@ internal static class SearchSql
         parameters.Add("offset", (long)(criteria.Page - 1) * criteria.PageSize);
 
         var sql = $"""
-            SELECT count(*)::int FROM catalog.products p WHERE {where};
+            SELECT count(*)::int FROM catalog.products p {textJoin} WHERE {where};
 
             SELECT p.id AS Id, p.slug AS Slug, p.name AS Name, p.brand AS Brand, c.slug AS CategorySlug,
                    p.image_keys[1] AS ImageKey, v.price_from AS PriceFrom, v.price_to AS PriceTo,
                    v.in_stock AS InStock, p.is_featured AS IsFeatured, {rank} AS rank
             FROM catalog.products p
             JOIN catalog.categories c ON c.id = p.category_id
+            {textJoin}
             CROSS JOIN LATERAL (
                 SELECT min(pv.price) AS price_from, max(pv.price) AS price_to,
                        coalesce(bool_or(pv.stock_on_hand - pv.stock_reserved > 0), false) AS in_stock
@@ -107,6 +113,35 @@ internal static class SearchSql
         return (sql, parameters);
     }
 
+    /// <summary>
+    /// The cast only runs on JSON numbers, so it can never fail, even if the planner evaluates it before the
+    /// category filter on a row whose spec under this key is not a number.
+    /// </summary>
+    private static string NumericSpec(string keyParameter) =>
+        $"(CASE WHEN jsonb_typeof(p.specs->@{keyParameter}) = 'number' THEN (p.specs->>@{keyParameter})::numeric END)";
+
+    /// <summary>
+    /// Complete words use the 'english' config (stemmed, stop words dropped). The last token is a prefix, matched both
+    /// stemmed ('english') and as typed ('simple'). A stop word as the last token is dropped ("the"), unless it is short
+    /// and so probably an unfinished word ("a" → arcwing, audio).
+    /// </summary>
+    private static string TextQuery(TsQueryParts parts, DynamicParameters parameters)
+    {
+        parameters.Add("tsPrefix", parts.Prefix);
+        const string english = "to_tsquery('english', @tsPrefix)";
+        var prefix = parts.ShortPrefix
+            ? $"({english} || to_tsquery('simple', @tsPrefix))"
+            : $"(CASE WHEN numnode({english}) = 0 THEN ''::tsquery ELSE {english} || to_tsquery('simple', @tsPrefix) END)";
+
+        if (parts.Words is null)
+        {
+            return prefix;
+        }
+
+        parameters.Add("tsWords", parts.Words);
+        return $"(to_tsquery('english', @tsWords) && {prefix})";
+    }
+
     private static void AppendSpec(
         StringBuilder where, DynamicParameters parameters, int index, SpecDefinition definition, SpecFilter filter)
     {
@@ -117,13 +152,13 @@ internal static class SearchSql
         {
             if (filter.Min.HasValue)
             {
-                where.Append($" AND (p.specs->>@{key})::numeric >= @specMin{index}");
+                where.Append($" AND {NumericSpec(key)} >= @specMin{index}");
                 parameters.Add($"specMin{index}", filter.Min.Value);
             }
 
             if (filter.Max.HasValue)
             {
-                where.Append($" AND (p.specs->>@{key})::numeric <= @specMax{index}");
+                where.Append($" AND {NumericSpec(key)} <= @specMax{index}");
                 parameters.Add($"specMax{index}", filter.Max.Value);
             }
 

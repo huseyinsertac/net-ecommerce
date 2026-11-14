@@ -137,6 +137,56 @@ public sealed class CatalogSearchTests(CatalogSearchFixture fixture) : IClassFix
         Slugs(page).ShouldBe(Slugs(await SearchOk(Search())));
     }
 
+    [Theory]
+    [InlineData("the")]
+    [InlineData("and the")]
+    [InlineData("with")]
+    public async Task Search_StopWordsOnly_BehaveLikeNoText(string text)
+    {
+        var page = await SearchOk(Search(text: text)); // default sort: Relevance, which falls back to Featured order
+        page.TotalCount.ShouldBe(10);
+        Slugs(page).ShouldBe(Slugs(await SearchOk(Search())));
+    }
+
+    [Fact]
+    public async Task Search_SingleLetterPrefix_MatchesFirstKeystroke()
+    {
+        // Lexemes starting with "a": arcwing, air, activ(e), adapt(ive). "a" itself is an English stop word.
+        Slugs(await SearchOk(Search(text: "a")))
+            .ShouldBe(["arcwing-14", "arcwing-16-pro", "corvid-air", "quietline-pro", "pulse-buds"], ignoreOrder: true);
+        Slugs(await SearchOk(Search(text: "q"))).ShouldBe(["quietline-pro", "quietline-lite"], ignoreOrder: true);
+    }
+
+    [Fact]
+    public async Task Search_StopWordBeforePrefix_IsIgnored()
+    {
+        Slugs(await SearchOk(Search(text: "the lapt")))
+            .ShouldBe(["arcwing-14", "arcwing-16-pro", "nimbus-book-13", "nimbus-book-15", "corvid-air"], ignoreOrder: true);
+        // A complete word whose English stem is shorter than the word still matches as the last token.
+        Slugs(await SearchOk(Search(text: "headphones")))
+            .ShouldBe(["quietline-pro", "quietline-lite"], ignoreOrder: true);
+    }
+
+    [Fact]
+    public async Task Search_OversizedFilterLists_ValidationError()
+    {
+        var values = Enumerable.Range(0, 51).Select(i => $"v{i}").ToArray();
+        var tooMany = await Query(Search(category: "laptops", specs: [Values("os", values)]));
+        tooMany.Error.ShouldBeOfType<ValidationError>().Errors.ShouldContainKey("spec");
+
+        var longValue = await Query(Search(category: "laptops", specs: [Values("os", new string('x', 101))]));
+        longValue.Error.ShouldBeOfType<ValidationError>().Errors.ShouldContainKey("spec");
+
+        var longBrand = await Query(Search(brands: [new string('b', 101)]));
+        longBrand.Error.ShouldBeOfType<ValidationError>().Errors.ShouldContainKey("brands");
+
+        var manyBrands = await Query(Search(brands: [.. Enumerable.Range(0, 21).Select(i => $"b{i}")]));
+        manyBrands.Error.ShouldBeOfType<ValidationError>().Errors.ShouldContainKey("brands");
+
+        // 50 values is the limit and still fine.
+        (await Query(Search(category: "laptops", specs: [Values("os", [.. values.Take(49), "Linux"])]))).IsSuccess.ShouldBeTrue();
+    }
+
     [Fact]
     public async Task Search_TooLongText_ValidationError()
     {

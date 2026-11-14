@@ -129,8 +129,10 @@ internal sealed class CatalogReader(CatalogDbContext db) : ICatalogReader
             FROM catalog.product_variants v
             WHERE v.product_id IN (SELECT p.id {ActiveProducts});
 
-            SELECT e.key AS Key, min(e.value::numeric) AS Min, max(e.value::numeric) AS Max
-            FROM catalog.products p CROSS JOIN LATERAL jsonb_each_text(p.specs) e
+            SELECT e.key AS Key,
+                   min(CASE WHEN jsonb_typeof(e.value) = 'number' THEN (e.value::text)::numeric END) AS Min,
+                   max(CASE WHEN jsonb_typeof(e.value) = 'number' THEN (e.value::text)::numeric END) AS Max
+            FROM catalog.products p CROSS JOIN LATERAL jsonb_each(p.specs) e
             WHERE p.status = {SearchSql.Active} AND p.category_id = ANY(@ids) AND e.key = ANY(@numberKeys)
             GROUP BY e.key;
 
