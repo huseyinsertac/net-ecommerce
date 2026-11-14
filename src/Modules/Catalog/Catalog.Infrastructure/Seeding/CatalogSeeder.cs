@@ -72,13 +72,19 @@ internal sealed class CatalogSeeder(CatalogDbContext db, ILogger<CatalogSeeder> 
             }
 
             var schema = seed.Specs
-                .Select(s => new SpecDefinition(s.Key, s.Label, Enum.Parse<SpecType>(s.Type), s.Unit, s.Filterable, s.Options))
+                .Select(s => new SpecDefinition(s.Key, s.Label, ParseSpecType(seed.Slug, s), s.Unit, s.Filterable, s.Options))
                 .ToList();
             bySlug.Add(seed.Slug, Unwrap(Category.Create(seed.Slug, seed.Name, seed.Icon, parentId, seed.SortOrder, schema)));
         }
 
         return bySlug;
     }
+
+    private static SpecType ParseSpecType(string categorySlug, SeedSpec spec) =>
+        Enum.TryParse<SpecType>(spec.Type, ignoreCase: false, out var type) && Enum.IsDefined(type)
+            ? type
+            : throw new InvalidOperationException(
+                $"Catalog seed is invalid: category '{categorySlug}' spec '{spec.Key}' has unknown type '{spec.Type}'.");
 
     private static Product BuildProduct(SeedProduct seed, IReadOnlyDictionary<string, Category> categories)
     {

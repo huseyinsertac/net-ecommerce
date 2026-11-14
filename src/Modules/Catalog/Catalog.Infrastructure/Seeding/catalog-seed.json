@@ -504,6 +504,7 @@
      "options": [
       "DSLR",
       "Mirrorless",
+      "SLR",
       "Rangefinder",
       "Box camera",
       "View camera"
@@ -743,7 +744,7 @@
    "description": "A 6.7-inch flagship with a bright 120 Hz OLED panel, a 50 MP main camera and a battery that comfortably lasts a heavy day. Aluminium frame, IP68 sealing and 5G on every variant. Ships with up to 512 GB of storage for photos and offline media.",
    "images": [
     "phone-black-02",
-    "phone-blank-01"
+    "phone-black-03"
    ],
    "specs": {
     "screen_in": 6.7,
@@ -772,7 +773,7 @@
       "color": "Black"
      },
      "price": 799.99,
-     "stock": 1
+     "stock": 5
     },
     {
      "sku": "KV-AUR5-128GB-WHITE",
@@ -781,7 +782,7 @@
       "color": "White"
      },
      "price": 799.99,
-     "stock": 30
+     "stock": 80
     },
     {
      "sku": "KV-AUR5-256GB-BLACK",
@@ -799,7 +800,7 @@
       "color": "White"
      },
      "price": 899.99,
-     "stock": 18
+     "stock": 30
     },
     {
      "sku": "KV-AUR5-512GB-BLACK",
@@ -817,7 +818,7 @@
       "color": "White"
      },
      "price": 1049.99,
-     "stock": 35
+     "stock": 60
     }
    ],
    "featured": true,
@@ -860,7 +861,7 @@
       "color": "Black"
      },
      "price": 1099.99,
-     "stock": 20
+     "stock": 6
     },
     {
      "sku": "KV-AUR5P-256GB-WHITE",
@@ -869,7 +870,7 @@
       "color": "White"
      },
      "price": 1099.99,
-     "stock": 24
+     "stock": 40
     },
     {
      "sku": "KV-AUR5P-512GB-BLACK",
@@ -887,7 +888,7 @@
       "color": "White"
      },
      "price": 1249.99,
-     "stock": 24
+     "stock": 60
     },
     {
      "sku": "KV-AUR5P-1TB-BLACK",
@@ -905,7 +906,7 @@
       "color": "White"
      },
      "price": 1449.99,
-     "stock": 12
+     "stock": 25
     }
    ],
    "featured": false,
@@ -920,7 +921,7 @@
    "description": "A well-priced 6.4-inch phone that keeps the essentials right: a smooth 90 Hz screen, a dependable 50 MP camera and all-day battery life. IP67 protection and 5G mean it handles rain, commutes and fast networks without fuss.",
    "images": [
     "phone-black-04",
-    "phone-blank-01"
+    "phone-black-02"
    ],
    "specs": {
     "screen_in": 6.4,
@@ -949,7 +950,7 @@
       "color": "Black"
      },
      "price": 449.99,
-     "stock": 0
+     "stock": 1
     },
     {
      "sku": "KV-AUR4A-128GB-WHITE",
@@ -958,7 +959,7 @@
       "color": "White"
      },
      "price": 449.99,
-     "stock": 100
+     "stock": 60
     },
     {
      "sku": "KV-AUR4A-256GB-BLACK",
@@ -967,7 +968,7 @@
       "color": "Black"
      },
      "price": 499.99,
-     "stock": 24
+     "stock": 50
     },
     {
      "sku": "KV-AUR4A-256GB-WHITE",
@@ -976,7 +977,7 @@
       "color": "White"
      },
      "price": 499.99,
-     "stock": 35
+     "stock": 30
     }
    ],
    "featured": false,
@@ -990,8 +991,7 @@
    "category": "phones",
    "description": "A balanced mid-range phone with a 6.5-inch 90 Hz display, a clean 50 MP camera and a big 5000 mAh battery. The splash-resistant body and 5G radio make it an easy everyday choice.",
    "images": [
-    "phone-black-04",
-    "phone-blank-01"
+    "phone-black-04"
    ],
    "specs": {
     "screen_in": 6.5,
@@ -1029,7 +1029,7 @@
       "color": "White"
      },
      "price": 399.99,
-     "stock": 2
+     "stock": 4
     },
     {
      "sku": "AW-SPK12-256GB-BLACK",
@@ -1038,7 +1038,7 @@
       "color": "Black"
      },
      "price": 459.99,
-     "stock": 20
+     "stock": 8
     },
     {
      "sku": "AW-SPK12-256GB-WHITE",
@@ -1047,7 +1047,7 @@
       "color": "White"
      },
      "price": 459.99,
-     "stock": 40
+     "stock": 60
     }
    ],
    "featured": false,
@@ -1099,7 +1099,7 @@
       "color": "White"
      },
      "price": 179.99,
-     "stock": 45
+     "stock": 12
     },
     {
      "sku": "AW-SPK12L-128GB-BLACK",
@@ -1108,7 +1108,7 @@
       "color": "Black"
      },
      "price": 219.99,
-     "stock": 60
+     "stock": 45
     },
     {
      "sku": "AW-SPK12L-128GB-WHITE",
@@ -1117,7 +1117,7 @@
       "color": "White"
      },
      "price": 219.99,
-     "stock": 0
+     "stock": 3
     }
    ],
    "featured": false,
@@ -1132,7 +1132,7 @@
    "description": "A genuinely compact flagship: a 6.1-inch 120 Hz OLED screen that fits a pocket, a 48 MP camera with optical stabilisation and IP67 protection. Wireless charging and 5G round out the package.",
    "images": [
     "phone-black-03",
-    "phone-blank-01"
+    "phone-black-04"
    ],
    "specs": {
     "screen_in": 6.1,
@@ -1161,7 +1161,7 @@
       "color": "Black"
      },
      "price": 599.99,
-     "stock": 4
+     "stock": 60
     },
     {
      "sku": "FR-ZIP3-128GB-WHITE",
@@ -1170,7 +1170,7 @@
       "color": "White"
      },
      "price": 599.99,
-     "stock": 45
+     "stock": 2
     },
     {
      "sku": "FR-ZIP3-256GB-BLACK",
@@ -1188,7 +1188,7 @@
       "color": "White"
      },
      "price": 679.99,
-     "stock": 0
+     "stock": 25
     }
    ],
    "featured": false,
@@ -1202,6 +1202,8 @@
    "category": "phones",
    "description": "Built for job sites and long hikes, with a reinforced frame, an IP68 rating and an enormous 8000 mAh battery. The 6.6-inch screen stays readable in direct sun, and a 64 MP camera captures detail when it counts.",
    "images": [
+    "phone-black-02",
+    "phone-black-04",
     "phone-black-03"
    ],
    "specs": {
@@ -1226,7 +1228,7 @@
       "storage": "128 GB"
      },
      "price": 549.99,
-     "stock": 60
+     "stock": 100
     },
     {
      "sku": "FR-TITAN-256GB",
@@ -1249,7 +1251,8 @@
    "description": "A fast, tidy phone with a 6.3-inch 120 Hz screen, a 50 MP dual camera and a 4800 mAh battery with quick charging. The matte glass back resists fingerprints, and IP68 sealing is standard.",
    "images": [
     "phone-black-04",
-    "phone-blank-01"
+    "phone-black-03",
+    "phone-black-02"
    ],
    "specs": {
     "screen_in": 6.3,
@@ -1278,7 +1281,7 @@
       "color": "Black"
      },
      "price": 649.99,
-     "stock": 10
+     "stock": 80
     },
     {
      "sku": "NV-EMB7-256GB-WHITE",
@@ -1287,7 +1290,7 @@
       "color": "White"
      },
      "price": 649.99,
-     "stock": 60
+     "stock": 8
     },
     {
      "sku": "NV-EMB7-512GB-BLACK",
@@ -1296,7 +1299,7 @@
       "color": "Black"
      },
      "price": 749.99,
-     "stock": 10
+     "stock": 30
     },
     {
      "sku": "NV-EMB7-512GB-WHITE",
@@ -1305,7 +1308,7 @@
       "color": "White"
      },
      "price": 749.99,
-     "stock": 20
+     "stock": 10
     }
    ],
    "featured": false,
@@ -1349,7 +1352,7 @@
       "color": "Silver"
      },
      "price": 1199.99,
-     "stock": 10
+     "stock": 18
     },
     {
      "sku": "AW-SLT14-512GB-BLACK",
@@ -1358,7 +1361,7 @@
       "color": "Black"
      },
      "price": 1199.99,
-     "stock": 30
+     "stock": 45
     },
     {
      "sku": "AW-SLT14-1TB-SILVER",
@@ -1367,7 +1370,7 @@
       "color": "Silver"
      },
      "price": 1349.99,
-     "stock": 60
+     "stock": 15
     },
     {
      "sku": "AW-SLT14-1TB-BLACK",
@@ -1376,7 +1379,7 @@
       "color": "Black"
      },
      "price": 1349.99,
-     "stock": 18
+     "stock": 80
     }
    ],
    "featured": true,
@@ -1419,7 +1422,7 @@
       "color": "Silver"
      },
      "price": 799.99,
-     "stock": 18
+     "stock": 40
     },
     {
      "sku": "AW-SLT13-256GB-BLACK",
@@ -1428,7 +1431,7 @@
       "color": "Black"
      },
      "price": 799.99,
-     "stock": 6
+     "stock": 45
     },
     {
      "sku": "AW-SLT13-512GB-SILVER",
@@ -1446,7 +1449,7 @@
       "color": "Black"
      },
      "price": 899.99,
-     "stock": 30
+     "stock": 60
     }
    ],
    "featured": false,
@@ -1460,7 +1463,8 @@
    "category": "laptops",
    "description": "A 16-inch workstation-class laptop with a Ryzen 9 processor, 32 GB of memory and an RTX 4070 for rendering and machine-learning work. A vapour-chamber cooler keeps clocks high under load. Coming soon.",
    "images": [
-    "laptop-dark-04"
+    "laptop-dark-04",
+    "laptop-silver-02"
    ],
    "specs": {
     "screen_in": 16,
@@ -1484,7 +1488,7 @@
       "storage": "1 TB"
      },
      "price": 2299.0,
-     "stock": 5
+     "stock": 1
     },
     {
      "sku": "AW-ATL16-2TB",
@@ -1492,7 +1496,7 @@
       "storage": "2 TB"
      },
      "price": 2699.0,
-     "stock": 2
+     "stock": 0
     }
    ],
    "featured": false,
@@ -1530,7 +1534,7 @@
       "storage": "512 GB"
      },
      "price": 1399.99,
-     "stock": 60
+     "stock": 12
     },
     {
      "sku": "NV-FRG15-1TB",
@@ -1538,7 +1542,7 @@
       "storage": "1 TB"
      },
      "price": 1499.99,
-     "stock": 18
+     "stock": 120
     }
    ],
    "featured": false,
@@ -1553,7 +1557,7 @@
    "description": "A desktop replacement with a 17.3-inch 165 Hz screen, a Ryzen 9 processor and an RTX 4070. Dual fans and a full-size keyboard keep marathon sessions comfortable, and an extra M.2 slot makes storage upgrades simple.",
    "images": [
     "laptop-dark-04",
-    "laptop-silver-02"
+    "laptop-silver-03"
    ],
    "specs": {
     "screen_in": 17.3,
@@ -1577,7 +1581,7 @@
       "storage": "1 TB"
      },
      "price": 1899.99,
-     "stock": 15
+     "stock": 60
     },
     {
      "sku": "NV-FRG17-2TB",
@@ -1585,7 +1589,7 @@
       "storage": "2 TB"
      },
      "price": 2199.99,
-     "stock": 80
+     "stock": 12
     }
    ],
    "featured": false,
@@ -1629,7 +1633,7 @@
       "color": "Silver"
      },
      "price": 449.99,
-     "stock": 40
+     "stock": 0
     },
     {
      "sku": "TS-CHR14-128GB-BLACK",
@@ -1647,7 +1651,7 @@
       "color": "Silver"
      },
      "price": 519.99,
-     "stock": 80
+     "stock": 18
     },
     {
      "sku": "TS-CHR14-256GB-BLACK",
@@ -1656,7 +1660,7 @@
       "color": "Black"
      },
      "price": 519.99,
-     "stock": 8
+     "stock": 100
     }
    ],
    "featured": false,
@@ -1700,7 +1704,7 @@
       "color": "Silver"
      },
      "price": 1499.99,
-     "stock": 10
+     "stock": 12
     },
     {
      "sku": "TS-STU16-1TB-BLACK",
@@ -1709,7 +1713,7 @@
       "color": "Black"
      },
      "price": 1499.99,
-     "stock": 0
+     "stock": 3
     },
     {
      "sku": "TS-STU16-2TB-SILVER",
@@ -1718,7 +1722,7 @@
       "color": "Silver"
      },
      "price": 1799.99,
-     "stock": 40
+     "stock": 24
     },
     {
      "sku": "TS-STU16-2TB-BLACK",
@@ -1727,7 +1731,7 @@
       "color": "Black"
      },
      "price": 1799.99,
-     "stock": 80
+     "stock": 45
     }
    ],
    "featured": false,
@@ -1770,7 +1774,7 @@
       "color": "Silver"
      },
      "price": 649.99,
-     "stock": 24
+     "stock": 45
     },
     {
      "sku": "TS-EVD15-256GB-BLACK",
@@ -1779,7 +1783,7 @@
       "color": "Black"
      },
      "price": 649.99,
-     "stock": 8
+     "stock": 20
     },
     {
      "sku": "TS-EVD15-512GB-SILVER",
@@ -1797,7 +1801,7 @@
       "color": "Black"
      },
      "price": 739.99,
-     "stock": 0
+     "stock": 1
     },
     {
      "sku": "TS-EVD15-1TB-SILVER",
@@ -1806,7 +1810,7 @@
       "color": "Silver"
      },
      "price": 849.99,
-     "stock": 10
+     "stock": 12
     },
     {
      "sku": "TS-EVD15-1TB-BLACK",
@@ -1815,7 +1819,7 @@
       "color": "Black"
      },
      "price": 849.99,
-     "stock": 12
+     "stock": 20
     }
    ],
    "featured": false,
@@ -1859,7 +1863,7 @@
       "color": "Black"
      },
      "price": 599.99,
-     "stock": 120
+     "stock": 30
     },
     {
      "sku": "TS-SLT11-128GB-SILVER",
@@ -1868,7 +1872,7 @@
       "color": "Silver"
      },
      "price": 599.99,
-     "stock": 0
+     "stock": 1
     },
     {
      "sku": "TS-SLT11-256GB-BLACK",
@@ -1877,7 +1881,7 @@
       "color": "Black"
      },
      "price": 699.99,
-     "stock": 60
+     "stock": 10
     },
     {
      "sku": "TS-SLT11-256GB-SILVER",
@@ -1886,7 +1890,7 @@
       "color": "Silver"
      },
      "price": 699.99,
-     "stock": 60
+     "stock": 35
     }
    ],
    "featured": true,
@@ -1924,7 +1928,7 @@
       "storage": "256 GB"
      },
      "price": 749.99,
-     "stock": 20
+     "stock": 10
     },
     {
      "sku": "TS-SLT11C-512GB",
@@ -1932,7 +1936,7 @@
       "storage": "512 GB"
      },
      "price": 899.99,
-     "stock": 6
+     "stock": 35
     }
    ],
    "featured": false,
@@ -1975,7 +1979,7 @@
       "color": "Black"
      },
      "price": 249.99,
-     "stock": 45
+     "stock": 24
     },
     {
      "sku": "KV-PAD10-64GB-SILVER",
@@ -1984,7 +1988,7 @@
       "color": "Silver"
      },
      "price": 249.99,
-     "stock": 45
+     "stock": 18
     },
     {
      "sku": "KV-PAD10-128GB-BLACK",
@@ -1993,7 +1997,7 @@
       "color": "Black"
      },
      "price": 299.99,
-     "stock": 25
+     "stock": 0
     },
     {
      "sku": "KV-PAD10-128GB-SILVER",
@@ -2002,7 +2006,7 @@
       "color": "Silver"
      },
      "price": 299.99,
-     "stock": 1
+     "stock": 0
     }
    ],
    "featured": false,
@@ -2046,7 +2050,7 @@
       "color": "Black"
      },
      "price": 449.99,
-     "stock": 100
+     "stock": 6
     },
     {
      "sku": "KV-PAD12-128GB-SILVER",
@@ -2055,7 +2059,7 @@
       "color": "Silver"
      },
      "price": 449.99,
-     "stock": 0
+     "stock": 2
     },
     {
      "sku": "KV-PAD12-256GB-BLACK",
@@ -2064,7 +2068,7 @@
       "color": "Black"
      },
      "price": 529.99,
-     "stock": 24
+     "stock": 80
     },
     {
      "sku": "KV-PAD12-256GB-SILVER",
@@ -2112,7 +2116,7 @@
       "storage": "256 GB"
      },
      "price": 1099.99,
-     "stock": 3
+     "stock": 0
     },
     {
      "sku": "AW-CNV13-512GB",
@@ -2120,7 +2124,7 @@
       "storage": "512 GB"
      },
      "price": 1249.99,
-     "stock": 0
+     "stock": 75
     },
     {
      "sku": "AW-CNV13-1TB",
@@ -2128,7 +2132,7 @@
       "storage": "1 TB"
      },
      "price": 1399.99,
-     "stock": 10
+     "stock": 6
     }
    ],
    "featured": false,
@@ -2142,7 +2146,8 @@
    "category": "tablets",
    "description": "A compact 10.5-inch Windows tablet with built-in 5G for field work, inspections and travel. It runs standard desktop software and supports a stylus for forms and signatures.",
    "images": [
-    "tablet-black-01"
+    "tablet-black-01",
+    "tablet-black-04"
    ],
    "specs": {
     "screen_in": 10.5,
@@ -2166,7 +2171,7 @@
       "storage": "128 GB"
      },
      "price": 699.99,
-     "stock": 1
+     "stock": 25
     },
     {
      "sku": "AW-CNVGO-256GB",
@@ -2174,7 +2179,7 @@
       "storage": "256 GB"
      },
      "price": 799.99,
-     "stock": 60
+     "stock": 0
     }
    ],
    "featured": false,
@@ -2217,7 +2222,7 @@
       "color": "Black"
      },
      "price": 159.99,
-     "stock": 1
+     "stock": 50
     },
     {
      "sku": "FR-RDR8-32GB-SILVER",
@@ -2226,7 +2231,7 @@
       "color": "Silver"
      },
      "price": 159.99,
-     "stock": 12
+     "stock": 45
     },
     {
      "sku": "FR-RDR8-64GB-BLACK",
@@ -2235,7 +2240,7 @@
       "color": "Black"
      },
      "price": 189.99,
-     "stock": 18
+     "stock": 0
     },
     {
      "sku": "FR-RDR8-64GB-SILVER",
@@ -2244,7 +2249,7 @@
       "color": "Silver"
      },
      "price": 189.99,
-     "stock": 30
+     "stock": 35
     }
    ],
    "featured": false,
@@ -2259,7 +2264,7 @@
    "description": "A tablet tuned for drawing, with a laminated 11-inch screen, 4096 pressure levels and a low-latency stylus included. Palm rejection works as you would expect, and a textured finish feels close to paper.",
    "images": [
     "tablet-black-04",
-    "tablet-black-02"
+    "tablet-black-03"
    ],
    "specs": {
     "screen_in": 11,
@@ -2283,7 +2288,7 @@
       "storage": "128 GB"
      },
      "price": 429.99,
-     "stock": 50
+     "stock": 35
     },
     {
      "sku": "NV-SKT11-256GB",
@@ -2291,7 +2296,7 @@
       "storage": "256 GB"
      },
      "price": 499.99,
-     "stock": 75
+     "stock": 12
     }
    ],
    "featured": false,
@@ -2329,7 +2334,7 @@
       "color": "Black"
      },
      "price": 299.99,
-     "stock": 40
+     "stock": 1
     },
     {
      "sku": "QL-STUANC-GREEN",
@@ -2345,7 +2350,7 @@
       "color": "Red"
      },
      "price": 299.99,
-     "stock": 25
+     "stock": 24
     }
    ],
    "featured": true,
@@ -2359,8 +2364,7 @@
    "category": "headphones",
    "description": "A lighter take on the Studio with the same warm, balanced sound but no noise cancelling, which stretches battery life to 50 hours. Foldable and light at 240 g, they slip easily into a bag.",
    "images": [
-    "headphones-black-01",
-    "headphones-green-02"
+    "headphones-black-01"
    ],
    "specs": {
     "form_factor": "Over-ear",
@@ -2383,7 +2387,7 @@
       "color": "Black"
      },
      "price": 129.99,
-     "stock": 45
+     "stock": 10
     },
     {
      "sku": "QL-STULT-GREEN",
@@ -2391,7 +2395,7 @@
       "color": "Green"
      },
      "price": 129.99,
-     "stock": 8
+     "stock": 50
     },
     {
      "sku": "QL-STULT-RED",
@@ -2399,7 +2403,7 @@
       "color": "Red"
      },
      "price": 129.99,
-     "stock": 75
+     "stock": 18
     }
    ],
    "featured": false,
@@ -2413,8 +2417,8 @@
    "category": "headphones",
    "description": "Our most ambitious over-ear: 50 mm drivers with deep, controlled bass, hybrid noise cancelling and a hinged aluminium frame. Choose fabric or leather ear pads to suit your taste.",
    "images": [
-    "headphones-black-01",
-    "headphones-green-02"
+    "headphones-green-02",
+    "headphones-black-01"
    ],
    "specs": {
     "form_factor": "Over-ear",
@@ -2442,7 +2446,7 @@
       "pads": "Fabric"
      },
      "price": 349.99,
-     "stock": 8
+     "stock": 50
     },
     {
      "sku": "QL-STUMAX-BLACK-LEATHE",
@@ -2451,7 +2455,7 @@
       "pads": "Leather"
      },
      "price": 369.99,
-     "stock": 8
+     "stock": 24
     },
     {
      "sku": "QL-STUMAX-GREEN-FABRIC",
@@ -2460,7 +2464,7 @@
       "pads": "Fabric"
      },
      "price": 349.99,
-     "stock": 4
+     "stock": 25
     },
     {
      "sku": "QL-STUMAX-GREEN-LEATHE",
@@ -2469,7 +2473,7 @@
       "pads": "Leather"
      },
      "price": 369.99,
-     "stock": 15
+     "stock": 50
     },
     {
      "sku": "QL-STUMAX-RED-FABRIC",
@@ -2478,7 +2482,7 @@
       "pads": "Fabric"
      },
      "price": 349.99,
-     "stock": 45
+     "stock": 24
     },
     {
      "sku": "QL-STUMAX-RED-LEATHE",
@@ -2487,7 +2491,7 @@
       "pads": "Leather"
      },
      "price": 369.99,
-     "stock": 100
+     "stock": 80
     }
    ],
    "featured": false,
@@ -2525,7 +2529,7 @@
       "color": "Red"
      },
      "price": 79.99,
-     "stock": 1
+     "stock": 10
     },
     {
      "sku": "KV-PULSE-BLACK",
@@ -2533,66 +2537,12 @@
       "color": "Black"
      },
      "price": 79.99,
-     "stock": 8
+     "stock": 45
     }
    ],
    "featured": false,
    "published": true,
    "createdAt": "2026-07-22T22:12:00Z"
-  },
-  {
-   "slug": "korvane-hush-anc",
-   "name": "Korvane Hush ANC",
-   "brand": "Korvane",
-   "category": "headphones",
-   "description": "Over-ear noise cancellers that make a noisy day calmer without the flagship price. 35 hours of battery, multipoint Bluetooth and clear call microphones suit working from anywhere.",
-   "images": [
-    "headphones-black-01",
-    "headphones-green-02"
-   ],
-   "specs": {
-    "form_factor": "Over-ear",
-    "anc": true,
-    "battery_hours": 35,
-    "multipoint": true,
-    "driver_mm": 40,
-    "weight_g": 265
-   },
-   "optionAxes": [
-    {
-     "key": "color",
-     "label": "Color"
-    }
-   ],
-   "variants": [
-    {
-     "sku": "KV-HUSH-BLACK",
-     "options": {
-      "color": "Black"
-     },
-     "price": 199.99,
-     "stock": 12
-    },
-    {
-     "sku": "KV-HUSH-GREEN",
-     "options": {
-      "color": "Green"
-     },
-     "price": 199.99,
-     "stock": 0
-    },
-    {
-     "sku": "KV-HUSH-RED",
-     "options": {
-      "color": "Red"
-     },
-     "price": 199.99,
-     "stock": 2
-    }
-   ],
-   "featured": false,
-   "published": true,
-   "createdAt": "2026-07-24T13:48:00Z"
   },
   {
    "slug": "ferrow-riff-wireless",
@@ -2624,7 +2574,7 @@
       "color": "Red"
      },
      "price": 59.99,
-     "stock": 24
+     "stock": 40
     },
     {
      "sku": "FR-RIFF-BLACK",
@@ -2632,12 +2582,12 @@
       "color": "Black"
      },
      "price": 59.99,
-     "stock": 0
+     "stock": 4
     }
    ],
    "featured": false,
    "published": true,
-   "createdAt": "2026-07-26T12:24:00Z"
+   "createdAt": "2026-07-24T13:48:00Z"
   },
   {
    "slug": "nordvik-concert-pro",
@@ -2646,7 +2596,7 @@
    "category": "headphones",
    "description": "Reference-grade wireless over-ears with 45 mm beryllium-coated drivers and adaptive noise cancelling. A premium leather headband, a hard travel case and a 38-hour battery come standard.",
    "images": [
-    "headphones-black-01"
+    "headphones-green-02"
    ],
    "specs": {
     "form_factor": "Over-ear",
@@ -2677,12 +2627,12 @@
       "color": "Green"
      },
      "price": 449.0,
-     "stock": 12
+     "stock": 60
     }
    ],
    "featured": false,
    "published": true,
-   "createdAt": "2026-07-28T11:00:00Z"
+   "createdAt": "2026-07-26T12:24:00Z"
   },
   {
    "slug": "orbitra-echo-wireless-headset",
@@ -2691,8 +2641,8 @@
    "category": "headphones",
    "description": "A wireless on-ear gaming headset with a detachable boom microphone, a low-latency 2.4 GHz dongle and a huge 60-hour battery. The cushioned headband stays comfortable through long sessions.",
    "images": [
-    "headphones-red-03",
-    "headphones-black-01"
+    "headphones-black-01",
+    "headphones-red-03"
    ],
    "specs": {
     "form_factor": "On-ear",
@@ -2715,7 +2665,7 @@
       "color": "Red"
      },
      "price": 149.99,
-     "stock": 20
+     "stock": 15
     },
     {
      "sku": "OR-ECHO-BLACK",
@@ -2723,12 +2673,12 @@
       "color": "Black"
      },
      "price": 149.99,
-     "stock": 0
+     "stock": 10
     }
    ],
    "featured": false,
    "published": true,
-   "createdAt": "2026-07-30T09:36:00Z"
+   "createdAt": "2026-07-28T11:00:00Z"
   },
   {
    "slug": "quietline-buds-pro",
@@ -2769,7 +2719,7 @@
       "color": "Pink"
      },
      "price": 179.99,
-     "stock": 80
+     "stock": 25
     },
     {
      "sku": "QL-BUDSP-WHITE",
@@ -2777,12 +2727,12 @@
       "color": "White"
      },
      "price": 179.99,
-     "stock": 45
+     "stock": 1
     }
    ],
    "featured": true,
    "published": true,
-   "createdAt": "2026-08-01T08:12:00Z"
+   "createdAt": "2026-07-30T09:36:00Z"
   },
   {
    "slug": "quietline-buds-air",
@@ -2815,7 +2765,7 @@
       "color": "Pink"
      },
      "price": 89.99,
-     "stock": 0
+     "stock": 75
     },
     {
      "sku": "QL-BUDSA-BLACK",
@@ -2823,7 +2773,7 @@
       "color": "Black"
      },
      "price": 89.99,
-     "stock": 12
+     "stock": 2
     },
     {
      "sku": "QL-BUDSA-WHITE",
@@ -2831,12 +2781,12 @@
       "color": "White"
      },
      "price": 89.99,
-     "stock": 60
+     "stock": 6
     }
    ],
    "featured": false,
    "published": true,
-   "createdAt": "2026-08-03T06:48:00Z"
+   "createdAt": "2026-08-01T08:12:00Z"
   },
   {
    "slug": "korvane-drop-2",
@@ -2869,7 +2819,7 @@
       "color": "Black"
      },
      "price": 129.99,
-     "stock": 25
+     "stock": 10
     },
     {
      "sku": "KV-DROP2-PINK",
@@ -2877,7 +2827,7 @@
       "color": "Pink"
      },
      "price": 129.99,
-     "stock": 12
+     "stock": 0
     },
     {
      "sku": "KV-DROP2-WHITE",
@@ -2885,12 +2835,12 @@
       "color": "White"
      },
      "price": 129.99,
-     "stock": 0
+     "stock": 8
     }
    ],
    "featured": false,
    "published": true,
-   "createdAt": "2026-08-05T05:24:00Z"
+   "createdAt": "2026-08-03T06:48:00Z"
   },
   {
    "slug": "korvane-drop-2-lite",
@@ -2899,8 +2849,7 @@
    "category": "earbuds",
    "description": "A pocket-friendly pair that nails the basics: clear sound, a stable Bluetooth connection and touch controls. Five hours per charge, with a compact case for the rest.",
    "images": [
-    "earbuds-black-04",
-    "earbuds-pink-03"
+    "earbuds-black-04"
    ],
    "specs": {
     "anc": false,
@@ -2923,7 +2872,7 @@
       "color": "Black"
      },
      "price": 59.99,
-     "stock": 3
+     "stock": 25
     },
     {
      "sku": "KV-DROP2L-PINK",
@@ -2931,12 +2880,12 @@
       "color": "Pink"
      },
      "price": 59.99,
-     "stock": 1
+     "stock": 6
     }
    ],
    "featured": false,
    "published": true,
-   "createdAt": "2026-08-06T21:00:00Z"
+   "createdAt": "2026-08-05T05:24:00Z"
   },
   {
    "slug": "ferrow-stride-sport-buds",
@@ -2945,7 +2894,8 @@
    "category": "earbuds",
    "description": "Sweat-proof earbuds designed for running, with an IPX7 rating and secure stabiliser fins. Nine hours of battery life and a bass-forward tuning keep you moving.",
    "images": [
-    "earbuds-black-04"
+    "earbuds-black-04",
+    "earbuds-black-01"
    ],
    "specs": {
     "anc": false,
@@ -2968,7 +2918,7 @@
       "color": "Black"
      },
      "price": 69.99,
-     "stock": 25
+     "stock": 2
     },
     {
      "sku": "FR-STRIDE-PINK",
@@ -2976,12 +2926,12 @@
       "color": "Pink"
      },
      "price": 69.99,
-     "stock": 12
+     "stock": 1
     }
    ],
    "featured": false,
    "published": true,
-   "createdAt": "2026-08-08T19:36:00Z"
+   "createdAt": "2026-08-06T21:00:00Z"
   },
   {
    "slug": "nordvik-resonance-anc",
@@ -2990,8 +2940,7 @@
    "category": "earbuds",
    "description": "Premium earbuds with hybrid noise cancelling, a wide soundstage and ten hours of playback on a single charge. The aluminium wireless charging case doubles as a stand.",
    "images": [
-    "earbuds-black-01",
-    "earbuds-pink-03"
+    "earbuds-black-01"
    ],
    "specs": {
     "anc": true,
@@ -3014,7 +2963,7 @@
       "color": "Black"
      },
      "price": 219.99,
-     "stock": 30
+     "stock": 35
     },
     {
      "sku": "NV-RESON-PINK",
@@ -3022,12 +2971,12 @@
       "color": "Pink"
      },
      "price": 219.99,
-     "stock": 18
+     "stock": 0
     }
    ],
    "featured": false,
    "published": true,
-   "createdAt": "2026-08-10T18:12:00Z"
+   "createdAt": "2026-08-08T19:36:00Z"
   },
   {
    "slug": "orbitra-latency-zero",
@@ -3036,6 +2985,7 @@
    "category": "earbuds",
    "description": "Gaming earbuds with a 2.4 GHz USB-C dongle that keeps lag under 30 ms, plus Bluetooth for your phone. Six hours of play per charge and a three-microphone array for clear voice chat.",
    "images": [
+    "earbuds-black-01",
     "earbuds-black-04"
    ],
    "specs": {
@@ -3059,7 +3009,7 @@
       "bundle": "Bluetooth only"
      },
      "price": 79.99,
-     "stock": 12
+     "stock": 8
     },
     {
      "sku": "OR-LATZ-WITHUS",
@@ -3067,12 +3017,12 @@
       "bundle": "With USB-C dongle"
      },
      "price": 99.99,
-     "stock": 80
+     "stock": 45
     }
    ],
    "featured": false,
    "published": true,
-   "createdAt": "2026-08-12T16:48:00Z"
+   "createdAt": "2026-08-10T18:12:00Z"
   },
   {
    "slug": "quietline-cube-portable",
@@ -3105,7 +3055,7 @@
       "color": "White"
      },
      "price": 89.99,
-     "stock": 15
+     "stock": 12
     },
     {
      "sku": "QL-CUBE-BLACK",
@@ -3113,12 +3063,12 @@
       "color": "Black"
      },
      "price": 89.99,
-     "stock": 1
+     "stock": 0
     }
    ],
    "featured": false,
    "published": true,
-   "createdAt": "2026-08-14T15:24:00Z"
+   "createdAt": "2026-08-12T16:48:00Z"
   },
   {
    "slug": "quietline-cube-mini",
@@ -3150,7 +3100,7 @@
       "color": "White"
      },
      "price": 29.99,
-     "stock": 30
+     "stock": 24
     },
     {
      "sku": "QL-CUBEM-BLACK",
@@ -3158,12 +3108,12 @@
       "color": "Black"
      },
      "price": 29.99,
-     "stock": 10
+     "stock": 18
     }
    ],
    "featured": false,
    "published": true,
-   "createdAt": "2026-08-16T14:00:00Z"
+   "createdAt": "2026-08-14T15:24:00Z"
   },
   {
    "slug": "quietline-hall",
@@ -3195,7 +3145,7 @@
       "color": "White"
      },
      "price": 149.99,
-     "stock": 45
+     "stock": 5
     },
     {
      "sku": "QL-HALL-BLACK",
@@ -3203,12 +3153,12 @@
       "color": "Black"
      },
      "price": 149.99,
-     "stock": 30
+     "stock": 80
     }
    ],
    "featured": false,
    "published": true,
-   "createdAt": "2026-08-18T12:36:00Z"
+   "createdAt": "2026-08-16T14:00:00Z"
   },
   {
    "slug": "korvane-pebble",
@@ -3217,7 +3167,8 @@
    "category": "speakers",
    "description": "A pebble-sized Bluetooth speaker with a surprisingly full sound for its size. It is easy to pair, easy to carry and comes in three colours.",
    "images": [
-    "speaker-white-03"
+    "speaker-white-03",
+    "speaker-white-01"
    ],
    "specs": {
     "size_class": "Mini",
@@ -3240,7 +3191,7 @@
       "color": "White"
      },
      "price": 24.99,
-     "stock": 100
+     "stock": 75
     },
     {
      "sku": "KV-PEBBLE-BLACK",
@@ -3248,7 +3199,7 @@
       "color": "Black"
      },
      "price": 24.99,
-     "stock": 18
+     "stock": 24
     },
     {
      "sku": "KV-PEBBLE-GREY",
@@ -3256,12 +3207,12 @@
       "color": "Grey"
      },
      "price": 24.99,
-     "stock": 4
+     "stock": 35
     }
    ],
    "featured": false,
    "published": true,
-   "createdAt": "2026-08-20T04:12:00Z"
+   "createdAt": "2026-08-18T12:36:00Z"
   },
   {
    "slug": "nordvik-kiln",
@@ -3294,7 +3245,7 @@
       "color": "Black"
      },
      "price": 199.0,
-     "stock": 80
+     "stock": 45
     },
     {
      "sku": "NV-KILN-WHITE",
@@ -3302,12 +3253,12 @@
       "color": "White"
      },
      "price": 199.0,
-     "stock": 15
+     "stock": 30
     }
    ],
    "featured": false,
    "published": true,
-   "createdAt": "2026-08-22T02:48:00Z"
+   "createdAt": "2026-08-20T04:12:00Z"
   },
   {
    "slug": "ferrow-bump-xl",
@@ -3340,7 +3291,7 @@
       "color": "White"
      },
      "price": 199.99,
-     "stock": 18
+     "stock": 4
     },
     {
      "sku": "FR-BUMPXL-BLACK",
@@ -3348,12 +3299,12 @@
       "color": "Black"
      },
      "price": 199.99,
-     "stock": 4
+     "stock": 12
     }
    ],
    "featured": false,
    "published": true,
-   "createdAt": "2026-08-24T01:24:00Z"
+   "createdAt": "2026-08-22T02:48:00Z"
   },
   {
    "slug": "lumenor-aura-portable",
@@ -3385,7 +3336,7 @@
       "color": "White"
      },
      "price": 59.99,
-     "stock": 50
+     "stock": 20
     },
     {
      "sku": "LM-AURA-BLACK",
@@ -3393,7 +3344,7 @@
       "color": "Black"
      },
      "price": 59.99,
-     "stock": 25
+     "stock": 45
     },
     {
      "sku": "LM-AURA-GREY",
@@ -3401,12 +3352,12 @@
       "color": "Grey"
      },
      "price": 59.99,
-     "stock": 25
+     "stock": 0
     }
    ],
    "featured": false,
    "published": true,
-   "createdAt": "2026-08-26T00:00:00Z"
+   "createdAt": "2026-08-24T01:24:00Z"
   },
   {
    "slug": "orbitra-pace-2",
@@ -3443,7 +3394,7 @@
       "size": "S/M"
      },
      "price": 49.99,
-     "stock": 0
+     "stock": 24
     },
     {
      "sku": "OR-PACE2-BLACK-L",
@@ -3452,7 +3403,7 @@
       "size": "L"
      },
      "price": 49.99,
-     "stock": 25
+     "stock": 15
     },
     {
      "sku": "OR-PACE2-BLUE-SM",
@@ -3461,7 +3412,7 @@
       "size": "S/M"
      },
      "price": 49.99,
-     "stock": 6
+     "stock": 45
     },
     {
      "sku": "OR-PACE2-BLUE-L",
@@ -3470,81 +3421,12 @@
       "size": "L"
      },
      "price": 49.99,
-     "stock": 12
-    }
-   ],
-   "featured": false,
-   "published": true,
-   "createdAt": "2026-08-27T22:36:00Z"
-  },
-  {
-   "slug": "orbitra-pace-2-pro",
-   "name": "Orbitra Pace 2 Pro",
-   "brand": "Orbitra",
-   "category": "wearables",
-   "description": "The Pace 2 with built-in GPS and contactless payments, so you can leave the phone at home. A larger 1.4-inch display shows maps and routes, and the battery still lasts 10 days.",
-   "images": [
-    "band-black-04"
-   ],
-   "specs": {
-    "kind": "Fitness band",
-    "display_in": 1.4,
-    "battery_days": 10,
-    "gps": true,
-    "water_atm": 5,
-    "nfc_pay": true
-   },
-   "optionAxes": [
-    {
-     "key": "color",
-     "label": "Color"
-    },
-    {
-     "key": "size",
-     "label": "Strap size"
-    }
-   ],
-   "variants": [
-    {
-     "sku": "OR-PACE2P-BLACK-SM",
-     "options": {
-      "color": "Black",
-      "size": "S/M"
-     },
-     "price": 79.99,
-     "stock": 24
-    },
-    {
-     "sku": "OR-PACE2P-BLACK-L",
-     "options": {
-      "color": "Black",
-      "size": "L"
-     },
-     "price": 79.99,
-     "stock": 5
-    },
-    {
-     "sku": "OR-PACE2P-BLUE-SM",
-     "options": {
-      "color": "Blue",
-      "size": "S/M"
-     },
-     "price": 79.99,
      "stock": 35
-    },
-    {
-     "sku": "OR-PACE2P-BLUE-L",
-     "options": {
-      "color": "Blue",
-      "size": "L"
-     },
-     "price": 79.99,
-     "stock": 100
     }
    ],
    "featured": false,
    "published": true,
-   "createdAt": "2026-08-29T21:12:00Z"
+   "createdAt": "2026-08-26T00:00:00Z"
   },
   {
    "slug": "lumenor-tempo",
@@ -3582,7 +3464,7 @@
       "strap": "Silicone"
      },
      "price": 149.99,
-     "stock": 100
+     "stock": 60
     },
     {
      "sku": "LM-TEMPO-WHITE-LEATHE",
@@ -3591,7 +3473,7 @@
       "strap": "Leather"
      },
      "price": 179.99,
-     "stock": 6
+     "stock": 80
     },
     {
      "sku": "LM-TEMPO-BLACK-SILICO",
@@ -3600,7 +3482,7 @@
       "strap": "Silicone"
      },
      "price": 149.99,
-     "stock": 75
+     "stock": 24
     },
     {
      "sku": "LM-TEMPO-BLACK-LEATHE",
@@ -3609,12 +3491,12 @@
       "strap": "Leather"
      },
      "price": 179.99,
-     "stock": 10
+     "stock": 45
     }
    ],
    "featured": true,
    "published": true,
-   "createdAt": "2026-08-31T19:48:00Z"
+   "createdAt": "2026-08-27T22:36:00Z"
   },
   {
    "slug": "lumenor-tempo-gps",
@@ -3652,7 +3534,7 @@
       "size": "41 mm"
      },
      "price": 229.99,
-     "stock": 5
+     "stock": 120
     },
     {
      "sku": "LM-TEMPOG-BLACK-45MM",
@@ -3661,7 +3543,7 @@
       "size": "45 mm"
      },
      "price": 259.99,
-     "stock": 35
+     "stock": 12
     },
     {
      "sku": "LM-TEMPOG-SILVER-41MM",
@@ -3670,7 +3552,7 @@
       "size": "41 mm"
      },
      "price": 229.99,
-     "stock": 18
+     "stock": 20
     },
     {
      "sku": "LM-TEMPOG-SILVER-45MM",
@@ -3679,12 +3561,12 @@
       "size": "45 mm"
      },
      "price": 259.99,
-     "stock": 18
+     "stock": 35
     }
    ],
    "featured": false,
    "published": true,
-   "createdAt": "2026-09-02T11:24:00Z"
+   "createdAt": "2026-08-29T21:12:00Z"
   },
   {
    "slug": "korvane-cadence-square",
@@ -3717,7 +3599,7 @@
       "color": "Green"
      },
      "price": 179.99,
-     "stock": 25
+     "stock": 0
     },
     {
      "sku": "KV-CADSQ-WHITE",
@@ -3725,7 +3607,7 @@
       "color": "White"
      },
      "price": 179.99,
-     "stock": 3
+     "stock": 0
     },
     {
      "sku": "KV-CADSQ-BLACK",
@@ -3733,12 +3615,12 @@
       "color": "Black"
      },
      "price": 179.99,
-     "stock": 6
+     "stock": 3
     }
    ],
    "featured": false,
    "published": true,
-   "createdAt": "2026-09-04T10:00:00Z"
+   "createdAt": "2026-08-31T19:48:00Z"
   },
   {
    "slug": "arcwing-tide-2",
@@ -3775,7 +3657,7 @@
       "size": "42 mm"
      },
      "price": 349.0,
-     "stock": 120
+     "stock": 0
     },
     {
      "sku": "AW-TIDE2-BLACK-46MM",
@@ -3784,7 +3666,7 @@
       "size": "46 mm"
      },
      "price": 399.0,
-     "stock": 100
+     "stock": 60
     },
     {
      "sku": "AW-TIDE2-SILVER-42MM",
@@ -3793,7 +3675,7 @@
       "size": "42 mm"
      },
      "price": 349.0,
-     "stock": 15
+     "stock": 45
     },
     {
      "sku": "AW-TIDE2-SILVER-46MM",
@@ -3802,12 +3684,12 @@
       "size": "46 mm"
      },
      "price": 399.0,
-     "stock": 12
+     "stock": 15
     }
    ],
    "featured": false,
    "published": true,
-   "createdAt": "2026-09-06T08:36:00Z"
+   "createdAt": "2026-09-02T11:24:00Z"
   },
   {
    "slug": "ferrow-trail-gps",
@@ -3840,7 +3722,7 @@
       "color": "Black"
      },
      "price": 269.99,
-     "stock": 15
+     "stock": 40
     },
     {
      "sku": "FR-TRAIL-GREEN",
@@ -3848,12 +3730,12 @@
       "color": "Green"
      },
      "price": 269.99,
-     "stock": 45
+     "stock": 15
     }
    ],
    "featured": false,
    "published": true,
-   "createdAt": "2026-09-08T07:12:00Z"
+   "createdAt": "2026-09-04T10:00:00Z"
   },
   {
    "slug": "lumenor-heritage-r2",
@@ -3890,7 +3772,7 @@
       "strap": "Standard"
      },
      "price": 549.99,
-     "stock": 0
+     "stock": 12
     },
     {
      "sku": "LM-HERR2-BLACK-LEATHE",
@@ -3899,7 +3781,7 @@
       "strap": "Leather"
      },
      "price": 589.99,
-     "stock": 80
+     "stock": 20
     },
     {
      "sku": "LM-HERR2-SILVER-STANDA",
@@ -3908,7 +3790,7 @@
       "strap": "Standard"
      },
      "price": 549.99,
-     "stock": 2
+     "stock": 18
     },
     {
      "sku": "LM-HERR2-SILVER-LEATHE",
@@ -3917,29 +3799,30 @@
       "strap": "Leather"
      },
      "price": 589.99,
-     "stock": 2
+     "stock": 60
     }
    ],
    "featured": false,
    "published": true,
-   "createdAt": "2026-09-10T05:48:00Z"
+   "createdAt": "2026-09-06T08:36:00Z"
   },
   {
-   "slug": "lumenor-heritage-d1",
-   "name": "Lumenor Heritage D1",
+   "slug": "lumenor-heritage-r4-premier",
+   "name": "Lumenor Heritage R4 Premier",
    "brand": "Lumenor",
    "category": "cameras",
-   "description": "A digital rangefinder-style camera with a 24 MP sensor and the handling of a classic film body. Dials for shutter speed and aperture, a fixed 35 mm f/2.8 lens and a tilting rear screen make it a joy to shoot.",
+   "description": "A hand-finished 35 mm rangefinder with a brass top plate, a fast fixed 50 mm f/1.4 lens and a bright, high-contrast viewfinder. Leather trim and a built-in light meter make it the Heritage for photographers who shoot film every day.",
    "images": [
-    "camera-vintage-02"
+    "camera-vintage-02",
+    "camera-vintage-01"
    ],
    "specs": {
-    "format": "Digital",
+    "format": "35 mm film",
     "body_style": "Rangefinder",
-    "autofocus": true,
+    "autofocus": false,
     "light_meter": true,
-    "weight_g": 480,
-    "lens": "35 mm f/2.8, fixed"
+    "weight_g": 620,
+    "lens": "50 mm f/1.4, fixed"
    },
    "optionAxes": [
     {
@@ -3949,25 +3832,25 @@
    ],
    "variants": [
     {
-     "sku": "LM-HERD1-BLACK",
+     "sku": "LM-HERR4-BLACK",
      "options": {
       "finish": "Black"
      },
      "price": 1299.0,
-     "stock": 24
+     "stock": 1
     },
     {
-     "sku": "LM-HERD1-SILVER",
+     "sku": "LM-HERR4-SILVER",
      "options": {
       "finish": "Silver"
      },
      "price": 1299.0,
-     "stock": 10
+     "stock": 5
     }
    ],
    "featured": true,
    "published": true,
-   "createdAt": "2026-09-12T04:24:00Z"
+   "createdAt": "2026-09-08T07:12:00Z"
   },
   {
    "slug": "tessel-boxcam-120",
@@ -4004,7 +3887,7 @@
       "bundle": "Camera only"
      },
      "price": 129.99,
-     "stock": 24
+     "stock": 12
     },
     {
      "sku": "TS-BOX120-WALNUT-WITH3F",
@@ -4013,12 +3896,12 @@
       "bundle": "With 3 film rolls"
      },
      "price": 154.99,
-     "stock": 50
+     "stock": 25
     }
    ],
    "featured": false,
    "published": true,
-   "createdAt": "2026-09-14T03:00:00Z"
+   "createdAt": "2026-09-10T05:48:00Z"
   },
   {
    "slug": "tessel-field-4x5",
@@ -4055,7 +3938,7 @@
       "lens": "Body only"
      },
      "price": 899.0,
-     "stock": 35
+     "stock": 40
     },
     {
      "sku": "TS-FLD45-WALNUT-WITH15",
@@ -4064,12 +3947,12 @@
       "lens": "With 150 mm lens"
      },
      "price": 1299.0,
-     "stock": 40
+     "stock": 5
     }
    ],
    "featured": false,
    "published": true,
-   "createdAt": "2026-09-15T18:36:00Z"
+   "createdAt": "2026-09-12T04:24:00Z"
   },
   {
    "slug": "nordvik-dx-24-dslr",
@@ -4101,7 +3984,7 @@
       "bundle": "Body only"
      },
      "price": 849.99,
-     "stock": 80
+     "stock": 18
     },
     {
      "sku": "NV-DX24-1855MM",
@@ -4109,7 +3992,7 @@
       "bundle": "18-55 mm kit lens"
      },
      "price": 999.99,
-     "stock": 0
+     "stock": 80
     },
     {
      "sku": "NV-DX24-KITLEN",
@@ -4117,28 +4000,29 @@
       "bundle": "Kit lens, bag and 64 GB card"
      },
      "price": 1099.99,
-     "stock": 50
+     "stock": 10
     }
    ],
    "featured": false,
    "published": true,
-   "createdAt": "2026-09-17T17:12:00Z"
+   "createdAt": "2026-09-14T03:00:00Z"
   },
   {
-   "slug": "nordvik-z-lite-mirrorless",
-   "name": "Nordvik Z-Lite Mirrorless",
+   "slug": "nordvik-fx-1-film-slr",
+   "name": "Nordvik FX-1 Film SLR",
    "brand": "Nordvik",
    "category": "cameras",
-   "description": "A compact mirrorless camera with a 26 MP APS-C sensor, in-body stabilisation and fast hybrid autofocus. It weighs just 410 g, records 4K video and fits easily in a small bag.",
+   "description": "A manual 35 mm SLR in the classic mould, with a bright pentaprism viewfinder, a built-in light meter and a rugged all-metal body. Pair it with the optional 50 mm f/1.8 lens and you have everything needed to learn film photography properly.",
    "images": [
-    "camera-black-04"
+    "camera-black-04",
+    "camera-vintage-02"
    ],
    "specs": {
-    "format": "Digital",
-    "body_style": "Mirrorless",
-    "autofocus": true,
+    "format": "35 mm film",
+    "body_style": "SLR",
+    "autofocus": false,
     "light_meter": true,
-    "weight_g": 410,
+    "weight_g": 690,
     "lens": "Interchangeable, bayonet mount"
    },
    "optionAxes": [
@@ -4153,45 +4037,45 @@
    ],
    "variants": [
     {
-     "sku": "NV-ZLITE-BODYON-BLACK",
+     "sku": "NV-FX1-BODYON-BLACK",
      "options": {
       "bundle": "Body only",
       "finish": "Black"
      },
-     "price": 1099.99,
-     "stock": 45
+     "price": 399.99,
+     "stock": 0
     },
     {
-     "sku": "NV-ZLITE-BODYON-SILVER",
+     "sku": "NV-FX1-BODYON-SILVER",
      "options": {
       "bundle": "Body only",
       "finish": "Silver"
      },
-     "price": 1099.99,
+     "price": 399.99,
+     "stock": 12
+    },
+    {
+     "sku": "NV-FX1-WITH50-BLACK",
+     "options": {
+      "bundle": "With 50 mm f/1.8 lens",
+      "finish": "Black"
+     },
+     "price": 519.99,
      "stock": 50
     },
     {
-     "sku": "NV-ZLITE-1650MM-BLACK",
+     "sku": "NV-FX1-WITH50-SILVER",
      "options": {
-      "bundle": "16-50 mm kit lens",
-      "finish": "Black"
-     },
-     "price": 1299.99,
-     "stock": 45
-    },
-    {
-     "sku": "NV-ZLITE-1650MM-SILVER",
-     "options": {
-      "bundle": "16-50 mm kit lens",
+      "bundle": "With 50 mm f/1.8 lens",
       "finish": "Silver"
      },
-     "price": 1299.99,
-     "stock": 1
+     "price": 519.99,
+     "stock": 25
     }
    ],
    "featured": false,
    "published": true,
-   "createdAt": "2026-09-19T15:48:00Z"
+   "createdAt": "2026-09-15T18:36:00Z"
   },
   {
    "slug": "orbitra-nova-wireless-controller",
@@ -4228,7 +4112,7 @@
       "bundle": "Controller"
      },
      "price": 69.99,
-     "stock": 40
+     "stock": 25
     },
     {
      "sku": "OR-NOVA-PURPLE-WITHCH",
@@ -4237,7 +4121,7 @@
       "bundle": "With charging dock"
      },
      "price": 89.99,
-     "stock": 10
+     "stock": 4
     },
     {
      "sku": "OR-NOVA-BLACK-CONTRO",
@@ -4255,21 +4139,22 @@
       "bundle": "With charging dock"
      },
      "price": 89.99,
-     "stock": 60
+     "stock": 1
     }
    ],
    "featured": true,
    "published": true,
-   "createdAt": "2026-09-21T14:24:00Z"
+   "createdAt": "2026-09-17T17:12:00Z"
   },
   {
-   "slug": "orbitra-crystal-controller",
-   "name": "Orbitra Crystal Controller",
+   "slug": "orbitra-neon-controller",
+   "name": "Orbitra Neon Controller",
    "brand": "Orbitra",
    "category": "gaming",
-   "description": "A translucent controller with a bold retro look and modern internals: wired and wireless connectivity, responsive triggers and a solid, balanced shape. A great pick for couch co-op.",
+   "description": "A vivid purple controller with a bold, lit-up look and modern internals: wired and wireless connectivity, responsive triggers and a solid, balanced shape. A great pick for couch co-op.",
    "images": [
-    "controller-clear-04"
+    "controller-purple-01",
+    "controller-black-03"
    ],
    "specs": {
     "platform": "PC + Console",
@@ -4287,25 +4172,25 @@
    ],
    "variants": [
     {
-     "sku": "OR-CRYS-CLEARP",
+     "sku": "OR-NEON-PURPLE",
      "options": {
-      "color": "Clear Purple"
+      "color": "Purple"
      },
      "price": 54.99,
-     "stock": 6
+     "stock": 0
     },
     {
-     "sku": "OR-CRYS-CLEARB",
+     "sku": "OR-NEON-BLACK",
      "options": {
-      "color": "Clear Black"
+      "color": "Black"
      },
      "price": 54.99,
-     "stock": 60
+     "stock": 40
     }
    ],
    "featured": false,
    "published": true,
-   "createdAt": "2026-09-23T13:00:00Z"
+   "createdAt": "2026-09-19T15:48:00Z"
   },
   {
    "slug": "ferrow-retro-six-pad",
@@ -4337,7 +4222,7 @@
       "color": "White"
      },
      "price": 24.99,
-     "stock": 25
+     "stock": 30
     },
     {
      "sku": "FR-RET6-BLACK",
@@ -4345,12 +4230,12 @@
       "color": "Black"
      },
      "price": 24.99,
-     "stock": 60
+     "stock": 50
     }
    ],
    "featured": false,
    "published": true,
-   "createdAt": "2026-09-25T11:36:00Z"
+   "createdAt": "2026-09-21T14:24:00Z"
   },
   {
    "slug": "voltrix-strike-wired-gamepad",
@@ -4382,7 +4267,7 @@
       "cable": "2 m"
      },
      "price": 29.99,
-     "stock": 12
+     "stock": 24
     },
     {
      "sku": "VX-STRIKE-3M",
@@ -4390,12 +4275,12 @@
       "cable": "3 m"
      },
      "price": 34.99,
-     "stock": 100
+     "stock": 10
     }
    ],
    "featured": false,
    "published": true,
-   "createdAt": "2026-09-27T10:12:00Z"
+   "createdAt": "2026-09-23T13:00:00Z"
   },
   {
    "slug": "ferrow-axis-elite",
@@ -4405,7 +4290,7 @@
    "description": "A tournament-grade controller with Hall-effect sticks, four remappable rear paddles and swappable thumbsticks. Wired and wireless modes let you play anywhere, and a carry case is available.",
    "images": [
     "controller-purple-01",
-    "controller-black-03"
+    "controller-white-02"
    ],
    "specs": {
     "platform": "PC + Console",
@@ -4433,7 +4318,7 @@
       "bundle": "Controller"
      },
      "price": 149.99,
-     "stock": 75
+     "stock": 30
     },
     {
      "sku": "FR-AXIS-PURPLE-WITHCA",
@@ -4442,7 +4327,7 @@
       "bundle": "With carry case"
      },
      "price": 174.99,
-     "stock": 35
+     "stock": 18
     },
     {
      "sku": "FR-AXIS-BLACK-CONTRO",
@@ -4451,7 +4336,7 @@
       "bundle": "Controller"
      },
      "price": 149.99,
-     "stock": 25
+     "stock": 120
     },
     {
      "sku": "FR-AXIS-BLACK-WITHCA",
@@ -4460,12 +4345,12 @@
       "bundle": "With carry case"
      },
      "price": 174.99,
-     "stock": 35
+     "stock": 0
     }
    ],
    "featured": false,
    "published": true,
-   "createdAt": "2026-09-29T01:48:00Z"
+   "createdAt": "2026-09-25T11:36:00Z"
   },
   {
    "slug": "orbitra-nova-lite",
@@ -4474,7 +4359,9 @@
    "category": "gaming",
    "description": "The easy way into Orbitra: a lightweight wireless controller with comfortable grips and responsive triggers. Pair it with a PC or console in seconds and play for 30 hours before charging.",
    "images": [
-    "controller-purple-01"
+    "controller-purple-01",
+    "controller-white-02",
+    "controller-black-03"
    ],
    "specs": {
     "platform": "PC + Console",
@@ -4497,7 +4384,7 @@
       "color": "Purple"
      },
      "price": 39.99,
-     "stock": 75
+     "stock": 6
     },
     {
      "sku": "OR-NOVAL-BLACK",
@@ -4505,12 +4392,12 @@
       "color": "Black"
      },
      "price": 39.99,
-     "stock": 80
+     "stock": 10
     }
    ],
    "featured": false,
    "published": true,
-   "createdAt": "2026-10-01T00:24:00Z"
+   "createdAt": "2026-09-27T10:12:00Z"
   },
   {
    "slug": "brimley-slab-10k",
@@ -4543,7 +4430,7 @@
       "color": "Silver"
      },
      "price": 39.99,
-     "stock": 30
+     "stock": 0
     },
     {
      "sku": "BR-SLAB10-MARBLE",
@@ -4551,12 +4438,12 @@
       "color": "Marble"
      },
      "price": 39.99,
-     "stock": 120
+     "stock": 25
     }
    ],
    "featured": false,
    "published": true,
-   "createdAt": "2026-10-02T23:00:00Z"
+   "createdAt": "2026-09-29T01:48:00Z"
   },
   {
    "slug": "brimley-slab-20k",
@@ -4589,7 +4476,7 @@
       "color": "Silver"
      },
      "price": 79.99,
-     "stock": 10
+     "stock": 60
     },
     {
      "sku": "BR-SLAB20-BLACK",
@@ -4597,12 +4484,12 @@
       "color": "Black"
      },
      "price": 79.99,
-     "stock": 0
+     "stock": 80
     }
    ],
    "featured": false,
    "published": true,
-   "createdAt": "2026-10-04T21:36:00Z"
+   "createdAt": "2026-10-01T00:24:00Z"
   },
   {
    "slug": "brimley-slab-27k-laptop",
@@ -4634,7 +4521,7 @@
       "bundle": "Power bank"
      },
      "price": 109.99,
-     "stock": 4
+     "stock": 15
     },
     {
      "sku": "BR-SLAB27-WITH10",
@@ -4642,12 +4529,12 @@
       "bundle": "With 100 W cable"
      },
      "price": 124.99,
-     "stock": 45
+     "stock": 0
     }
    ],
    "featured": false,
    "published": true,
-   "createdAt": "2026-10-06T20:12:00Z"
+   "createdAt": "2026-10-02T23:00:00Z"
   },
   {
    "slug": "voltrix-marble-10k-wireless",
@@ -4679,7 +4566,7 @@
       "color": "Marble"
      },
      "price": 49.99,
-     "stock": 35
+     "stock": 12
     },
     {
      "sku": "VX-MARB10-SILVER",
@@ -4687,12 +4574,12 @@
       "color": "Silver"
      },
      "price": 49.99,
-     "stock": 60
+     "stock": 8
     }
    ],
    "featured": false,
    "published": true,
-   "createdAt": "2026-10-08T18:48:00Z"
+   "createdAt": "2026-10-04T21:36:00Z"
   },
   {
    "slug": "voltrix-link-10k",
@@ -4724,7 +4611,7 @@
       "color": "Silver"
      },
      "price": 44.99,
-     "stock": 12
+     "stock": 100
     },
     {
      "sku": "VX-LINK10-MARBLE",
@@ -4732,7 +4619,7 @@
       "color": "Marble"
      },
      "price": 44.99,
-     "stock": 4
+     "stock": 18
     },
     {
      "sku": "VX-LINK10-BLACK",
@@ -4740,12 +4627,12 @@
       "color": "Black"
      },
      "price": 44.99,
-     "stock": 0
+     "stock": 18
     }
    ],
    "featured": false,
    "published": true,
-   "createdAt": "2026-10-10T17:24:00Z"
+   "createdAt": "2026-10-06T20:12:00Z"
   },
   {
    "slug": "nordvik-peak-20k",
@@ -4754,8 +4641,8 @@
    "category": "chargers-power",
    "description": "A fast 20,000 mAh power bank with 100 W USB-C output that recharges itself in under two hours. Its fire-retardant casing and temperature monitoring add a layer of safety.",
    "images": [
-    "powerbank-silver-03",
-    "powerbank-silver-01"
+    "powerbank-silver-01",
+    "powerbank-silver-03"
    ],
    "specs": {
     "capacity_mah": 20000,
@@ -4778,7 +4665,7 @@
       "color": "Silver"
      },
      "price": 89.99,
-     "stock": 60
+     "stock": 0
     },
     {
      "sku": "NV-PEAK20-BLACK",
@@ -4786,12 +4673,12 @@
       "color": "Black"
      },
      "price": 89.99,
-     "stock": 75
+     "stock": 10
     }
    ],
    "featured": false,
    "published": true,
-   "createdAt": "2026-10-12T09:00:00Z"
+   "createdAt": "2026-10-08T18:48:00Z"
   },
   {
    "slug": "ferrow-pocket-5k-slim",
@@ -4800,8 +4687,7 @@
    "category": "chargers-power",
    "description": "A credit-card-thin 5,000 mAh power bank that slides into a wallet or back pocket. It provides one full phone charge with a 20 W USB-C port.",
    "images": [
-    "powerbank-silver-01",
-    "powerbank-marble-02"
+    "powerbank-silver-01"
    ],
    "specs": {
     "capacity_mah": 5000,
@@ -4824,7 +4710,7 @@
       "color": "Silver"
      },
      "price": 24.99,
-     "stock": 0
+     "stock": 60
     },
     {
      "sku": "FR-POCK5-MARBLE",
@@ -4840,12 +4726,12 @@
       "color": "Black"
      },
      "price": 24.99,
-     "stock": 25
+     "stock": 0
     }
    ],
    "featured": false,
    "published": true,
-   "createdAt": "2026-10-14T07:36:00Z"
+   "createdAt": "2026-10-10T17:24:00Z"
   },
   {
    "slug": "lumenor-mag-10k-wireless",
@@ -4878,7 +4764,7 @@
       "color": "Marble"
      },
      "price": 59.99,
-     "stock": 40
+     "stock": 12
     },
     {
      "sku": "LM-MAG10-SILVER",
@@ -4886,12 +4772,12 @@
       "color": "Silver"
      },
      "price": 59.99,
-     "stock": 3
+     "stock": 8
     }
    ],
    "featured": false,
    "published": true,
-   "createdAt": "2026-10-16T06:12:00Z"
+   "createdAt": "2026-10-12T09:00:00Z"
   },
   {
    "slug": "brimley-7-port-switched-usb-hub",
@@ -4922,7 +4808,7 @@
       "color": "Black"
      },
      "price": 29.99,
-     "stock": 50
+     "stock": 75
     },
     {
      "sku": "BR-HUB7-WHITE",
@@ -4930,12 +4816,12 @@
       "color": "White"
      },
      "price": 29.99,
-     "stock": 10
+     "stock": 35
     }
    ],
    "featured": false,
    "published": true,
-   "createdAt": "2026-10-18T04:48:00Z"
+   "createdAt": "2026-10-14T07:36:00Z"
   },
   {
    "slug": "voltrix-7-port-powered-hub",
@@ -4944,7 +4830,8 @@
    "category": "cables-hubs",
    "description": "A powered 7-port USB 3.0 hub that keeps external drives and webcams happy, with a dedicated wall adapter for stable power. Ideal for desks that always run short of ports.",
    "images": [
-    "hub-black-01"
+    "hub-black-01",
+    "cable-black-04"
    ],
    "specs": {
     "kind": "Hub",
@@ -4966,7 +4853,7 @@
       "plug": "US"
      },
      "price": 44.99,
-     "stock": 0
+     "stock": 4
     },
     {
      "sku": "VX-HUB7P-UK",
@@ -4974,7 +4861,7 @@
       "plug": "UK"
      },
      "price": 44.99,
-     "stock": 12
+     "stock": 50
     },
     {
      "sku": "VX-HUB7P-EU",
@@ -4982,12 +4869,12 @@
       "plug": "EU"
      },
      "price": 44.99,
-     "stock": 35
+     "stock": 40
     }
    ],
    "featured": false,
    "published": true,
-   "createdAt": "2026-10-20T03:24:00Z"
+   "createdAt": "2026-10-16T06:12:00Z"
   },
   {
    "slug": "brimley-usb-a-to-usb-b-device-cable",
@@ -5018,7 +4905,7 @@
       "length": "1.8 m"
      },
      "price": 7.99,
-     "stock": 15
+     "stock": 0
     },
     {
      "sku": "BR-AB-3M",
@@ -5026,7 +4913,7 @@
       "length": "3 m"
      },
      "price": 11.99,
-     "stock": 4
+     "stock": 2
     },
     {
      "sku": "BR-AB-5M",
@@ -5034,12 +4921,12 @@
       "length": "5 m"
      },
      "price": 15.99,
-     "stock": 45
+     "stock": 100
     }
    ],
    "featured": false,
    "published": true,
-   "createdAt": "2026-10-22T02:00:00Z"
+   "createdAt": "2026-10-18T04:48:00Z"
   },
   {
    "slug": "brimley-usb-a-to-usb-c-charge-cable",
@@ -5075,7 +4962,7 @@
       "color": "White"
      },
      "price": 9.99,
-     "stock": 2
+     "stock": 60
     },
     {
      "sku": "BR-AC-1M-BLACK",
@@ -5084,7 +4971,7 @@
       "color": "Black"
      },
      "price": 9.99,
-     "stock": 50
+     "stock": 15
     },
     {
      "sku": "BR-AC-2M-WHITE",
@@ -5093,7 +4980,7 @@
       "color": "White"
      },
      "price": 12.99,
-     "stock": 12
+     "stock": 25
     },
     {
      "sku": "BR-AC-2M-BLACK",
@@ -5102,12 +4989,12 @@
       "color": "Black"
      },
      "price": 12.99,
-     "stock": 0
+     "stock": 75
     }
    ],
    "featured": false,
    "published": true,
-   "createdAt": "2026-10-24T00:36:00Z"
+   "createdAt": "2026-10-20T03:24:00Z"
   },
   {
    "slug": "voltrix-usb-cable-kit",
@@ -5138,7 +5025,7 @@
       "pack": "3 cables"
      },
      "price": 14.99,
-     "stock": 0
+     "stock": 4
     },
     {
      "sku": "VX-KIT-5CABLE",
@@ -5146,12 +5033,12 @@
       "pack": "5 cables"
      },
      "price": 22.99,
-     "stock": 50
+     "stock": 40
     }
    ],
    "featured": false,
    "published": true,
-   "createdAt": "2026-10-25T16:12:00Z"
+   "createdAt": "2026-10-22T02:00:00Z"
   },
   {
    "slug": "voltrix-braided-usb-a-to-usb-c-cable",
@@ -5188,7 +5075,7 @@
       "color": "White"
      },
      "price": 14.99,
-     "stock": 30
+     "stock": 10
     },
     {
      "sku": "VX-BRAID-1M-BLACK",
@@ -5197,7 +5084,7 @@
       "color": "Black"
      },
      "price": 14.99,
-     "stock": 24
+     "stock": 100
     },
     {
      "sku": "VX-BRAID-2M-WHITE",
@@ -5206,7 +5093,7 @@
       "color": "White"
      },
      "price": 19.99,
-     "stock": 0
+     "stock": 4
     },
     {
      "sku": "VX-BRAID-2M-BLACK",
@@ -5215,7 +5102,7 @@
       "color": "Black"
      },
      "price": 19.99,
-     "stock": 5
+     "stock": 100
     },
     {
      "sku": "VX-BRAID-3M-WHITE",
@@ -5224,7 +5111,7 @@
       "color": "White"
      },
      "price": 22.99,
-     "stock": 40
+     "stock": 100
     },
     {
      "sku": "VX-BRAID-3M-BLACK",
@@ -5233,12 +5120,12 @@
       "color": "Black"
      },
      "price": 22.99,
-     "stock": 1
+     "stock": 2
     }
    ],
    "featured": false,
    "published": true,
-   "createdAt": "2026-10-27T14:48:00Z"
+   "createdAt": "2026-10-24T00:36:00Z"
   }
  ]
 }

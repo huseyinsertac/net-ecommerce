@@ -162,6 +162,21 @@ public sealed class CatalogSeedTests(CatalogSeedFixture fixture) : IClassFixture
     }
 
     [Fact]
+    public async Task Seed_NoTwoProductsInALeafShareTheSameGallery()
+    {
+        var (_, products) = await LoadAsync();
+
+        foreach (var group in products.GroupBy(p => p.CategoryId))
+        {
+            var galleries = group.Select(p => string.Join('|', p.ImageKeys)).ToList();
+            galleries.Distinct().Count().ShouldBe(galleries.Count, "two products in one category have identical image lists");
+        }
+
+        products.SelectMany(p => p.ImageKeys).ShouldNotContain("phone-blank-01");
+        products.SelectMany(p => p.ImageKeys).ShouldNotContain("controller-clear-04");
+    }
+
+    [Fact]
     public async Task Seed_AllCategoryImagesExist()
     {
         var (categories, _) = await LoadAsync();

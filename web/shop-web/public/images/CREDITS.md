@@ -41,7 +41,6 @@ All photos are from [Unsplash](https://unsplash.com) and used under the [Unsplas
 | `controller-purple-01` | gaming | Javier Martínez | [Unsplash](https://unsplash.com/photos/game-controller-in-neon-light-hUD0PUczwJQ) |
 | `controller-white-02` | gaming | Adam Valstar | [Unsplash](https://unsplash.com/photos/a-video-game-controller-sitting-on-top-of-a-table-PLuIeOaqpYg) |
 | `controller-black-03` | gaming | Vitalii Abakumov | [Unsplash](https://unsplash.com/photos/a-black-wired-game-controller-on-a-white-background-UCXxAKedX7k) |
-| `controller-clear-04` | gaming | luthfi alfarizi | [Unsplash](https://unsplash.com/photos/a-translucent-purple-video-game-controller-on-a-white-background-5W-u-CW_gZc) |
 | `powerbank-silver-01` | chargers-power | gomi | [Unsplash](https://unsplash.com/photos/a-silver-electronic-device-sitting-on-top-of-a-white-table-CY4mVpRvPxc) |
 | `powerbank-marble-02` | chargers-power | gomi | [Unsplash](https://unsplash.com/photos/a-white-and-blue-case-sitting-on-top-of-a-white-table-RIOptBd-1H8) |
 | `powerbank-silver-03` | chargers-power | Markus Winkler | [Unsplash](https://unsplash.com/photos/white-electronic-device-on-green-textile-JHEIAnOXbkc) |
