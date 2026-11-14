@@ -16,7 +16,8 @@ namespace Shop.Infrastructure.Common.Persistence;
 public abstract class ModuleDbContext(
     DbContextOptions options,
     IDomainEventDispatcher dispatcher,
-    PendingIntegrationEvents pendingEvents) : DbContext(options)
+    PendingIntegrationEvents pendingEvents,
+    IntegrationEventTypeRegistry registry) : DbContext(options)
 {
     /// <summary>Guards against handlers that keep raising events forever.</summary>
     private const int MaxDispatchRounds = 10;
@@ -65,7 +66,18 @@ public abstract class ModuleDbContext(
 
     public override async Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess, CancellationToken cancellationToken = default)
     {
-        await DispatchDomainEventsAsync(cancellationToken);
+        try
+        {
+            await DispatchDomainEventsAsync(cancellationToken);
+        }
+        catch
+        {
+            // Whatever was published before the failure belongs to a save that did not happen; a retry in this scope
+            // must not drain it.
+            pendingEvents.Clear();
+            throw;
+        }
+
         DrainPublishedIntegrationEvents();
         return await base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken);
     }
@@ -79,6 +91,12 @@ public abstract class ModuleDbContext(
         foreach (var e in pendingEvents.Drain(GetType()))
         {
             var type = e.GetType();
+            if (registry.Resolve(type.FullName!) is null)
+            {
+                throw new InvalidOperationException(
+                    $"Integration event type '{type.FullName}' is not registered; pass its Contracts assembly to AddEventing.");
+            }
+
             OutboxMessages.Add(new OutboxMessage
             {
                 Id = e.Id,

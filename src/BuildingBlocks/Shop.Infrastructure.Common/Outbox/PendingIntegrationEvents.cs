@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging;
 using Shop.Application.Abstractions.Events;
 using Shop.SharedKernel;
 
@@ -9,7 +10,7 @@ namespace Shop.Infrastructure.Common.Outbox;
 /// context's outbox. Invariant: one module per DI scope. Once a module context has drained events, a different module
 /// context draining events in the same scope throws, because the events could otherwise land in the wrong module's outbox.
 /// </summary>
-public sealed class PendingIntegrationEvents : IEventPublisher
+public sealed class PendingIntegrationEvents(ILogger<PendingIntegrationEvents> logger) : IEventPublisher, IDisposable
 {
     private readonly List<IIntegrationEvent> _pending = [];
     private Type? _owner;
@@ -18,6 +19,19 @@ public sealed class PendingIntegrationEvents : IEventPublisher
     {
         ArgumentNullException.ThrowIfNull(e);
         _pending.Add(e);
+    }
+
+    /// <summary>Discards undrained events, e.g. after a failed save, so a retry in the same scope cannot drain them.</summary>
+    internal void Clear() => _pending.Clear();
+
+    public void Dispose()
+    {
+        if (_pending.Count > 0)
+        {
+            logger.LogWarning(
+                "{Count} published integration event(s) were never saved to an outbox before the scope ended: {Types}",
+                _pending.Count, string.Join(", ", _pending.Select(e => e.GetType().Name).Distinct()));
+        }
     }
 
     internal IReadOnlyList<IIntegrationEvent> Drain(Type contextType)

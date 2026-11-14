@@ -8,7 +8,8 @@ namespace Identity.Infrastructure.Persistence;
 public sealed class IdentityDbContext(
     DbContextOptions<IdentityDbContext> options,
     IDomainEventDispatcher dispatcher,
-    PendingIntegrationEvents pendingEvents) : ModuleDbContext(options, dispatcher, pendingEvents)
+    PendingIntegrationEvents pendingEvents,
+    IntegrationEventTypeRegistry registry) : ModuleDbContext(options, dispatcher, pendingEvents, registry)
 {
     public override string Schema => "identity";
 }

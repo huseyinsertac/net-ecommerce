@@ -7,8 +7,11 @@ using Testcontainers.PostgreSql;
 namespace Shop.IntegrationTests;
 
 /// <summary>Boots the real API in the Production environment against a throwaway Postgres container.</summary>
-public sealed class ShopApiFactory : WebApplicationFactory<Program>, IAsyncLifetime
+public class ShopApiFactory : WebApplicationFactory<Program>, IAsyncLifetime
 {
+    /// <summary>Seeding is off for the shared factory; a dedicated subclass can turn it on.</summary>
+    protected virtual bool SeedOnStartup => false;
+
     private readonly PostgreSqlContainer _postgres = new PostgreSqlBuilder("postgres:18-alpine").Build();
 
     public string ConnectionString => _postgres.GetConnectionString();
@@ -25,6 +28,7 @@ public sealed class ShopApiFactory : WebApplicationFactory<Program>, IAsyncLifet
     {
         builder.UseEnvironment("Production");
         builder.UseSetting("ConnectionStrings:Shop", _postgres.GetConnectionString());
+        builder.UseSetting("Database:SeedOnStartup", SeedOnStartup ? "true" : "false");
         builder.ConfigureServices(services => services.AddSingleton<IStartupFilter, ThrowingEndpointStartupFilter>());
     }
 

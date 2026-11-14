@@ -8,7 +8,8 @@ namespace Ordering.Infrastructure.Persistence;
 public sealed class OrderingDbContext(
     DbContextOptions<OrderingDbContext> options,
     IDomainEventDispatcher dispatcher,
-    PendingIntegrationEvents pendingEvents) : ModuleDbContext(options, dispatcher, pendingEvents)
+    PendingIntegrationEvents pendingEvents,
+    IntegrationEventTypeRegistry registry) : ModuleDbContext(options, dispatcher, pendingEvents, registry)
 {
     public override string Schema => "ordering";
 }
