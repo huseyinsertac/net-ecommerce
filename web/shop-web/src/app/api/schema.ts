@@ -26,7 +26,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["AnonymousTypeOfstringAndstringAndstring"];
+                        "application/json": components["schemas"]["SystemInfoDto"];
                     };
                 };
             };
@@ -111,11 +111,6 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
-        AnonymousTypeOfstringAndstringAndstring: {
-            name: null | string;
-            version: null | string;
-            environment: null | string;
-        };
         CategoryFacetsDto: {
             slug: string;
             name: string;
@@ -214,7 +209,7 @@ export interface components {
         SpecFacetDto: {
             key: string;
             label: string;
-            type: string;
+            type: components["schemas"]["SpecFacetType"];
             unit: null | string;
             /** Format: double */
             min: null | number;
@@ -222,10 +217,17 @@ export interface components {
             max: null | number;
             options: components["schemas"]["FacetOptionDto"][];
         };
+        /** @enum {unknown} */
+        SpecFacetType: "number" | "enum" | "boolean";
         SpecRowDto: {
             key: string;
             label: string;
             value: string;
+        };
+        SystemInfoDto: {
+            name: string;
+            version: string;
+            environment: string;
         };
         VariantDto: {
             /** Format: uuid */

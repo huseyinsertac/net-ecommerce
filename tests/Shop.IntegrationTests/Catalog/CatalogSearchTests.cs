@@ -381,15 +381,15 @@ public sealed class CatalogSearchTests(CatalogSearchFixture fixture) : IClassFix
 
         facets.Specs.Select(s => s.Key).ShouldBe(["ram_gb", "os", "touchscreen"]); // schema order; cpu not filterable
         var ram = facets.Specs[0];
-        (ram.Label, ram.Type, ram.Unit, ram.Min, ram.Max).ShouldBe(("RAM", "number", "GB", 8m, 32m)); // draft's 64 excluded
+        (ram.Label, ram.Type, ram.Unit, ram.Min, ram.Max).ShouldBe(("RAM", SpecFacetType.Number, "GB", 8m, 32m)); // draft's 64 excluded
         ram.Options.ShouldBeEmpty();
 
         var os = facets.Specs[1];
-        os.Type.ShouldBe("enum");
+        os.Type.ShouldBe(SpecFacetType.Enum);
         os.Options.ShouldBe([new("Windows 11", 2), new("Linux", 3), new("FreeBSD", 0)]); // schema order, zero counts kept
 
         var touch = facets.Specs[2];
-        touch.Type.ShouldBe("boolean");
+        touch.Type.ShouldBe(SpecFacetType.Boolean);
         touch.Options.ShouldBe([new("true", 2), new("false", 3)]);
 
         var parent = (await Query(new GetCategoryFacets("electronics"))).Value;

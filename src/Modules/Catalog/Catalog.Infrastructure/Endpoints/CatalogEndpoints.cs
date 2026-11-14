@@ -1,10 +1,13 @@
 using System.ComponentModel;
+using System.Text.Json.Nodes;
 using Catalog.Application.Categories;
 using Catalog.Application.Products;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.OpenApi;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.OpenApi;
 using Shop.Application.Abstractions;
 using Shop.Application.Abstractions.Messaging;
 using Shop.Application.Abstractions.Paging;
@@ -38,6 +41,7 @@ internal static class CatalogEndpoints
 
         group.MapGet("/products", GetProducts)
             .WithName("SearchCatalogProducts")
+            .AddOpenApiOperationTransformer(AdvertiseSortValues)
             .WithTags(Tag)
             .WithSummary("Searches active products with text, brand, price, stock, spec filters, sorting and paging.")
             .Produces<PagedResult<ProductSummaryDto>>()
@@ -50,6 +54,17 @@ internal static class CatalogEndpoints
             .WithSummary("Product detail with specs, option axes and variants.")
             .Produces<ProductDetailDto>()
             .ProducesProblem(StatusCodes.Status404NotFound);
+    }
+
+    /// <summary>A union type for sort in the generated client instead of a bare string.</summary>
+    private static Task AdvertiseSortValues(OpenApiOperation operation, OpenApiOperationTransformerContext context, CancellationToken ct)
+    {
+        if (operation.Parameters?.FirstOrDefault(p => p.Name == "sort")?.Schema is OpenApiSchema schema)
+        {
+            schema.Enum = [.. SortValues.Keys.Select(k => (JsonNode)JsonValue.Create(k)!)];
+        }
+
+        return Task.CompletedTask;
     }
 
     private static Task<IResult> GetCategories(IDispatcher dispatcher, CancellationToken ct) =>

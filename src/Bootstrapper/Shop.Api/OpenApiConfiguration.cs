@@ -1,5 +1,3 @@
-using System.Text.Json.Nodes;
-using Catalog.Application.Products;
 using Microsoft.AspNetCore.OpenApi;
 using Microsoft.OpenApi;
 
@@ -24,19 +22,6 @@ internal static class OpenApiConfiguration
             if (schema.Properties?.ContainsKey("totalPages") == true)
             {
                 (schema.Required ??= new HashSet<string>()).Add("totalPages");
-            }
-
-            return Task.CompletedTask;
-        });
-
-        options.AddOperationTransformer((operation, context, _) =>
-        {
-            // A union type for sort in the generated client instead of a bare string.
-            if (context.Description.ActionDescriptor.EndpointMetadata.OfType<EndpointNameMetadata>()
-                    .Any(m => m.EndpointName == "SearchCatalogProducts")
-                && operation.Parameters?.FirstOrDefault(p => p.Name == "sort")?.Schema is OpenApiSchema schema)
-            {
-                schema.Enum = [.. Enum.GetNames<ProductSort>().Select(n => (JsonNode)JsonValue.Create(char.ToLowerInvariant(n[0]) + n[1..])!)];
             }
 
             return Task.CompletedTask;

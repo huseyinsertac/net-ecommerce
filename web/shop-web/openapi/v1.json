@@ -16,7 +16,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/AnonymousTypeOfstringAndstringAndstring"
+                  "$ref": "#/components/schemas/SystemInfoDto"
                 }
               }
             }
@@ -281,34 +281,6 @@
   },
   "components": {
     "schemas": {
-      "AnonymousTypeOfstringAndstringAndstring": {
-        "required": [
-          "name",
-          "version",
-          "environment"
-        ],
-        "type": "object",
-        "properties": {
-          "name": {
-            "type": [
-              "null",
-              "string"
-            ]
-          },
-          "version": {
-            "type": [
-              "null",
-              "string"
-            ]
-          },
-          "environment": {
-            "type": [
-              "null",
-              "string"
-            ]
-          }
-        }
-      },
       "CategoryFacetsDto": {
         "required": [
           "slug",
@@ -698,7 +670,7 @@
             "type": "string"
           },
           "type": {
-            "type": "string"
+            "$ref": "#/components/schemas/SpecFacetType"
           },
           "unit": {
             "type": [
@@ -728,6 +700,13 @@
           }
         }
       },
+      "SpecFacetType": {
+        "enum": [
+          "number",
+          "enum",
+          "boolean"
+        ]
+      },
       "SpecRowDto": {
         "required": [
           "key",
@@ -743,6 +722,25 @@
             "type": "string"
           },
           "value": {
+            "type": "string"
+          }
+        }
+      },
+      "SystemInfoDto": {
+        "required": [
+          "name",
+          "version",
+          "environment"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "version": {
+            "type": "string"
+          },
+          "environment": {
             "type": "string"
           }
         }

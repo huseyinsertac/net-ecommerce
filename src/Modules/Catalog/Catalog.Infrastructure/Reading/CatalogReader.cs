@@ -154,15 +154,15 @@ internal sealed class CatalogReader(CatalogDbContext db) : ICatalogReader
 
             var specs = specDefs.Select(s => s.Type switch
             {
-                SpecType.Number => new SpecFacetDto(s.Key, s.Label, "number", s.Unit,
+                SpecType.Number => new SpecFacetDto(s.Key, s.Label, SpecFacetType.Number, s.Unit,
                     ranges.GetValueOrDefault(s.Key)?.Min, ranges.GetValueOrDefault(s.Key)?.Max, []),
-                SpecType.Enum => new SpecFacetDto(s.Key, s.Label, "enum", s.Unit, null, null,
+                SpecType.Enum => new SpecFacetDto(s.Key, s.Label, SpecFacetType.Enum, s.Unit, null, null,
                     [.. s.Options.Select(o => new FacetOptionDto(o, CountOf(counts[s.Key], o)))]),
-                SpecType.Boolean => new SpecFacetDto(s.Key, s.Label, "boolean", s.Unit, null, null,
+                SpecType.Boolean => new SpecFacetDto(s.Key, s.Label, SpecFacetType.Boolean, s.Unit, null, null,
                     [new FacetOptionDto("true", CountOf(counts[s.Key], "true")),
                      new FacetOptionDto("false", CountOf(counts[s.Key], "false"))]),
                 // Filterable free text: offered like an enum over the values that actually occur.
-                _ => new SpecFacetDto(s.Key, s.Label, "enum", s.Unit, null, null,
+                _ => new SpecFacetDto(s.Key, s.Label, SpecFacetType.Enum, s.Unit, null, null,
                     [.. counts[s.Key].Select(r => new FacetOptionDto(r.Value, r.Count))]),
             }).ToList();
 
