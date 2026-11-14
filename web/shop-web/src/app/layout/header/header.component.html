@@ -10,7 +10,12 @@
     <mat-icon fontSet="material-symbols-outlined" class="bolt">bolt</mat-icon>{{ brand.name }}
   </a>
 
-  <form class="search-form" role="search" (submit)="search($event, q.value)">
+  <form
+    class="search-form"
+    [class.open]="searchOpen()"
+    role="search"
+    (submit)="search($event, q.value)"
+  >
     <mat-form-field class="search" appearance="outline" subscriptSizing="dynamic">
       <mat-icon matPrefix fontSet="material-symbols-outlined">search</mat-icon>
       <input
@@ -28,6 +33,17 @@
   </form>
 
   <span class="spacer"></span>
+
+  <button
+    mat-icon-button
+    type="button"
+    class="search-toggle"
+    aria-label="Toggle search"
+    [attr.aria-expanded]="searchOpen()"
+    (click)="searchOpen.set(!searchOpen())"
+  >
+    <mat-icon fontSet="material-symbols-outlined">{{ searchOpen() ? 'close' : 'search' }}</mat-icon>
+  </button>
 
   <a mat-button class="nav-link" routerLink="/">Shop</a>
 

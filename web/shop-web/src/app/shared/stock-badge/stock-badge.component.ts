@@ -3,7 +3,9 @@ import { stockLabel } from './stock-label';
 
 @Component({
   selector: 'app-stock-badge',
-  template: `<span class="badge" [class.out]="label() === 'Out of stock'">{{ label() }}</span>`,
+  template: `@if (label(); as text) {
+    <span class="badge" [class.out]="text === 'Out of stock'">{{ text }}</span>
+  }`,
   styles: `
     .badge {
       font: var(--mat-sys-label-medium);
@@ -16,14 +18,17 @@ import { stockLabel } from './stock-label';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class StockBadgeComponent {
-  /** Units available (detail view). */
+  /** Units available (detail view). Takes precedence over `inStock` when both are set. */
   readonly available = input<number>();
   /** Flag only (list view, where the count is not known). */
   readonly inStock = input<boolean>();
 
+  /** Renders nothing when neither input is provided. */
   protected readonly label = computed(() => {
     const n = this.available();
     if (n !== undefined) return stockLabel(n);
-    return this.inStock() === false ? stockLabel(0) : 'In stock';
+    const flag = this.inStock();
+    if (flag === undefined) return undefined;
+    return flag ? 'In stock' : stockLabel(0);
   });
 }

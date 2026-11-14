@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { MatBadgeModule } from '@angular/material/badge';
 import { MatButtonModule } from '@angular/material/button';
@@ -31,6 +31,8 @@ export class HeaderComponent {
   protected readonly brand = BRAND;
   protected readonly cartCount = 0;
   private readonly router = inject(Router);
+  /** Phone layout only: whether the search row is expanded. */
+  protected readonly searchOpen = signal(false);
 
   /** Current `q` while on /search, else empty. */
   protected readonly currentQuery = toSignal(
@@ -50,6 +52,7 @@ export class HeaderComponent {
     event.preventDefault();
     const q = value.trim();
     if (!q) return;
+    this.searchOpen.set(false);
     void this.router.navigate(['/search'], { queryParams: { q } });
   }
 }

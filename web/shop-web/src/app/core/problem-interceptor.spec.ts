@@ -22,6 +22,33 @@ describe('problemInterceptor', () => {
     ctrl = TestBed.inject(HttpTestingController);
   });
 
+  afterEach(() => ctrl.verify());
+
+  it('rethrows the error to the caller', () => {
+    const errors: number[] = [];
+    http.get('/x').subscribe({ error: (e: { status: number }) => errors.push(e.status) });
+    ctrl.expectOne('/x').flush({ title: 'Boom' }, { status: 500, statusText: 'Server Error' });
+    expect(errors).toEqual([500]);
+  });
+
+  it('uses fallback text when a 500 body is not ProblemDetails', () => {
+    http.get('/x').subscribe({ error: () => undefined });
+    ctrl.expectOne('/x').flush('<html>oops</html>', { status: 500, statusText: 'Server Error' });
+    expect(open).toHaveBeenCalledWith(
+      'Something went wrong on our side.',
+      'Dismiss',
+      expect.anything(),
+    );
+  });
+
+  it('does not toast 400', () => {
+    http.get('/x').subscribe({ error: () => undefined });
+    ctrl
+      .expectOne('/x')
+      .flush({ title: 'Bad', type: 'validation.failed' }, { status: 400, statusText: 'Bad' });
+    expect(open).not.toHaveBeenCalled();
+  });
+
   it('toasts the problem title on 500', () => {
     http.get('/x').subscribe({ error: () => undefined });
     ctrl
@@ -40,7 +67,10 @@ describe('problemInterceptor', () => {
     http.get('/x').subscribe({ error: () => undefined });
     ctrl
       .expectOne('/x')
-      .flush({ title: 'Nope', type: 'catalog.product_not_found' }, { status: 404, statusText: 'NF' });
+      .flush(
+        { title: 'Nope', type: 'catalog.product_not_found' },
+        { status: 404, statusText: 'NF' },
+      );
     expect(open).not.toHaveBeenCalled();
   });
 });

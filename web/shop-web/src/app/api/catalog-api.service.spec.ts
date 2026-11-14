@@ -45,9 +45,66 @@ describe('buildProductParams', () => {
   });
 });
 
+describe('buildProductParams encoding', () => {
+  const wire = (q: Partial<ProductQuery>) => buildProductParams({ ...empty, ...q }).toString();
+  const decode = (s: string) => new URLSearchParams(s); // server-side decoding stand-in
+
+  it('percent-encodes + so it is not read as a space', () => {
+    const s = wire({ q: 'c++' });
+    expect(s).toContain('q=c%2B%2B');
+    expect(decode(s).get('q')).toBe('c++');
+  });
+
+  it('encodes spaces as %20 and round-trips', () => {
+    const s = wire({ q: 'usb c cable', brands: ['A+B', 'Volt Lane'] });
+    expect(s).toContain('q=usb%20c%20cable');
+    expect(decode(s).getAll('brand')).toEqual(['A+B', 'Volt Lane']);
+  });
+
+  it('round-trips spec strings with : , and ..', () => {
+    const specs = ['ram:8..16', 'color:red,blue', 'size:6.1..6.9'];
+    expect(decode(wire({ specs })).getAll('spec')).toEqual(specs);
+  });
+});
+
+describe('CatalogApi resources', () => {
+  function setup() {
+    TestBed.configureTestingModule({
+      providers: [provideHttpClient(), provideHttpClientTesting()],
+    });
+    return { api: TestBed.inject(CatalogApi), ctrl: TestBed.inject(HttpTestingController) };
+  }
+
+  it('facets fires no request until a slug is set, then fires once', () => {
+    const { api, ctrl } = setup();
+    const slug = signal<string | undefined>(undefined);
+    TestBed.runInInjectionContext(() => api.facets(slug));
+    TestBed.tick();
+    ctrl.expectNone(() => true);
+    slug.set('phones');
+    TestBed.tick();
+    ctrl.expectOne('/api/catalog/categories/phones/facets').flush({});
+    ctrl.verify();
+  });
+
+  it('products re-requests when the query signal changes', () => {
+    const { api, ctrl } = setup();
+    const query = signal<ProductQuery>(empty);
+    TestBed.runInInjectionContext(() => api.products(query));
+    TestBed.tick();
+    ctrl.expectOne((r) => r.params.get('page') === '1').flush({ items: [] });
+    query.set({ ...empty, page: 2 });
+    TestBed.tick();
+    ctrl.expectOne((r) => r.params.get('page') === '2').flush({ items: [] });
+    ctrl.verify();
+  });
+});
+
 describe('CatalogApi', () => {
   it('requests the product by slug', async () => {
-    TestBed.configureTestingModule({ providers: [provideHttpClient(), provideHttpClientTesting()] });
+    TestBed.configureTestingModule({
+      providers: [provideHttpClient(), provideHttpClientTesting()],
+    });
     const api = TestBed.inject(CatalogApi);
     const ctrl = TestBed.inject(HttpTestingController);
     const ref = TestBed.runInInjectionContext(() => api.product(signal('volt-phone')));
