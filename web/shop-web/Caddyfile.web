@@ -1,12 +1,21 @@
 :80 {
 	root * /srv
-	# index.html (served for / and every SPA route) must revalidate; hashed assets can be cached.
-	@index not path *.js *.css *.png *.jpg *.svg *.ico *.woff *.woff2 *.json *.txt /images/*
-	header @index Cache-Control "no-cache"
-	# Curated photos are immutable per key; cache for a week.
-	@images path /images/*
-	header @images Cache-Control "public, max-age=604800"
-	try_files {path} /index.html
-	file_server
 	encode zstd gzip
+
+	# Curated photos: a missing file is a real 404 (never the SPA shell). Cached for a week on hits only.
+	# Not "immutable": the files can be replaced under the same key, so they are allowed to go stale for a week.
+	handle /images/* {
+		@hit file
+		header @hit Cache-Control "public, max-age=604800"
+		file_server
+	}
+
+	# Everything else is the SPA: index.html (served for / and every SPA route) must revalidate;
+	# hashed assets can be cached.
+	handle {
+		@index not path *.js *.css *.png *.jpg *.svg *.ico *.woff *.woff2 *.json *.txt
+		header @index Cache-Control "no-cache"
+		try_files {path} /index.html
+		file_server
+	}
 }
