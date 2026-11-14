@@ -33,11 +33,28 @@ public sealed partial class Category : AggregateRoot<Guid>
             return CatalogErrors.InvalidSlug(slug ?? string.Empty);
         }
 
+        if (string.IsNullOrWhiteSpace(name))
+        {
+            return CatalogErrors.InvalidName("Name");
+        }
+
+        if (string.IsNullOrWhiteSpace(icon))
+        {
+            return CatalogErrors.InvalidName("Icon");
+        }
+
+        if (specSchema is null)
+        {
+            return CatalogErrors.InvalidSpecSchema("Spec schema must not be null.");
+        }
+
         var schemaError = ValidateSchema(specSchema);
         if (schemaError is not null)
         {
             return schemaError;
         }
+
+        var copied = specSchema.Select(spec => spec with { Options = [.. spec.Options] }).ToList();
 
         return new Category
         {
@@ -47,7 +64,7 @@ public sealed partial class Category : AggregateRoot<Guid>
             Icon = icon,
             ParentId = parentId,
             SortOrder = sortOrder,
-            _specSchema = [.. specSchema],
+            _specSchema = copied,
         };
     }
 
@@ -55,6 +72,11 @@ public sealed partial class Category : AggregateRoot<Guid>
 
     public Result ValidateSpecs(IReadOnlyDictionary<string, SpecValue> values)
     {
+        if (values is null)
+        {
+            return Result.Failure(CatalogErrors.NullSpecValues());
+        }
+
         foreach (var key in values.Keys)
         {
             if (FindSpec(key) is null)
@@ -95,9 +117,24 @@ public sealed partial class Category : AggregateRoot<Guid>
         var seen = new HashSet<string>();
         foreach (var spec in specSchema)
         {
-            if (!SpecKeyPattern().IsMatch(spec.Key))
+            if (spec is null)
+            {
+                return CatalogErrors.InvalidSpecSchema("Spec definitions must not be null.");
+            }
+
+            if (spec.Key is null || !SpecKeyPattern().IsMatch(spec.Key))
             {
                 return CatalogErrors.InvalidSpecSchema($"Spec key '{spec.Key}' must match ^[a-z][a-z0-9_]*$.");
+            }
+
+            if (string.IsNullOrWhiteSpace(spec.Label))
+            {
+                return CatalogErrors.InvalidSpecSchema($"Spec '{spec.Key}' needs a label.");
+            }
+
+            if (spec.Options is null)
+            {
+                return CatalogErrors.InvalidSpecSchema($"Spec '{spec.Key}' must have an options list (empty if none).");
             }
 
             if (!seen.Add(spec.Key))
@@ -112,9 +149,19 @@ public sealed partial class Category : AggregateRoot<Guid>
                     return CatalogErrors.InvalidSpecSchema($"Enum spec '{spec.Key}' needs at least one option.");
                 }
 
+                if (spec.Options.Any(string.IsNullOrWhiteSpace))
+                {
+                    return CatalogErrors.InvalidSpecSchema($"Enum spec '{spec.Key}' has a blank option.");
+                }
+
                 if (spec.Options.Any(o => o.Contains(',')))
                 {
                     return CatalogErrors.InvalidSpecSchema($"Enum spec '{spec.Key}' has an option containing a comma.");
+                }
+
+                if (spec.Options.Distinct().Count() != spec.Options.Count)
+                {
+                    return CatalogErrors.InvalidSpecSchema($"Enum spec '{spec.Key}' has duplicate options.");
                 }
             }
             else if (spec.Options.Count != 0)

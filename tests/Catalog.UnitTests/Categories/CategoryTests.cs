@@ -31,7 +31,7 @@ public class CategoryTests
         result.Value.Id.ShouldNotBe(Guid.Empty);
         result.Value.Slug.ShouldBe("laptops");
         result.Value.SpecSchema.Count.ShouldBe(2);
-        result.Value.FindSpec("ram_gb").ShouldBe(Ram);
+        result.Value.FindSpec("ram_gb")!.Key.ShouldBe("ram_gb");
         result.Value.FindSpec("nope").ShouldBeNull();
     }
 
@@ -155,4 +155,61 @@ public class CategoryTests
         result.Error.Code.ShouldBe("catalog.spec_invalid_option");
         result.Error.Message.ShouldContain("os");
     }
+
+    private static string? Code(Result<Category> r) => r.IsFailure ? r.Error.Code : null;
+
+    [Fact]
+    public void Create_NullSchema_Fails() =>
+        Code(Category.Create("a", "A", "i", null, 0, null!)).ShouldBe("catalog.invalid_spec_schema");
+
+    [Fact]
+    public void Create_NullSpecElement_Fails() =>
+        Code(Category.Create("a", "A", "i", null, 0, [null!])).ShouldBe("catalog.invalid_spec_schema");
+
+    [Fact]
+    public void Create_NullKey_Fails() =>
+        Code(Category.Create("a", "A", "i", null, 0, [Ram with { Key = null! }])).ShouldBe("catalog.invalid_spec_schema");
+
+    [Fact]
+    public void Create_NullOptions_Fails() =>
+        Code(Category.Create("a", "A", "i", null, 0, [Ram with { Options = null! }])).ShouldBe("catalog.invalid_spec_schema");
+
+    [Theory]
+    [InlineData(null)]
+    [InlineData("")]
+    [InlineData("  ")]
+    public void Create_BlankNameIconOrLabel_Fails(string? blank)
+    {
+        Code(Category.Create("a", blank!, "i", null, 0, [])).ShouldBe("catalog.invalid_name");
+        Code(Category.Create("a", "A", blank!, null, 0, [])).ShouldBe("catalog.invalid_name");
+        Code(Category.Create("a", "A", "i", null, 0, [Ram with { Label = blank! }])).ShouldBe("catalog.invalid_spec_schema");
+    }
+
+    [Theory]
+    [InlineData(null)]
+    [InlineData(" ")]
+    public void Create_BlankEnumOption_Fails(string? option) =>
+        Code(Category.Create("a", "A", "i", null, 0, [Os with { Options = ["linux", option!] }]))
+            .ShouldBe("catalog.invalid_spec_schema");
+
+    [Fact]
+    public void Create_DuplicateEnumOption_Fails() =>
+        Code(Category.Create("a", "A", "i", null, 0, [Os with { Options = ["linux", "linux"] }]))
+            .ShouldBe("catalog.invalid_spec_schema");
+
+    [Fact]
+    public void Create_CallerMutatingOptionsAfterwards_DoesNotAffectCategory()
+    {
+        var options = new List<string> { "windows", "linux" };
+        var category = Category.Create("a", "A", "i", null, 0, [Os with { Options = options }]).Value;
+
+        options.Add("beos");
+        options[0] = "x";
+
+        category.FindSpec("os")!.Options.ShouldBe(["windows", "linux"]);
+    }
+
+    [Fact]
+    public void ValidateSpecs_NullValues_FailsWithoutThrowing() =>
+        NewCategory().ValidateSpecs(null!).IsFailure.ShouldBeTrue();
 }

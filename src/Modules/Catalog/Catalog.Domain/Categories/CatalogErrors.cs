@@ -8,8 +8,14 @@ public static class CatalogErrors
         Error.Validation("catalog.invalid_slug",
             $"Slug '{slug}' must be lowercase alphanumeric words separated by hyphens, at most 80 characters.");
 
+    public static Error InvalidName(string field) =>
+        Error.Validation("catalog.invalid_name", $"{field} must not be blank.");
+
     public static Error InvalidSpecSchema(string message) =>
         Error.Validation("catalog.invalid_spec_schema", message);
+
+    public static Error NullSpecValues() =>
+        Error.Validation("catalog.spec_unknown", "Spec values must be provided.");
 
     public static Error SpecMissing(string key) =>
         Error.Validation("catalog.spec_missing", $"Spec '{key}' is required.");
