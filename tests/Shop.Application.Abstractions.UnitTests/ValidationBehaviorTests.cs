@@ -22,6 +22,20 @@ public sealed class GetThingValidator : AbstractValidator<GetThing>
     public GetThingValidator() => RuleFor(x => x.Id).NotEmpty();
 }
 
+public sealed record NestedItem(string Value);
+
+public sealed record GetNested(IReadOnlyList<NestedItem> Items) : IQuery<string>;
+
+public sealed class GetNestedValidator : AbstractValidator<GetNested>
+{
+    public GetNestedValidator() => RuleForEach(x => x.Items).ChildRules(i => i.RuleFor(n => n.Value).NotEmpty());
+}
+
+public sealed class GetNestedHandler : IQueryHandler<GetNested, string>
+{
+    public Task<Result<string>> Handle(GetNested query, CancellationToken ct) => Task.FromResult(Result.Success("ok"));
+}
+
 public sealed class GetThingHandler(TestLog log) : IQueryHandler<GetThing, string>
 {
     public Task<Result<string>> Handle(GetThing query, CancellationToken ct)
@@ -93,7 +107,7 @@ public class ValidationBehaviorTests
             var result = await sp.CreateScope().ServiceProvider.GetRequiredService<IDispatcher>().Send(new CreateThing(""), TestContext.Current.CancellationToken);
             result.IsFailure.ShouldBeTrue();
             var error = result.Error.ShouldBeOfType<ValidationError>();
-            error.Errors["Name"].ShouldNotBeEmpty();
+            error.Errors["name"].ShouldNotBeEmpty();
             log.HandlerCalls.ShouldBe(0);
         }
     }
@@ -108,8 +122,20 @@ public class ValidationBehaviorTests
                 .Query(new GetThing(""), TestContext.Current.CancellationToken);
             result.IsFailure.ShouldBeTrue();
             var error = result.Error.ShouldBeOfType<ValidationError>();
-            error.Errors["Id"].ShouldNotBeEmpty();
+            error.Errors["id"].ShouldNotBeEmpty();
             log.HandlerCalls.ShouldBe(0);
+        }
+    }
+
+    [Fact]
+    public async Task Validation_NestedPropertyPath_IsCamelCased()
+    {
+        var (sp, _) = Build();
+        using (sp)
+        {
+            var result = await sp.CreateScope().ServiceProvider.GetRequiredService<IDispatcher>()
+                .Query(new GetNested([new NestedItem("a"), new NestedItem("")]), TestContext.Current.CancellationToken);
+            result.Error.ShouldBeOfType<ValidationError>().Errors.ShouldContainKey("items[1].value");
         }
     }
 

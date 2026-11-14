@@ -174,6 +174,13 @@
             "in": "query",
             "description": "Sort order: featured, relevance, priceAsc, priceDesc or newest. Defaults to relevance with text, otherwise featured.",
             "schema": {
+              "enum": [
+                "featured",
+                "relevance",
+                "priceAsc",
+                "priceDesc",
+                "newest"
+              ],
               "type": "string"
             }
           },
@@ -212,7 +219,7 @@
             "content": {
               "application/problem\u002Bjson": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
                 }
               }
             }
@@ -407,6 +414,51 @@
           }
         }
       },
+      "HttpValidationProblemDetails": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "title": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "status": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int32"
+          },
+          "detail": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "instance": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "errors": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
       "OptionAxisDto": {
         "required": [
           "key",
@@ -434,7 +486,8 @@
           "items",
           "page",
           "pageSize",
-          "totalCount"
+          "totalCount",
+          "totalPages"
         ],
         "type": "object",
         "properties": {

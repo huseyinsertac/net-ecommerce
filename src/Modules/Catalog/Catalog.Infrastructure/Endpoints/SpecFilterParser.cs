@@ -33,6 +33,12 @@ public static class SpecFilterParser
             return false;
         }
 
+        if (body.Contains("...", StringComparison.Ordinal))
+        {
+            error = "A range uses exactly two dots (min..max).";
+            return false;
+        }
+
         var dots = body.IndexOf(RangeSeparator, StringComparison.Ordinal);
         if (dots >= 0)
         {

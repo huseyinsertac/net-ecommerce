@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
-using Microsoft.OpenApi;
 using Scalar.AspNetCore;
 using Serilog;
 using Serilog.Formatting.Compact;
@@ -41,17 +40,7 @@ builder.Services.Configure<ForwardedHeadersOptions>(options =>
 
 builder.Services.AddProblemDetails();
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
-builder.Services.AddOpenApi(options => options.AddSchemaTransformer((schema, _, _) =>
-{
-    // .NET advertises numbers as number|string (it accepts quoted numbers); the contract is plain numbers.
-    if (schema.Type is { } type && type.HasFlag(JsonSchemaType.String) && (type.HasFlag(JsonSchemaType.Number) || type.HasFlag(JsonSchemaType.Integer)))
-    {
-        schema.Type = type & ~JsonSchemaType.String;
-        schema.Pattern = null;
-    }
-
-    return Task.CompletedTask;
-}));
+builder.Services.AddOpenApi(OpenApiConfiguration.Configure);
 
 builder.Services.AddDispatcher();
 builder.Services.AddEventing(

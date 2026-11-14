@@ -191,7 +191,7 @@ public sealed class CatalogSearchTests(CatalogSearchFixture fixture) : IClassFix
     public async Task Search_TooLongText_ValidationError()
     {
         var result = await Query(Search(text: new string('a', 300)));
-        result.Error.ShouldBeOfType<ValidationError>().Errors.ShouldContainKey(nameof(SearchProducts.Text));
+        result.Error.ShouldBeOfType<ValidationError>().Errors.ShouldContainKey("text");
     }
 
     [Fact]
@@ -313,9 +313,9 @@ public sealed class CatalogSearchTests(CatalogSearchFixture fixture) : IClassFix
     }
 
     [Theory]
-    [InlineData(0, 24, "Page")]
-    [InlineData(1, 0, "PageSize")]
-    [InlineData(1, 49, "PageSize")]
+    [InlineData(0, 24, "page")]
+    [InlineData(1, 0, "pageSize")]
+    [InlineData(1, 49, "pageSize")]
     public async Task Search_InvalidPaging_ValidationError(int page, int pageSize, string field)
     {
         var result = await Query(Search(page: page, pageSize: pageSize));

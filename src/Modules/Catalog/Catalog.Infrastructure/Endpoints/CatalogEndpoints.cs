@@ -41,7 +41,7 @@ internal static class CatalogEndpoints
             .WithTags(Tag)
             .WithSummary("Searches active products with text, brand, price, stock, spec filters, sorting and paging.")
             .Produces<PagedResult<ProductSummaryDto>>()
-            .ProducesProblem(StatusCodes.Status400BadRequest)
+            .ProducesValidationProblem()
             .ProducesProblem(StatusCodes.Status404NotFound);
 
         group.MapGet("/products/{slug}", GetProduct)

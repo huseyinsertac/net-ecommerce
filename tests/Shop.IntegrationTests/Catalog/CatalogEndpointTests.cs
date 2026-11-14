@@ -118,7 +118,7 @@ public sealed class CatalogEndpointTests(CatalogEndpointFixture fixture) : IClas
         response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
         var problem = await Json(response);
         problem.GetProperty("type").GetString().ShouldBe("validation.failed");
-        problem.GetProperty("errors").TryGetProperty("PageSize", out _).ShouldBeTrue();
+        problem.GetProperty("errors").TryGetProperty("pageSize", out _).ShouldBeTrue();
     }
 
     [Fact]

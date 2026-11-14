@@ -40,6 +40,32 @@ public sealed class SpecFilterParserTests
         filter.Values.ShouldBe(["true"]);
     }
 
+    [Fact]
+    public void TryParse_NegativeBounds()
+    {
+        SpecFilterParser.TryParse("temp_c:-5..-1", out var filter, out _).ShouldBeTrue();
+
+        filter.Min.ShouldBe(-5m);
+        filter.Max.ShouldBe(-1m);
+    }
+
+    [Fact]
+    public void TryParse_ExtraColon_StaysInValue()
+    {
+        SpecFilterParser.TryParse("a:b:c", out var filter, out _).ShouldBeTrue();
+
+        filter.Key.ShouldBe("a");
+        filter.Values.ShouldBe(["b:c"]);
+    }
+
+    [Fact]
+    public void TryParse_TrimsKey()
+    {
+        SpecFilterParser.TryParse("  ram_gb  :16..", out var filter, out _).ShouldBeTrue();
+
+        filter.Key.ShouldBe("ram_gb");
+    }
+
     [Theory]
     [InlineData("ram_gb")]
     [InlineData(":16")]
@@ -47,6 +73,8 @@ public sealed class SpecFilterParserTests
     [InlineData("ram_gb:a..b")]
     [InlineData("ram_gb:")]
     [InlineData("ram_gb: , ")]
+    [InlineData("ram_gb:1...5")]
+    [InlineData("ram_gb:1....5")]
     [InlineData("")]
     public void TryParse_Malformed_ReturnsFalseWithError(string raw)
     {

@@ -9,6 +9,23 @@ public sealed class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logge
 {
     public async ValueTask<bool> TryHandleAsync(HttpContext httpContext, Exception exception, CancellationToken cancellationToken)
     {
+        if (exception is BadHttpRequestException badRequest)
+        {
+            // Minimal APIs throw this for unparseable route/query/body values in Development; it is the caller's mistake.
+            httpContext.Response.StatusCode = badRequest.StatusCode;
+            return await problemDetails.TryWriteAsync(new ProblemDetailsContext
+            {
+                HttpContext = httpContext,
+                Exception = exception,
+                ProblemDetails = new ProblemDetails
+                {
+                    Status = badRequest.StatusCode,
+                    Title = "The request could not be understood.",
+                    Detail = environment.IsDevelopment() ? badRequest.Message : null,
+                },
+            });
+        }
+
         logger.LogError(exception, "Unhandled exception for {Method} {Path}", httpContext.Request.Method, httpContext.Request.Path);
 
         httpContext.Response.StatusCode = StatusCodes.Status500InternalServerError;

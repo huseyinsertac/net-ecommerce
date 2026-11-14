@@ -30,8 +30,12 @@ internal sealed class ValidationBehavior<TRequest, TResult>(IEnumerable<IValidat
         }
 
         var errors = failures
-            .GroupBy(f => f.PropertyName)
+            .GroupBy(f => ToCamelCasePath(f.PropertyName))
             .ToDictionary(g => g.Key, g => g.Select(f => f.ErrorMessage).Distinct().ToArray());
         return ResultFactory.Failure<TResult>(new ValidationError(errors));
     }
+
+    /// <summary>"Specs[0].Values" becomes "specs[0].values": error keys match the camelCase JSON the API speaks.</summary>
+    private static string ToCamelCasePath(string path) =>
+        string.Join('.', path.Split('.').Select(s => s.Length == 0 ? s : char.ToLowerInvariant(s[0]) + s[1..]));
 }
