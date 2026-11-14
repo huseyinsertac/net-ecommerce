@@ -1,9 +1,153 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { BreakpointObserver } from '@angular/cdk/layout';
+import { HttpErrorResponse } from '@angular/common/http';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  inject,
+  signal,
+  viewChild,
+} from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { MatButtonModule } from '@angular/material/button';
+import { MatChipsModule } from '@angular/material/chips';
+import { MatIconModule } from '@angular/material/icon';
+import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
+import { MatSelectModule } from '@angular/material/select';
+import { MatSidenav, MatSidenavModule } from '@angular/material/sidenav';
+import { ActivatedRoute, Router } from '@angular/router';
+import { combineLatest, map } from 'rxjs';
+import { CatalogApi } from '../../api/catalog-api.service';
+import { NotFoundComponent } from '../../shared/not-found/not-found.component';
+import { ProductCardComponent } from '../../shared/product-card/product-card.component';
+import { FilterPanelComponent } from './filter-panel/filter-panel.component';
+import {
+  ListingState,
+  SORT_OPTIONS,
+  activeChips,
+  applyFilterChange,
+  clearFilters,
+  defaultSort,
+  fromRoute,
+  toProductQuery,
+  toQueryParams,
+} from './listing-query';
 
-/** Placeholder; implemented in Task 10. */
+const PAGE_SIZE = 24;
+
+/** Product grid for a category (`/c/:slug`) or a search (`/search?q=`). State lives only in the URL. */
 @Component({
   selector: 'app-product-list-page',
-  template: `<p>Products</p>`,
+  imports: [
+    MatButtonModule,
+    MatChipsModule,
+    MatIconModule,
+    MatPaginatorModule,
+    MatSelectModule,
+    MatSidenavModule,
+    FilterPanelComponent,
+    NotFoundComponent,
+    ProductCardComponent,
+  ],
+  templateUrl: './product-list.page.html',
+  styleUrl: './product-list.page.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ProductListPage {}
+export class ProductListPage {
+  private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
+  private readonly api = inject(CatalogApi);
+
+  protected readonly pageSize = PAGE_SIZE;
+  protected readonly skeletons = Array.from({ length: 12 }, (_, i) => i);
+
+  protected readonly state = toSignal(
+    combineLatest([this.route.paramMap, this.route.queryParamMap]).pipe(
+      map(([p, q]) => fromRoute(p.get('slug') ?? undefined, q)),
+    ),
+    { requireSync: true },
+  );
+
+  private readonly categorySlug = computed(() => this.state().category);
+  protected readonly facets = this.api.facets(this.categorySlug);
+  protected readonly products = this.api.products(computed(() => toProductQuery(this.state(), PAGE_SIZE)));
+
+  protected readonly compact = toSignal(
+    inject(BreakpointObserver)
+      .observe('(max-width: 899.98px)')
+      .pipe(map((r) => r.matches)),
+    { initialValue: false },
+  );
+  protected readonly drawerTop = signal(64);
+  private readonly drawer = viewChild(MatSidenav);
+  protected readonly facetData = computed(() =>
+    this.facets.hasValue() ? this.facets.value() : undefined,
+  );
+
+  protected readonly sortOptions = computed(() =>
+    SORT_OPTIONS.filter((o) => o.value !== 'relevance' || this.state().q),
+  );
+  protected readonly sortValue = computed(() => this.state().sort ?? defaultSort(this.state()));
+
+  private readonly status = computed(() => {
+    for (const err of [this.products.error(), this.facets.error()]) {
+      if (err instanceof HttpErrorResponse && (err.status === 404 || err.status === 400)) {
+        return err.status;
+      }
+    }
+    return undefined;
+  });
+  protected readonly notFound = computed(() => this.status() === 404);
+  protected readonly invalidFilters = computed(() => this.status() === 400);
+  protected readonly failed = computed(() => !this.status() && !!this.products.error());
+
+  protected readonly page = computed(() => this.products.hasValue() ? this.products.value() : undefined);
+  protected readonly total = computed(() => this.page()?.totalCount);
+
+  protected readonly title = computed(() => {
+    const { q, category } = this.state();
+    if (q) return `Results for "${q}"`;
+    if (category) return this.facets.hasValue() ? this.facets.value().name : '';
+    return 'All products';
+  });
+
+  protected readonly chips = computed(() => {
+    const meta: Record<string, { label: string; unit: string | null }> = {};
+    if (this.facets.hasValue()) {
+      for (const s of this.facets.value().specs) meta[s.key] = { label: s.label, unit: s.unit };
+    }
+    return activeChips(this.state(), meta);
+  });
+
+  protected change(patch: Partial<ListingState>): void {
+    this.go(applyFilterChange(this.state(), patch));
+  }
+
+  protected removeChip(remove: (s: ListingState) => ListingState): void {
+    this.go(remove(this.state()));
+  }
+
+  protected clearAll(): void {
+    this.go(clearFilters(this.state()));
+  }
+
+  protected setSort(sort: ListingState['sort']): void {
+    this.change({ sort });
+  }
+
+  protected onPage(e: PageEvent): void {
+    this.go({ ...this.state(), page: e.pageIndex + 1 });
+    window.scrollTo({ top: 0 });
+  }
+
+  protected openFilters(): void {
+    // The drawer sits below the sticky site header, whose height differs by breakpoint.
+    const header = document.querySelector('app-header');
+    if (header) this.drawerTop.set(Math.round(header.getBoundingClientRect().height));
+    void this.drawer()?.open();
+  }
+
+  private go(next: ListingState): void {
+    void this.router.navigate([], { queryParams: toQueryParams(next), queryParamsHandling: '' });
+  }
+}

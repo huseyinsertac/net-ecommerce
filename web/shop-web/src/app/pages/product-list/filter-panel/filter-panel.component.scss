@@ -1,0 +1,41 @@
+.panel {
+  display: flex;
+  flex-direction: column;
+}
+
+.block {
+  display: flex;
+  flex-direction: column;
+  padding: 16px 0;
+  border-bottom: 1px solid var(--mat-sys-outline-variant);
+
+  &:last-child {
+    border-bottom: 0;
+  }
+
+  h3 {
+    margin: 0 0 8px;
+    font: var(--mat-sys-title-small);
+  }
+}
+
+.unit,
+.count {
+  font-weight: 400;
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.range {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  mat-form-field {
+    flex: 1;
+    min-width: 0;
+  }
+}
+
+.dash {
+  color: var(--mat-sys-on-surface-variant);
+}

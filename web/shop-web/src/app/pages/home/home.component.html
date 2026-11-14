@@ -1,19 +1,47 @@
 <section class="hero">
   <h1>{{ brand.tagline }}</h1>
   <p>Phones, laptops, audio and more, picked for people who care how their gear performs.</p>
-  <button mat-flat-button type="button" disabled>Catalog coming soon</button>
+  <a mat-flat-button routerLink="/search">Shop all products</a>
 </section>
 
-<section class="featured">
-  <h2>Featured categories</h2>
-  <div class="grid">
-    @for (category of categories; track category.name) {
-      <mat-card appearance="outlined" class="category">
-        <mat-card-content>
-          <mat-icon fontSet="material-symbols-outlined">{{ category.icon }}</mat-icon>
-          <span>{{ category.name }}</span>
-        </mat-card-content>
-      </mat-card>
-    }
-  </div>
+<section class="section">
+  <h2>Shop by category</h2>
+  @if (categoryList(); as list) {
+    <ul class="cats">
+      @for (c of list; track c.slug) {
+        <li>
+          <a class="category" [routerLink]="['/c', c.slug]">
+            <img [src]="thumb(c.imageUrl)" alt="" width="400" height="400" loading="lazy" />
+            <span class="cat-body">
+              <span class="cat-name">{{ c.name }}</span>
+              <span class="cat-count">{{ c.productCount }} {{ c.productCount === 1 ? 'product' : 'products' }}</span>
+            </span>
+          </a>
+        </li>
+      }
+    </ul>
+  } @else if (!categories.error()) {
+    <ul class="cats" aria-busy="true" aria-label="Loading categories">
+      @for (i of skeletons; track i) {
+        <li class="skeleton cat-skeleton"></li>
+      }
+    </ul>
+  }
+</section>
+
+<section class="section">
+  <h2>Featured</h2>
+  @if (featuredItems(); as items) {
+    <ul class="products">
+      @for (p of items; track p.id) {
+        <li><app-product-card [product]="p" /></li>
+      }
+    </ul>
+  } @else if (!featured.error()) {
+    <ul class="products" aria-busy="true" aria-label="Loading featured products">
+      @for (i of skeletons; track i) {
+        <li class="skeleton product-skeleton"></li>
+      }
+    </ul>
+  }
 </section>

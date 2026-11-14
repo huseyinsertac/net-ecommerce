@@ -1,0 +1,139 @@
+@if (notFound()) {
+  <app-not-found />
+} @else {
+  <mat-sidenav-container class="shell">
+    @if (compact()) {
+      <mat-sidenav
+        #drawer
+        mode="over"
+        fixedInViewport
+        [fixedTopGap]="drawerTop()"
+        class="drawer"
+        aria-label="Filters"
+      >
+        <div class="drawer-head">
+          <h2>Filters</h2>
+          <button mat-icon-button type="button" aria-label="Close filters" (click)="drawer.close()">
+            <mat-icon fontSet="material-symbols-outlined">close</mat-icon>
+          </button>
+        </div>
+        <app-filter-panel [facets]="facetData()" [state]="state()" (filterChange)="change($event)" />
+        <button mat-flat-button type="button" class="apply" (click)="drawer.close()">
+          Show @if (total() !== undefined) {
+            {{ total() }}
+          } results
+        </button>
+      </mat-sidenav>
+    }
+
+    <mat-sidenav-content>
+      <div class="page">
+        @if (!compact()) {
+          <aside class="filters" aria-label="Filters">
+            <h2>Filters</h2>
+            <app-filter-panel
+              [facets]="facetData()"
+              [state]="state()"
+              (filterChange)="change($event)"
+            />
+          </aside>
+        }
+
+        <section class="results">
+          <header class="title">
+            <div>
+              <h1>{{ title() }}</h1>
+              @if (total() !== undefined) {
+                <p class="count">{{ total() }} {{ total() === 1 ? 'product' : 'products' }}</p>
+              }
+            </div>
+            <div class="tools">
+              @if (compact()) {
+                <button
+                  mat-stroked-button
+                  type="button"
+                  (click)="openFilters()"
+                >
+                  <mat-icon fontSet="material-symbols-outlined">tune</mat-icon>
+                  Filters
+                </button>
+              }
+              <div class="sort">
+                <span class="sort-label" aria-hidden="true">Sort</span>
+                <mat-select
+                  aria-label="Sort by"
+                  [value]="sortValue()"
+                  (selectionChange)="setSort($event.value)"
+                >
+                  @for (o of sortOptions(); track o.value) {
+                    <mat-option [value]="o.value">{{ o.label }}</mat-option>
+                  }
+                </mat-select>
+              </div>
+            </div>
+          </header>
+
+          @if (chips().length) {
+            <div class="chips">
+              <mat-chip-set aria-label="Active filters">
+                @for (c of chips(); track c.id) {
+                  <mat-chip (removed)="removeChip(c.remove)">
+                    {{ c.label }}
+                    <button matChipRemove type="button" [attr.aria-label]="'Remove ' + c.label">
+                      <mat-icon fontSet="material-symbols-outlined">cancel</mat-icon>
+                    </button>
+                  </mat-chip>
+                }
+              </mat-chip-set>
+              <button mat-button type="button" (click)="clearAll()">Clear all</button>
+            </div>
+          }
+
+          @if (invalidFilters()) {
+            <div class="empty">
+              <h2>Those filters can't be applied</h2>
+              <p>The link may be out of date. Clear the filters to see everything.</p>
+              <button mat-flat-button type="button" (click)="clearAll()">Clear filters</button>
+            </div>
+          } @else if (failed()) {
+            <div class="empty">
+              <h2>We couldn't load products</h2>
+              <p>Please try again in a moment.</p>
+              <button mat-flat-button type="button" (click)="products.reload()">Retry</button>
+            </div>
+          } @else if (page(); as result) {
+            @if (result.totalCount === 0) {
+              <div class="empty">
+                <mat-icon fontSet="material-symbols-outlined" class="empty-icon">search_off</mat-icon>
+                <h2>No products match these filters</h2>
+                <p>Try removing a filter or searching for something else.</p>
+                <button mat-flat-button type="button" (click)="clearAll()">Clear filters</button>
+              </div>
+            } @else {
+              <ul class="grid">
+                @for (p of result.items; track p.id) {
+                  <li><app-product-card [product]="p" /></li>
+                }
+              </ul>
+              <mat-paginator
+                [length]="result.totalCount"
+                [pageSize]="pageSize"
+                [pageIndex]="result.page - 1"
+                [hidePageSize]="true"
+                [showFirstLastButtons]="true"
+                aria-label="Product pages"
+                (page)="onPage($event)"
+              />
+            }
+          } @else {
+            <ul class="grid" aria-busy="true" aria-label="Loading products">
+              @for (i of skeletons; track i) {
+                <li class="skeleton"></li>
+              }
+            </ul>
+          }
+        </section>
+      </div>
+    </mat-sidenav-content>
+  </mat-sidenav-container>
+}
