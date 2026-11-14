@@ -5,6 +5,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="Seeding/catalog-seed.json" LogicalName="Catalog.Infrastructure.Seeding.catalog-seed.json" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="../Catalog.Application/Catalog.Application.csproj" />
     <ProjectReference Include="../../../BuildingBlocks/Shop.Infrastructure.Common/Shop.Infrastructure.Common.csproj" />
   </ItemGroup>
