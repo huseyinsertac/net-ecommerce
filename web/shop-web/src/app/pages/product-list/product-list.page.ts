@@ -5,6 +5,7 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
+  effect,
   inject,
   linkedSignal,
   signal,
@@ -17,6 +18,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { MatSelectModule } from '@angular/material/select';
 import { MatSidenav, MatSidenavModule } from '@angular/material/sidenav';
+import { Title } from '@angular/platform-browser';
 import { ActivatedRoute, Router } from '@angular/router';
 import { combineLatest, map } from 'rxjs';
 import { CatalogApi, PagedProducts } from '../../api/catalog-api.service';
@@ -66,6 +68,7 @@ export class ProductListPage {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly api = inject(CatalogApi);
+  private readonly titleService = inject(Title);
 
   protected readonly pageSize = PAGE_SIZE;
   protected readonly skeletons = Array.from({ length: 12 }, (_, i) => i);
@@ -79,6 +82,11 @@ export class ProductListPage {
 
   private readonly categorySlug = computed(() => this.state().category);
   protected readonly facets = this.api.facets(this.categorySlug);
+  private readonly categoryTree = this.api.categories();
+  /** Category tree for the "Category" block; undefined until loaded (the block is simply absent). */
+  protected readonly categories = computed(() =>
+    this.categoryTree.hasValue() ? this.categoryTree.value() : undefined,
+  );
   protected readonly products = this.api.products(computed(() => toProductQuery(this.state(), PAGE_SIZE)));
 
   protected readonly compact = toSignal(
@@ -132,6 +140,13 @@ export class ProductListPage {
     }
     return activeChips(this.state(), meta);
   });
+
+  constructor() {
+    // Category pages are named after the category; /search keeps its route title.
+    effect(() => {
+      if (this.state().category) this.titleService.setTitle(`${this.title()} · VoltLane`);
+    });
+  }
 
   protected change(patch: Partial<ListingState>): void {
     this.go(applyFilterChange(this.state(), patch));

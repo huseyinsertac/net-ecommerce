@@ -9,6 +9,7 @@
             <app-filter-panel
               [facets]="facetData()"
               [state]="state()"
+              [categories]="categories()"
               (filterChange)="change($event)"
             />
           </aside>
@@ -133,7 +134,13 @@
             <mat-icon fontSet="material-symbols-outlined">close</mat-icon>
           </button>
         </div>
-        <app-filter-panel [facets]="facetData()" [state]="state()" (filterChange)="change($event)" />
+        <app-filter-panel
+          [facets]="facetData()"
+          [state]="state()"
+          [categories]="categories()"
+          (filterChange)="change($event)"
+          (categoryPick)="drawer.close()"
+        />
         <button mat-flat-button type="button" class="apply" (click)="drawer.close()">
           Show @if (total() !== undefined) {
             {{ total() }}

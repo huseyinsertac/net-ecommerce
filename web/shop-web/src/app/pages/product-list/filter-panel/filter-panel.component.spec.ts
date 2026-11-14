@@ -1,5 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { CategoryFacets } from '../../../api/catalog-api.service';
+import { provideRouter } from '@angular/router';
+import { CategoryFacets, CategoryNode } from '../../../api/catalog-api.service';
 import { ListingState } from '../listing-query';
 import { FilterPanelComponent } from './filter-panel.component';
 
@@ -38,11 +39,27 @@ const facets: CategoryFacets = {
   ],
 };
 
+const node = (slug: string, name: string, productCount: number, children: CategoryNode[] = []): CategoryNode => ({
+  slug,
+  name,
+  icon: 'x',
+  imageUrl: '/x.webp',
+  productCount,
+  children,
+});
+
+const tree: CategoryNode[] = [
+  node('audio', 'Audio', 9, [node('headphones', 'Headphones', 5), node('speakers', 'Speakers', 4)]),
+  node('laptops', 'Laptops', 6),
+];
+
 const state: ListingState = { category: 'laptops', brands: [], inStock: false, specs: {}, page: 1 };
 
-async function render(s: ListingState = state) {
+async function render(s: ListingState = state, categories: CategoryNode[] | undefined = undefined) {
+  TestBed.configureTestingModule({ providers: [provideRouter([])] });
   const f: ComponentFixture<FilterPanelComponent> = TestBed.createComponent(FilterPanelComponent);
   f.componentRef.setInput('facets', facets);
+  if (categories) f.componentRef.setInput('categories', categories);
   f.componentRef.setInput('state', s);
   const emitted: Partial<ListingState>[] = [];
   f.componentInstance.filterChange.subscribe((e) => emitted.push(e));
@@ -79,6 +96,57 @@ describe('FilterPanelComponent', () => {
     expect(emitted).toEqual([{ specs: { os: { values: ['Linux'] } } }]);
   });
 
+  describe('category block', () => {
+    const links = (el: HTMLElement) =>
+      Array.from(el.querySelectorAll<HTMLAnchorElement>('nav[aria-label="Categories"] a')).map((a) => [
+        a.getAttribute('href'),
+        a.textContent?.replace(/\s+/g, ' ').trim(),
+      ]);
+
+    it('a parent lists its children as links with counts', async () => {
+      const { el } = await render({ ...state, category: 'audio' }, tree);
+      expect(links(el)).toEqual([
+        ['/c/headphones', 'Headphones (5)'],
+        ['/c/speakers', 'Speakers (4)'],
+      ]);
+    });
+
+    it('a leaf lists its siblings, marks itself, and links up to the parent', async () => {
+      const { el } = await render({ ...state, category: 'headphones' }, tree);
+      expect(links(el)).toEqual([
+        ['/c/audio', 'All Audio'],
+        ['/c/speakers', 'Speakers (4)'],
+      ]);
+      expect(el.querySelector('[aria-current="page"]')?.textContent).toContain('Headphones');
+    });
+
+    it('search lists the top-level categories without catalog-wide counts and keeps q', async () => {
+      const { el } = await render({ ...state, category: undefined, q: 'wireless' }, tree);
+      expect(links(el)).toEqual([
+        ['/c/audio?q=wireless', 'Audio'],
+        ['/c/laptops?q=wireless', 'Laptops'],
+      ]);
+    });
+
+    it('renders no block until the tree is known', async () => {
+      const { el } = await render();
+      expect(el.querySelector('nav[aria-label="Categories"]')).toBeNull();
+    });
+  });
+
+  describe('price placeholders', () => {
+    it('floor the min and ceil the max to whole dollars', async () => {
+      TestBed.configureTestingModule({ providers: [provideRouter([])] });
+      const f = TestBed.createComponent(FilterPanelComponent);
+      f.componentRef.setInput('facets', { ...facets, minPrice: 399.5, maxPrice: 2199.9 });
+      f.componentRef.setInput('state', state);
+      await f.whenStable();
+      const el = f.nativeElement as HTMLElement;
+      expect(el.querySelector<HTMLInputElement>('input[data-price-min]')!.placeholder).toBe('399');
+      expect(el.querySelector<HTMLInputElement>('input[data-price-max]')!.placeholder).toBe('2200');
+    });
+  });
+
   describe('debounced number inputs', () => {
     afterEach(() => vi.useRealTimers());
 
@@ -98,6 +166,37 @@ describe('FilterPanelComponent', () => {
       vi.advanceTimersByTime(1);
       vi.advanceTimersByTime(1000);
       expect(emitted).toEqual([{ minPrice: 500, maxPrice: undefined }]);
+    });
+
+    it('min above max emits nothing and shows an inline error; fixing it emits', async () => {
+      const { f, el, emitted } = await render();
+      vi.useFakeTimers();
+      type(el, 'input[data-price-max]', '100');
+      vi.advanceTimersByTime(400);
+      emitted.length = 0;
+      type(el, 'input[data-price-min]', '500');
+      vi.advanceTimersByTime(1000);
+      f.detectChanges();
+      expect(emitted).toEqual([]);
+      expect(el.textContent).toContain('Min must be ≤ max');
+      type(el, 'input[data-price-max]', '900');
+      f.detectChanges();
+      expect(el.textContent).not.toContain('Min must be ≤ max');
+      vi.advanceTimersByTime(400);
+      expect(emitted).toEqual([{ minPrice: 500, maxPrice: 900 }]);
+    });
+
+    it('a spec range with min above max emits nothing and shows an inline error', async () => {
+      const { f, el, emitted } = await render();
+      vi.useFakeTimers();
+      type(el, 'input[data-spec-max="ram_gb"]', '8');
+      vi.advanceTimersByTime(400);
+      emitted.length = 0;
+      type(el, 'input[data-spec-min="ram_gb"]', '32');
+      vi.advanceTimersByTime(1000);
+      f.detectChanges();
+      expect(emitted).toEqual([]);
+      expect(el.textContent).toContain('Min must be ≤ max');
     });
 
     it('typing then changing state before 400 ms emits nothing', async () => {

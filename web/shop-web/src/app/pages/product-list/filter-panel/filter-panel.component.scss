@@ -39,3 +39,38 @@
 .dash {
   color: var(--mat-sys-on-surface-variant);
 }
+
+.cats {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.cat {
+  display: block;
+  padding: 6px 0;
+  color: var(--mat-sys-on-surface);
+  text-decoration: none;
+
+  &:hover {
+    color: var(--mat-sys-primary);
+    text-decoration: underline;
+  }
+
+  &.up {
+    color: var(--mat-sys-primary);
+  }
+
+  &.current {
+    font-weight: 600;
+  }
+}
+
+.range-error {
+  margin: 6px 0 0;
+  color: var(--mat-sys-error);
+  font: var(--mat-sys-body-small);
+}

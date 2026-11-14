@@ -1,6 +1,7 @@
 import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, TestRequest, provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
+import { Title } from '@angular/platform-browser';
 import { Router, provideRouter } from '@angular/router';
 import { RouterTestingHarness } from '@angular/router/testing';
 import { ProductListPage } from './product-list.page';
@@ -24,8 +25,55 @@ async function setup(url: string) {
 }
 
 describe('ProductListPage', () => {
+  describe('category navigation and title', () => {
+    const tree = [
+      {
+        slug: 'audio',
+        name: 'Audio',
+        icon: 'x',
+        imageUrl: '/x.webp',
+        productCount: 3,
+        children: [
+          { slug: 'headphones', name: 'Headphones', icon: 'x', imageUrl: '/x.webp', productCount: 2, children: [] },
+          { slug: 'speakers', name: 'Speakers', icon: 'x', imageUrl: '/x.webp', productCount: 1, children: [] },
+        ],
+      },
+    ];
+
+    async function open(url: string) {
+      const { http, harness } = await setup(url);
+      for (const r of http.match(() => true)) {
+        if (r.request.url === '/api/catalog/categories') r.flush(tree);
+        else if (r.request.url.endsWith('/facets'))
+          r.flush({ slug: 'audio', name: 'Audio', brands: [], minPrice: 1, maxPrice: 9, specs: [] });
+        else r.flush({ items: [], page: 1, pageSize: 24, totalCount: 0, totalPages: 0 });
+      }
+      await harness.fixture.whenStable();
+      harness.detectChanges();
+      return harness.routeNativeElement as HTMLElement;
+    }
+
+    it('a parent category page links to its children', async () => {
+      const el = await open('/c/audio');
+      const hrefs = Array.from(el.querySelectorAll('nav[aria-label="Categories"] a')).map((a) => a.getAttribute('href'));
+      expect(hrefs).toEqual(['/c/headphones', '/c/speakers']);
+    });
+
+    it('/search links to the top-level categories, keeping q', async () => {
+      const el = await open('/search?q=wireless');
+      const hrefs = Array.from(el.querySelectorAll('nav[aria-label="Categories"] a')).map((a) => a.getAttribute('href'));
+      expect(hrefs).toEqual(['/c/audio?q=wireless']);
+    });
+
+    it('names the tab after the category', async () => {
+      await open('/c/audio');
+      expect(TestBed.inject(Title).getTitle()).toBe('Audio · VoltLane');
+    });
+  });
+
   it('shows the empty state when totalCount is 0', async () => {
     const { http, harness } = await setup('/search?q=zzz');
+    http.expectOne('/api/catalog/categories').flush([]);
     http
       .expectOne((r) => r.url === '/api/catalog/products')
       .flush({ items: [], page: 1, pageSize: 24, totalCount: 0, totalPages: 0 });
@@ -70,6 +118,7 @@ describe('ProductListPage', () => {
     /** Answers every pending catalog request with a 100-product catalog. */
     function answer(r: TestRequest): void {
       if (r.request.url.endsWith('/facets')) r.flush(facets);
+      else if (r.request.url === '/api/catalog/categories') r.flush([]);
       else
         r.flush({
           items: [item],
@@ -133,6 +182,7 @@ describe('ProductListPage', () => {
       const { http, harness } = await setup('/c/audio?spec=x:1..2');
       for (const r of http.match(() => true)) {
         if (r.request.url.endsWith('/facets')) r.flush({ ...facets, specs: [] });
+        else if (r.request.url === '/api/catalog/categories') r.flush([]);
         else
           r.flush(
             { type: 'validation.failed', status: 400, errors: { spec: ['Spec filters require a leaf category.'] } },
@@ -149,6 +199,7 @@ describe('ProductListPage', () => {
       const { http, harness } = await setup('/c/laptops?page=99');
       for (const r of http.match(() => true)) {
         if (r.request.url.endsWith('/facets')) r.flush(facets);
+        else if (r.request.url === '/api/catalog/categories') r.flush([]);
         else r.flush({ items: [], page: 99, pageSize: 24, totalCount: 100, totalPages: 5 });
       }
       await harness.fixture.whenStable();

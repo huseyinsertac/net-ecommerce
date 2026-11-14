@@ -1,5 +1,43 @@
 @let f = facets();
 <div class="panel">
+  @if (categoryBlock(); as cb) {
+    <section class="block">
+      <h3>Category</h3>
+      <nav aria-label="Categories">
+        <ul class="cats">
+          @if (cb.up; as up) {
+            <li>
+              <a
+                class="cat up"
+                [routerLink]="['/c', up.slug]"
+                [queryParams]="categoryQuery()"
+                (click)="categoryPick.emit()"
+                >All {{ up.name }}</a
+              >
+            </li>
+          }
+          @for (c of cb.items; track c.slug) {
+            <li>
+              @if (c.slug === cb.current) {
+                <span class="cat current" aria-current="page"
+                  >{{ c.name }} @if (c.count !== undefined) {<span class="count">({{ c.count }})</span>}</span
+                >
+              } @else {
+                <a
+                  class="cat"
+                  [routerLink]="['/c', c.slug]"
+                  [queryParams]="categoryQuery()"
+                  (click)="categoryPick.emit()"
+                  >{{ c.name }} @if (c.count !== undefined) {<span class="count">({{ c.count }})</span>}</a
+                >
+              }
+            </li>
+          }
+        </ul>
+      </nav>
+    </section>
+  }
+
   <section class="block">
     <mat-slide-toggle
       [checked]="state().inStock"
@@ -39,7 +77,8 @@
           inputmode="decimal"
           aria-label="Minimum price"
           data-price-min
-          [placeholder]="f && f.maxPrice > 0 ? '' + f.minPrice : 'Min'"
+          [errorStateMatcher]="matcher('price')"
+          [placeholder]="f && f.maxPrice > 0 ? '' + floor(f.minPrice) : 'Min'"
           [value]="state().minPrice ?? ''"
           (input)="price(lo.value, hi.value)"
           (change)="price(lo.value, hi.value, true)"
@@ -56,13 +95,17 @@
           inputmode="decimal"
           aria-label="Maximum price"
           data-price-max
-          [placeholder]="f && f.maxPrice > 0 ? '' + f.maxPrice : 'Max'"
+          [errorStateMatcher]="matcher('price')"
+          [placeholder]="f && f.maxPrice > 0 ? '' + ceil(f.maxPrice) : 'Max'"
           [value]="state().maxPrice ?? ''"
           (input)="price(lo.value, hi.value)"
           (change)="price(lo.value, hi.value, true)"
         />
       </mat-form-field>
     </div>
+    @if (rangeInvalid('price')) {
+      <p class="range-error" role="alert">Min must be ≤ max</p>
+    }
   </section>
 
   @if (f) {
@@ -82,6 +125,7 @@
                   inputmode="decimal"
                   [attr.aria-label]="'Minimum ' + spec.label"
                   [attr.data-spec-min]="spec.key"
+                  [errorStateMatcher]="matcher('spec:' + spec.key)"
                   [placeholder]="spec.min === null ? 'Min' : '' + spec.min"
                   [value]="state().specs[spec.key]?.min ?? ''"
                   (input)="specRange(spec.key, smin.value, smax.value)"
@@ -97,6 +141,7 @@
                   inputmode="decimal"
                   [attr.aria-label]="'Maximum ' + spec.label"
                   [attr.data-spec-max]="spec.key"
+                  [errorStateMatcher]="matcher('spec:' + spec.key)"
                   [placeholder]="spec.max === null ? 'Max' : '' + spec.max"
                   [value]="state().specs[spec.key]?.max ?? ''"
                   (input)="specRange(spec.key, smin.value, smax.value)"
@@ -104,6 +149,9 @@
                 />
               </mat-form-field>
             </div>
+            @if (rangeInvalid('spec:' + spec.key)) {
+              <p class="range-error" role="alert">Min must be ≤ max</p>
+            }
           }
           @case ('boolean') {
             <mat-slide-toggle
