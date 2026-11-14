@@ -40,6 +40,7 @@
     <Project Path="src/Modules/Payments/Payments.Infrastructure/Payments.Infrastructure.csproj" />
   </Folder>
   <Folder Name="/tests/">
+    <Project Path="tests/Catalog.UnitTests/Catalog.UnitTests.csproj" />
     <Project Path="tests/Shop.Application.Abstractions.UnitTests/Shop.Application.Abstractions.UnitTests.csproj" />
     <Project Path="tests/Shop.ArchitectureTests/Shop.ArchitectureTests.csproj" />
     <Project Path="tests/Shop.Infrastructure.Common.IntegrationTests/Shop.Infrastructure.Common.IntegrationTests.csproj" />
