@@ -1,7 +1,8 @@
+using Microsoft.AspNetCore.Http;
 using Shop.Application.Abstractions;
 using Shop.SharedKernel;
 
-namespace Shop.Api.ErrorHandling;
+namespace Shop.Infrastructure.Common.Http;
 
 public static class ErrorResults
 {

@@ -1,4 +1,5 @@
 using Catalog.Application.Abstractions;
+using Catalog.Infrastructure.Endpoints;
 using Catalog.Infrastructure.Persistence;
 using Catalog.Infrastructure.Reading;
 using Microsoft.AspNetCore.Builder;
@@ -24,6 +25,6 @@ public sealed class CatalogModule : IModule
 
     public void MapEndpoints(IEndpointRouteBuilder app)
     {
-        app.MapGroup($"/api/{Name}");
+        CatalogEndpoints.Map(app.MapGroup($"/api/{Name}"));
     }
 }

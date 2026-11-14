@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Shop.Api.ErrorHandling;
+using Shop.Infrastructure.Common.Http;
 using Shop.Application.Abstractions;
 using Shop.SharedKernel;
 using Shouldly;
