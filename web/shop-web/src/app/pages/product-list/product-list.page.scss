@@ -36,6 +36,8 @@
     align-items: center;
     justify-content: space-between;
     padding-top: 8px;
+    // The icon button's 48px touch target pokes 4px past its box; keep it inside the scroller.
+    padding-right: 4px;
 
     h2 {
       margin: 0;
