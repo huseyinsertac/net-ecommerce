@@ -28,4 +28,37 @@ public static class CatalogErrors
 
     public static Error SpecInvalidOption(string key) =>
         Error.Validation("catalog.spec_invalid_option", $"Spec '{key}' has a value that is not one of its allowed options.");
+
+    public static Error InvalidProduct(string message) =>
+        Error.Validation("catalog.invalid_product", message);
+
+    public static Error InvalidSku(string sku) =>
+        Error.Validation("catalog.invalid_sku", $"SKU '{sku}' must be non-empty and match ^[A-Z0-9-]+$.");
+
+    public static Error DuplicateSku(string sku) =>
+        Error.Validation("catalog.duplicate_sku", $"SKU '{sku}' is used more than once in this product.");
+
+    public static Error InvalidPrice(string message) =>
+        Error.Validation("catalog.invalid_price", message);
+
+    public static Error InvalidStock(string sku) =>
+        Error.Validation("catalog.invalid_stock", $"Stock for SKU '{sku}' must not be negative.");
+
+    public static Error InvalidVariantOptions(string message) =>
+        Error.Validation("catalog.invalid_variant_options", message);
+
+    public static Error InvalidStatusTransition(string from, string to) =>
+        Error.Conflict("catalog.invalid_status_transition", $"A {from} product cannot become {to}.");
+
+    public static Error InvalidQuantity() =>
+        Error.Validation("catalog.invalid_quantity", "Quantity must be greater than zero.");
+
+    public static Error VariantNotFound(Guid variantId) =>
+        Error.NotFound("catalog.variant_not_found", $"Variant '{variantId}' was not found on this product.");
+
+    public static Error InsufficientStock(string sku) =>
+        Error.Conflict("catalog.insufficient_stock", $"Not enough available stock for SKU '{sku}'.");
+
+    public static Error ReleaseExceedsReserved(string sku) =>
+        Error.Conflict("catalog.release_exceeds_reserved", $"Quantity exceeds the reserved stock for SKU '{sku}'.");
 }
