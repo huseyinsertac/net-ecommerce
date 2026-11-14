@@ -27,6 +27,14 @@ describe('HeaderComponent', () => {
     expect((fixture.nativeElement as HTMLElement).textContent).toContain(BRAND.name);
   });
 
+  it('shows no cart badge while the count is 0', async () => {
+    const fixture = TestBed.createComponent(HeaderComponent);
+    await fixture.whenStable();
+    const el = fixture.nativeElement as HTMLElement;
+    expect(el.querySelector('.mat-badge')).not.toBeNull();
+    expect(el.querySelector('.mat-badge-hidden')).not.toBeNull();
+  });
+
   async function submit(value: string) {
     const router = TestBed.inject(Router);
     const nav = vi.spyOn(router, 'navigate').mockResolvedValue(true);

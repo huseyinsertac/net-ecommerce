@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, input, linkedSignal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input, linkedSignal, signal } from '@angular/core';
 import type { ProductImage } from '../../../api/catalog-api.service';
 
 /** Main image with a thumbnail row. Left/Right arrows (when focused) step through, wrapping. */
@@ -18,6 +18,14 @@ export class GalleryComponent {
     computation: () => 0,
   });
   protected readonly current = computed(() => this.images()[this.index()]);
+
+  /** Landscape photos fill the 4:3 stage (cover); portrait and square ones stay whole (contain) on white. */
+  protected readonly landscape = signal(true);
+
+  protected onLoad(event: Event): void {
+    const img = event.target as HTMLImageElement;
+    if (img.naturalHeight > 0) this.landscape.set(img.naturalWidth / img.naturalHeight >= 1.2);
+  }
 
   protected select(i: number): void {
     this.index.set(i);

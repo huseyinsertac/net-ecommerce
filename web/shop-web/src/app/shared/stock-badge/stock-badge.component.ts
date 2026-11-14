@@ -4,12 +4,15 @@ import { stockLabel } from './stock-label';
 @Component({
   selector: 'app-stock-badge',
   template: `@if (label(); as text) {
-    <span class="badge" [class.out]="text === 'Out of stock'">{{ text }}</span>
+    <span class="badge" [class.out]="text === 'Out of stock'" [class.low]="text.startsWith('Only')">{{ text }}</span>
   }`,
   styles: `
     .badge {
       font: var(--mat-sys-label-medium);
       color: var(--mat-sys-tertiary);
+    }
+    .badge.low {
+      color: #b45309; /* amber-700: 5:1 on white */
     }
     .badge.out {
       color: var(--mat-sys-error);

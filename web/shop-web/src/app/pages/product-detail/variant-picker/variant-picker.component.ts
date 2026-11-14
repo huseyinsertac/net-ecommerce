@@ -23,6 +23,7 @@ export class VariantPickerComponent {
   readonly selection = input.required<Selection>();
   readonly selectionChange = output<Selection>();
 
+  /** Safeguard: option values come from the variants, so this only disables a value no variant has. */
   protected selectable(axisKey: string, value: string): boolean {
     // Only values that appear in no variant at all are disabled. A value whose combination with the
     // other current picks is missing stays clickable: bestSelectionFor then adjusts the other axes.

@@ -1,5 +1,6 @@
 <footer class="footer">
   <span>© {{ year }} {{ brand.name }} · portfolio project</span>
+  <a class="credits" href="/images/CREDITS.md" target="_blank" rel="noopener">Photo credits</a>
   <span class="api" [class.offline]="system.offline()">
     @if (system.info(); as info) {
       API {{ info.version }}

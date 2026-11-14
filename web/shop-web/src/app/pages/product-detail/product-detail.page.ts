@@ -1,6 +1,7 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { ChangeDetectionStrategy, Component, computed, effect, inject } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
+import { Title } from '@angular/platform-browser';
 import { MatButtonModule } from '@angular/material/button';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { combineLatest, map } from 'rxjs';
@@ -37,6 +38,7 @@ function humanise(slug: string): string {
 export class ProductDetailPage {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
+  private readonly titleService = inject(Title);
 
   private readonly params = toSignal(
     combineLatest([this.route.paramMap, this.route.queryParamMap]).pipe(
@@ -68,6 +70,10 @@ export class ProductDetailPage {
   protected readonly hasPicker = computed(() => (this.detail()?.options.length ?? 0) > 0);
 
   constructor() {
+    effect(() => {
+      const d = this.detail();
+      if (d) this.titleService.setTitle(`${d.name} · VoltLane`);
+    });
     // A `?variant=` that names no variant of this product is replaced with the default one.
     effect(() => {
       const d = this.detail();

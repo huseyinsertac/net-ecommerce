@@ -10,10 +10,12 @@
     @if (current(); as img) {
       <img
         class="main"
+        [class.fill]="landscape()"
+        (load)="onLoad($event)"
         [src]="img.url"
         [alt]="name() + ' (image ' + (index() + 1) + ' of ' + images().length + ')'"
         width="1200"
-        height="1200"
+        height="900"
         fetchpriority="high"
       />
     }

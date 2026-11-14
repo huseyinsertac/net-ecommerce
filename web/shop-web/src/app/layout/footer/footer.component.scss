@@ -9,6 +9,14 @@
   font: var(--mat-sys-body-small);
 }
 
+.credits {
+  color: inherit;
+
+  &:hover {
+    color: var(--mat-sys-primary);
+  }
+}
+
 .offline {
   color: var(--mat-sys-error);
 }

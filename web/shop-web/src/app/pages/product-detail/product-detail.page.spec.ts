@@ -2,6 +2,7 @@ import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 import { Router, provideRouter } from '@angular/router';
+import { Title } from '@angular/platform-browser';
 import { RouterTestingHarness } from '@angular/router/testing';
 import { ProductDetail } from '../../api/catalog-api.service';
 import { ProductDetailPage } from './product-detail.page';
@@ -50,6 +51,11 @@ async function setup(url: string, body: object = detail, status = 200) {
 }
 
 describe('ProductDetailPage', () => {
+  it('sets the browser tab title to the product name', async () => {
+    await setup('/p/aurora-x');
+    expect(TestBed.inject(Title).getTitle()).toBe('Aurora X · VoltLane');
+  });
+
   it('shows the selected variant price and stock label (first in-stock by default)', async () => {
     const { el } = await setup('/p/aurora-x');
     expect(el.querySelector('.price')?.textContent).toContain('$600.00');
