@@ -10,12 +10,40 @@
     <mat-icon fontSet="material-symbols-outlined" class="bolt">bolt</mat-icon>{{ brand.name }}
   </a>
 
-  <mat-form-field class="search" appearance="outline" subscriptSizing="dynamic">
-    <mat-icon matPrefix fontSet="material-symbols-outlined">search</mat-icon>
-    <input matInput disabled placeholder="Search products (coming soon)" aria-label="Search" />
-  </mat-form-field>
+  <form
+    class="search-form"
+    [class.open]="searchOpen()"
+    role="search"
+    (submit)="search($event, q.value)"
+  >
+    <mat-form-field class="search" appearance="outline" subscriptSizing="dynamic">
+      <mat-icon matPrefix fontSet="material-symbols-outlined">search</mat-icon>
+      <input
+        #q
+        matInput
+        type="search"
+        placeholder="Search products"
+        aria-label="Search"
+        [value]="currentQuery()"
+      />
+    </mat-form-field>
+    <button mat-icon-button type="submit" aria-label="Submit search">
+      <mat-icon fontSet="material-symbols-outlined">arrow_forward</mat-icon>
+    </button>
+  </form>
 
   <span class="spacer"></span>
+
+  <button
+    mat-icon-button
+    type="button"
+    class="search-toggle"
+    [attr.aria-label]="searchOpen() ? 'Close search' : 'Open search'"
+    [attr.aria-expanded]="searchOpen()"
+    (click)="toggleSearch()"
+  >
+    <mat-icon fontSet="material-symbols-outlined">{{ searchOpen() ? 'close' : 'search' }}</mat-icon>
+  </button>
 
   <a mat-button class="nav-link" routerLink="/">Shop</a>
 
@@ -24,7 +52,7 @@
       fontSet="material-symbols-outlined"
       [matBadge]="cartCount"
       matBadgeSize="small"
-      [matBadgeHidden]="false"
+      [matBadgeHidden]="cartCount === 0"
       >shopping_cart</mat-icon
     >
   </button>

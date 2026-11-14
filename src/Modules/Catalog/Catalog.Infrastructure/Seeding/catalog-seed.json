@@ -1,0 +1,5131 @@
+{
+ "categories": [
+  {
+   "slug": "phones",
+   "name": "Phones",
+   "icon": "smartphone",
+   "parent": null,
+   "sortOrder": 1,
+   "specs": [
+    {
+     "key": "screen_in",
+     "label": "Screen size",
+     "type": "Number",
+     "unit": "in",
+     "filterable": true,
+     "options": []
+    },
+    {
+     "key": "refresh_hz",
+     "label": "Refresh rate",
+     "type": "Number",
+     "unit": "Hz",
+     "filterable": true,
+     "options": []
+    },
+    {
+     "key": "battery_mah",
+     "label": "Battery",
+     "type": "Number",
+     "unit": "mAh",
+     "filterable": true,
+     "options": []
+    },
+    {
+     "key": "camera_mp",
+     "label": "Main camera",
+     "type": "Number",
+     "unit": "MP",
+     "filterable": false,
+     "options": []
+    },
+    {
+     "key": "five_g",
+     "label": "5G",
+     "type": "Boolean",
+     "unit": null,
+     "filterable": true,
+     "options": []
+    },
+    {
+     "key": "water_rating",
+     "label": "Water resistance",
+     "type": "Enum",
+     "unit": null,
+     "filterable": true,
+     "options": [
+      "None",
+      "IP54",
+      "IP67",
+      "IP68"
+     ]
+    },
+    {
+     "key": "chipset",
+     "label": "Processor",
+     "type": "Text",
+     "unit": null,
+     "filterable": false,
+     "options": []
+    }
+   ]
+  },
+  {
+   "slug": "laptops",
+   "name": "Laptops",
+   "icon": "laptop_mac",
+   "parent": null,
+   "sortOrder": 2,
+   "specs": [
+    {
+     "key": "screen_in",
+     "label": "Screen size",
+     "type": "Number",
+     "unit": "in",
+     "filterable": true,
+     "options": []
+    },
+    {
+     "key": "ram_gb",
+     "label": "Memory",
+     "type": "Number",
+     "unit": "GB",
+     "filterable": true,
+     "options": []
+    },
+    {
+     "key": "cpu_class",
+     "label": "Processor",
+     "type": "Enum",
+     "unit": null,
+     "filterable": true,
+     "options": [
+      "Core Ultra 5",
+      "Core Ultra 7",
+      "Ryzen 5",
+      "Ryzen 7",
+      "Ryzen 9"
+     ]
+    },
+    {
+     "key": "gpu",
+     "label": "Graphics",
+     "type": "Enum",
+     "unit": null,
+     "filterable": true,
+     "options": [
+      "Integrated",
+      "RTX 4050",
+      "RTX 4060",
+      "RTX 4070"
+     ]
+    },
+    {
+     "key": "battery_hours",
+     "label": "Battery life",
+     "type": "Number",
+     "unit": "h",
+     "filterable": false,
+     "options": []
+    },
+    {
+     "key": "os",
+     "label": "Operating system",
+     "type": "Enum",
+     "unit": null,
+     "filterable": true,
+     "options": [
+      "Windows 11",
+      "ChromeOS"
+     ]
+    },
+    {
+     "key": "weight_kg",
+     "label": "Weight",
+     "type": "Number",
+     "unit": "kg",
+     "filterable": true,
+     "options": []
+    }
+   ]
+  },
+  {
+   "slug": "tablets",
+   "name": "Tablets",
+   "icon": "tablet_mac",
+   "parent": null,
+   "sortOrder": 3,
+   "specs": [
+    {
+     "key": "screen_in",
+     "label": "Screen size",
+     "type": "Number",
+     "unit": "in",
+     "filterable": true,
+     "options": []
+    },
+    {
+     "key": "ram_gb",
+     "label": "Memory",
+     "type": "Number",
+     "unit": "GB",
+     "filterable": true,
+     "options": []
+    },
+    {
+     "key": "battery_hours",
+     "label": "Battery life",
+     "type": "Number",
+     "unit": "h",
+     "filterable": false,
+     "options": []
+    },
+    {
+     "key": "cellular",
+     "label": "Cellular",
+     "type": "Boolean",
+     "unit": null,
+     "filterable": true,
+     "options": []
+    },
+    {
+     "key": "stylus_support",
+     "label": "Stylus support",
+     "type": "Boolean",
+     "unit": null,
+     "filterable": true,
+     "options": []
+    },
+    {
+     "key": "os",
+     "label": "Operating system",
+     "type": "Enum",
+     "unit": null,
+     "filterable": true,
+     "options": [
+      "Android",
+      "Windows 11"
+     ]
+    },
+    {
+     "key": "weight_g",
+     "label": "Weight",
+     "type": "Number",
+     "unit": "g",
+     "filterable": false,
+     "options": []
+    }
+   ]
+  },
+  {
+   "slug": "audio",
+   "name": "Audio",
+   "icon": "headphones",
+   "parent": null,
+   "sortOrder": 4,
+   "specs": []
+  },
+  {
+   "slug": "headphones",
+   "name": "Headphones",
+   "icon": "headphones",
+   "parent": "audio",
+   "sortOrder": 1,
+   "specs": [
+    {
+     "key": "form_factor",
+     "label": "Style",
+     "type": "Enum",
+     "unit": null,
+     "filterable": true,
+     "options": [
+      "Over-ear",
+      "On-ear"
+     ]
+    },
+    {
+     "key": "anc",
+     "label": "Active noise cancelling",
+     "type": "Boolean",
+     "unit": null,
+     "filterable": true,
+     "options": []
+    },
+    {
+     "key": "battery_hours",
+     "label": "Battery life",
+     "type": "Number",
+     "unit": "h",
+     "filterable": true,
+     "options": []
+    },
+    {
+     "key": "multipoint",
+     "label": "Multipoint pairing",
+     "type": "Boolean",
+     "unit": null,
+     "filterable": true,
+     "options": []
+    },
+    {
+     "key": "driver_mm",
+     "label": "Driver size",
+     "type": "Number",
+     "unit": "mm",
+     "filterable": false,
+     "options": []
+    },
+    {
+     "key": "weight_g",
+     "label": "Weight",
+     "type": "Number",
+     "unit": "g",
+     "filterable": false,
+     "options": []
+    }
+   ]
+  },
+  {
+   "slug": "earbuds",
+   "name": "Earbuds",
+   "icon": "earbuds",
+   "parent": "audio",
+   "sortOrder": 2,
+   "specs": [
+    {
+     "key": "anc",
+     "label": "Active noise cancelling",
+     "type": "Boolean",
+     "unit": null,
+     "filterable": true,
+     "options": []
+    },
+    {
+     "key": "battery_hours",
+     "label": "Battery life (earbuds)",
+     "type": "Number",
+     "unit": "h",
+     "filterable": true,
+     "options": []
+    },
+    {
+     "key": "total_hours",
+     "label": "Battery life (with case)",
+     "type": "Number",
+     "unit": "h",
+     "filterable": false,
+     "options": []
+    },
+    {
+     "key": "water_rating",
+     "label": "Water resistance",
+     "type": "Enum",
+     "unit": null,
+     "filterable": true,
+     "options": [
+      "None",
+      "IPX4",
+      "IPX5",
+      "IPX7"
+     ]
+    },
+    {
+     "key": "wireless_charging",
+     "label": "Wireless charging case",
+     "type": "Boolean",
+     "unit": null,
+     "filterable": true,
+     "options": []
+    },
+    {
+     "key": "fit",
+     "label": "Fit",
+     "type": "Enum",
+     "unit": null,
+     "filterable": true,
+     "options": [
+      "In-ear",
+      "Semi-in-ear"
+     ]
+    }
+   ]
+  },
+  {
+   "slug": "speakers",
+   "name": "Speakers",
+   "icon": "speaker",
+   "parent": "audio",
+   "sortOrder": 3,
+   "specs": [
+    {
+     "key": "size_class",
+     "label": "Size",
+     "type": "Enum",
+     "unit": null,
+     "filterable": true,
+     "options": [
+      "Mini",
+      "Portable",
+      "Large portable"
+     ]
+    },
+    {
+     "key": "battery_hours",
+     "label": "Battery life",
+     "type": "Number",
+     "unit": "h",
+     "filterable": true,
+     "options": []
+    },
+    {
+     "key": "output_w",
+     "label": "Output power",
+     "type": "Number",
+     "unit": "W",
+     "filterable": true,
+     "options": []
+    },
+    {
+     "key": "water_rating",
+     "label": "Water resistance",
+     "type": "Enum",
+     "unit": null,
+     "filterable": true,
+     "options": [
+      "None",
+      "IPX5",
+      "IPX7"
+     ]
+    },
+    {
+     "key": "stereo_pairing",
+     "label": "Stereo pairing",
+     "type": "Boolean",
+     "unit": null,
+     "filterable": true,
+     "options": []
+    },
+    {
+     "key": "weight_g",
+     "label": "Weight",
+     "type": "Number",
+     "unit": "g",
+     "filterable": false,
+     "options": []
+    }
+   ]
+  },
+  {
+   "slug": "wearables",
+   "name": "Wearables",
+   "icon": "watch",
+   "parent": null,
+   "sortOrder": 5,
+   "specs": [
+    {
+     "key": "kind",
+     "label": "Type",
+     "type": "Enum",
+     "unit": null,
+     "filterable": true,
+     "options": [
+      "Smartwatch",
+      "Fitness band"
+     ]
+    },
+    {
+     "key": "display_in",
+     "label": "Display size",
+     "type": "Number",
+     "unit": "in",
+     "filterable": false,
+     "options": []
+    },
+    {
+     "key": "battery_days",
+     "label": "Battery life",
+     "type": "Number",
+     "unit": "days",
+     "filterable": true,
+     "options": []
+    },
+    {
+     "key": "gps",
+     "label": "Built-in GPS",
+     "type": "Boolean",
+     "unit": null,
+     "filterable": true,
+     "options": []
+    },
+    {
+     "key": "water_atm",
+     "label": "Water resistance",
+     "type": "Number",
+     "unit": "ATM",
+     "filterable": true,
+     "options": []
+    },
+    {
+     "key": "nfc_pay",
+     "label": "Contactless payments",
+     "type": "Boolean",
+     "unit": null,
+     "filterable": true,
+     "options": []
+    }
+   ]
+  },
+  {
+   "slug": "cameras",
+   "name": "Cameras",
+   "icon": "photo_camera",
+   "parent": null,
+   "sortOrder": 6,
+   "specs": [
+    {
+     "key": "format",
+     "label": "Format",
+     "type": "Enum",
+     "unit": null,
+     "filterable": true,
+     "options": [
+      "Digital",
+      "35 mm film",
+      "120 film",
+      "4x5 sheet film"
+     ]
+    },
+    {
+     "key": "body_style",
+     "label": "Body style",
+     "type": "Enum",
+     "unit": null,
+     "filterable": true,
+     "options": [
+      "DSLR",
+      "Mirrorless",
+      "SLR",
+      "Rangefinder",
+      "Box camera",
+      "View camera"
+     ]
+    },
+    {
+     "key": "autofocus",
+     "label": "Autofocus",
+     "type": "Boolean",
+     "unit": null,
+     "filterable": true,
+     "options": []
+    },
+    {
+     "key": "light_meter",
+     "label": "Built-in light meter",
+     "type": "Boolean",
+     "unit": null,
+     "filterable": false,
+     "options": []
+    },
+    {
+     "key": "weight_g",
+     "label": "Weight",
+     "type": "Number",
+     "unit": "g",
+     "filterable": true,
+     "options": []
+    },
+    {
+     "key": "lens",
+     "label": "Lens",
+     "type": "Text",
+     "unit": null,
+     "filterable": false,
+     "options": []
+    }
+   ]
+  },
+  {
+   "slug": "gaming",
+   "name": "Gaming",
+   "icon": "sports_esports",
+   "parent": null,
+   "sortOrder": 7,
+   "specs": [
+    {
+     "key": "platform",
+     "label": "Platform",
+     "type": "Enum",
+     "unit": null,
+     "filterable": true,
+     "options": [
+      "PC",
+      "PC + Console"
+     ]
+    },
+    {
+     "key": "connection",
+     "label": "Connection",
+     "type": "Enum",
+     "unit": null,
+     "filterable": true,
+     "options": [
+      "Wired",
+      "Wireless",
+      "Wired + Wireless"
+     ]
+    },
+    {
+     "key": "polling_rate_hz",
+     "label": "Polling rate",
+     "type": "Number",
+     "unit": "Hz",
+     "filterable": true,
+     "options": []
+    },
+    {
+     "key": "hall_effect",
+     "label": "Hall-effect sticks",
+     "type": "Boolean",
+     "unit": null,
+     "filterable": true,
+     "options": []
+    },
+    {
+     "key": "back_buttons",
+     "label": "Rear buttons",
+     "type": "Boolean",
+     "unit": null,
+     "filterable": true,
+     "options": []
+    },
+    {
+     "key": "weight_g",
+     "label": "Weight",
+     "type": "Number",
+     "unit": "g",
+     "filterable": false,
+     "options": []
+    }
+   ]
+  },
+  {
+   "slug": "accessories",
+   "name": "Accessories",
+   "icon": "power",
+   "parent": null,
+   "sortOrder": 8,
+   "specs": []
+  },
+  {
+   "slug": "chargers-power",
+   "name": "Chargers & Power",
+   "icon": "battery_charging_full",
+   "parent": "accessories",
+   "sortOrder": 1,
+   "specs": [
+    {
+     "key": "capacity_mah",
+     "label": "Capacity",
+     "type": "Number",
+     "unit": "mAh",
+     "filterable": true,
+     "options": []
+    },
+    {
+     "key": "max_output_w",
+     "label": "Max output",
+     "type": "Number",
+     "unit": "W",
+     "filterable": true,
+     "options": []
+    },
+    {
+     "key": "ports",
+     "label": "Ports",
+     "type": "Number",
+     "unit": null,
+     "filterable": true,
+     "options": []
+    },
+    {
+     "key": "wireless_charging",
+     "label": "Wireless charging",
+     "type": "Boolean",
+     "unit": null,
+     "filterable": true,
+     "options": []
+    },
+    {
+     "key": "airline_safe",
+     "label": "Carry-on safe",
+     "type": "Boolean",
+     "unit": null,
+     "filterable": true,
+     "options": []
+    },
+    {
+     "key": "weight_g",
+     "label": "Weight",
+     "type": "Number",
+     "unit": "g",
+     "filterable": false,
+     "options": []
+    }
+   ]
+  },
+  {
+   "slug": "cables-hubs",
+   "name": "Cables & Hubs",
+   "icon": "usb",
+   "parent": "accessories",
+   "sortOrder": 2,
+   "specs": [
+    {
+     "key": "kind",
+     "label": "Type",
+     "type": "Enum",
+     "unit": null,
+     "filterable": true,
+     "options": [
+      "Cable",
+      "Hub"
+     ]
+    },
+    {
+     "key": "connectors",
+     "label": "Connectors",
+     "type": "Enum",
+     "unit": null,
+     "filterable": true,
+     "options": [
+      "USB-A to USB-B",
+      "USB-A to USB-C",
+      "Multi-connector kit",
+      "7-port USB-A hub"
+     ]
+    },
+    {
+     "key": "usb_standard",
+     "label": "USB standard",
+     "type": "Enum",
+     "unit": null,
+     "filterable": true,
+     "options": [
+      "USB 2.0",
+      "USB 3.0",
+      "USB 3.2 Gen 1"
+     ]
+    },
+    {
+     "key": "data_gbps",
+     "label": "Data speed",
+     "type": "Number",
+     "unit": "Gbps",
+     "filterable": true,
+     "options": []
+    },
+    {
+     "key": "braided",
+     "label": "Braided jacket",
+     "type": "Boolean",
+     "unit": null,
+     "filterable": true,
+     "options": []
+    }
+   ]
+  }
+ ],
+ "products": [
+  {
+   "slug": "korvane-aurora-5",
+   "name": "Korvane Aurora 5",
+   "brand": "Korvane",
+   "category": "phones",
+   "description": "A 6.7-inch flagship with a bright 120 Hz OLED panel, a 50 MP main camera and a battery that comfortably lasts a heavy day. Aluminium frame, IP68 sealing and 5G on every variant. Ships with up to 512 GB of storage for photos and offline media.",
+   "images": [
+    "phone-black-02",
+    "phone-black-03"
+   ],
+   "specs": {
+    "screen_in": 6.7,
+    "refresh_hz": 120,
+    "battery_mah": 5000,
+    "camera_mp": 50,
+    "five_g": true,
+    "water_rating": "IP68",
+    "chipset": "Octa-core, 3.4 GHz"
+   },
+   "optionAxes": [
+    {
+     "key": "storage",
+     "label": "Storage"
+    },
+    {
+     "key": "color",
+     "label": "Color"
+    }
+   ],
+   "variants": [
+    {
+     "sku": "KV-AUR5-128GB-BLACK",
+     "options": {
+      "storage": "128 GB",
+      "color": "Black"
+     },
+     "price": 799.99,
+     "stock": 5
+    },
+    {
+     "sku": "KV-AUR5-128GB-WHITE",
+     "options": {
+      "storage": "128 GB",
+      "color": "White"
+     },
+     "price": 799.99,
+     "stock": 80
+    },
+    {
+     "sku": "KV-AUR5-256GB-BLACK",
+     "options": {
+      "storage": "256 GB",
+      "color": "Black"
+     },
+     "price": 899.99,
+     "stock": 4
+    },
+    {
+     "sku": "KV-AUR5-256GB-WHITE",
+     "options": {
+      "storage": "256 GB",
+      "color": "White"
+     },
+     "price": 899.99,
+     "stock": 30
+    },
+    {
+     "sku": "KV-AUR5-512GB-BLACK",
+     "options": {
+      "storage": "512 GB",
+      "color": "Black"
+     },
+     "price": 1049.99,
+     "stock": 0
+    },
+    {
+     "sku": "KV-AUR5-512GB-WHITE",
+     "options": {
+      "storage": "512 GB",
+      "color": "White"
+     },
+     "price": 1049.99,
+     "stock": 60
+    }
+   ],
+   "featured": true,
+   "published": true,
+   "createdAt": "2026-06-01T09:00:00Z"
+  },
+  {
+   "slug": "korvane-aurora-5-pro",
+   "name": "Korvane Aurora 5 Pro",
+   "brand": "Korvane",
+   "category": "phones",
+   "description": "The larger, faster Aurora with a 6.9-inch 144 Hz display, a triple-lens camera system and 65 W wired charging. Built for people who edit video and play demanding games on the go. Arriving soon.",
+   "images": [
+    "phone-black-03"
+   ],
+   "specs": {
+    "screen_in": 6.9,
+    "refresh_hz": 144,
+    "battery_mah": 5400,
+    "camera_mp": 108,
+    "five_g": true,
+    "water_rating": "IP68",
+    "chipset": "Octa-core, 3.6 GHz"
+   },
+   "optionAxes": [
+    {
+     "key": "storage",
+     "label": "Storage"
+    },
+    {
+     "key": "color",
+     "label": "Color"
+    }
+   ],
+   "variants": [
+    {
+     "sku": "KV-AUR5P-256GB-BLACK",
+     "options": {
+      "storage": "256 GB",
+      "color": "Black"
+     },
+     "price": 1099.99,
+     "stock": 6
+    },
+    {
+     "sku": "KV-AUR5P-256GB-WHITE",
+     "options": {
+      "storage": "256 GB",
+      "color": "White"
+     },
+     "price": 1099.99,
+     "stock": 40
+    },
+    {
+     "sku": "KV-AUR5P-512GB-BLACK",
+     "options": {
+      "storage": "512 GB",
+      "color": "Black"
+     },
+     "price": 1249.99,
+     "stock": 0
+    },
+    {
+     "sku": "KV-AUR5P-512GB-WHITE",
+     "options": {
+      "storage": "512 GB",
+      "color": "White"
+     },
+     "price": 1249.99,
+     "stock": 60
+    },
+    {
+     "sku": "KV-AUR5P-1TB-BLACK",
+     "options": {
+      "storage": "1 TB",
+      "color": "Black"
+     },
+     "price": 1449.99,
+     "stock": 5
+    },
+    {
+     "sku": "KV-AUR5P-1TB-WHITE",
+     "options": {
+      "storage": "1 TB",
+      "color": "White"
+     },
+     "price": 1449.99,
+     "stock": 25
+    }
+   ],
+   "featured": false,
+   "published": false,
+   "createdAt": "2026-06-03T07:36:00Z"
+  },
+  {
+   "slug": "korvane-aurora-4a",
+   "name": "Korvane Aurora 4a",
+   "brand": "Korvane",
+   "category": "phones",
+   "description": "A well-priced 6.4-inch phone that keeps the essentials right: a smooth 90 Hz screen, a dependable 50 MP camera and all-day battery life. IP67 protection and 5G mean it handles rain, commutes and fast networks without fuss.",
+   "images": [
+    "phone-black-04",
+    "phone-black-02"
+   ],
+   "specs": {
+    "screen_in": 6.4,
+    "refresh_hz": 90,
+    "battery_mah": 4500,
+    "camera_mp": 50,
+    "five_g": true,
+    "water_rating": "IP67",
+    "chipset": "Octa-core, 2.8 GHz"
+   },
+   "optionAxes": [
+    {
+     "key": "storage",
+     "label": "Storage"
+    },
+    {
+     "key": "color",
+     "label": "Color"
+    }
+   ],
+   "variants": [
+    {
+     "sku": "KV-AUR4A-128GB-BLACK",
+     "options": {
+      "storage": "128 GB",
+      "color": "Black"
+     },
+     "price": 449.99,
+     "stock": 1
+    },
+    {
+     "sku": "KV-AUR4A-128GB-WHITE",
+     "options": {
+      "storage": "128 GB",
+      "color": "White"
+     },
+     "price": 449.99,
+     "stock": 60
+    },
+    {
+     "sku": "KV-AUR4A-256GB-BLACK",
+     "options": {
+      "storage": "256 GB",
+      "color": "Black"
+     },
+     "price": 499.99,
+     "stock": 50
+    },
+    {
+     "sku": "KV-AUR4A-256GB-WHITE",
+     "options": {
+      "storage": "256 GB",
+      "color": "White"
+     },
+     "price": 499.99,
+     "stock": 30
+    }
+   ],
+   "featured": false,
+   "published": true,
+   "createdAt": "2026-06-05T06:12:00Z"
+  },
+  {
+   "slug": "arcwing-spark-12",
+   "name": "Arcwing Spark 12",
+   "brand": "Arcwing",
+   "category": "phones",
+   "description": "A balanced mid-range phone with a 6.5-inch 90 Hz display, a clean 50 MP camera and a big 5000 mAh battery. The splash-resistant body and 5G radio make it an easy everyday choice.",
+   "images": [
+    "phone-black-04"
+   ],
+   "specs": {
+    "screen_in": 6.5,
+    "refresh_hz": 90,
+    "battery_mah": 5000,
+    "camera_mp": 50,
+    "five_g": true,
+    "water_rating": "IP54",
+    "chipset": "Octa-core, 2.4 GHz"
+   },
+   "optionAxes": [
+    {
+     "key": "storage",
+     "label": "Storage"
+    },
+    {
+     "key": "color",
+     "label": "Color"
+    }
+   ],
+   "variants": [
+    {
+     "sku": "AW-SPK12-128GB-BLACK",
+     "options": {
+      "storage": "128 GB",
+      "color": "Black"
+     },
+     "price": 399.99,
+     "stock": 75
+    },
+    {
+     "sku": "AW-SPK12-128GB-WHITE",
+     "options": {
+      "storage": "128 GB",
+      "color": "White"
+     },
+     "price": 399.99,
+     "stock": 4
+    },
+    {
+     "sku": "AW-SPK12-256GB-BLACK",
+     "options": {
+      "storage": "256 GB",
+      "color": "Black"
+     },
+     "price": 459.99,
+     "stock": 8
+    },
+    {
+     "sku": "AW-SPK12-256GB-WHITE",
+     "options": {
+      "storage": "256 GB",
+      "color": "White"
+     },
+     "price": 459.99,
+     "stock": 60
+    }
+   ],
+   "featured": false,
+   "published": true,
+   "createdAt": "2026-06-07T04:48:00Z"
+  },
+  {
+   "slug": "arcwing-spark-12-lite",
+   "name": "Arcwing Spark 12 Lite",
+   "brand": "Arcwing",
+   "category": "phones",
+   "description": "The no-nonsense Spark: a 6.6-inch screen, a 5000 mAh battery that goes two days between charges and a 13 MP camera that covers snapshots and video calls. A smart first phone or dependable backup.",
+   "images": [
+    "phone-black-02"
+   ],
+   "specs": {
+    "screen_in": 6.6,
+    "refresh_hz": 90,
+    "battery_mah": 5000,
+    "camera_mp": 13,
+    "five_g": false,
+    "water_rating": "None",
+    "chipset": "Octa-core, 2.0 GHz"
+   },
+   "optionAxes": [
+    {
+     "key": "storage",
+     "label": "Storage"
+    },
+    {
+     "key": "color",
+     "label": "Color"
+    }
+   ],
+   "variants": [
+    {
+     "sku": "AW-SPK12L-64GB-BLACK",
+     "options": {
+      "storage": "64 GB",
+      "color": "Black"
+     },
+     "price": 179.99,
+     "stock": 0
+    },
+    {
+     "sku": "AW-SPK12L-64GB-WHITE",
+     "options": {
+      "storage": "64 GB",
+      "color": "White"
+     },
+     "price": 179.99,
+     "stock": 12
+    },
+    {
+     "sku": "AW-SPK12L-128GB-BLACK",
+     "options": {
+      "storage": "128 GB",
+      "color": "Black"
+     },
+     "price": 219.99,
+     "stock": 45
+    },
+    {
+     "sku": "AW-SPK12L-128GB-WHITE",
+     "options": {
+      "storage": "128 GB",
+      "color": "White"
+     },
+     "price": 219.99,
+     "stock": 3
+    }
+   ],
+   "featured": false,
+   "published": true,
+   "createdAt": "2026-06-09T03:24:00Z"
+  },
+  {
+   "slug": "ferrow-zip-3",
+   "name": "Ferrow Zip 3",
+   "brand": "Ferrow",
+   "category": "phones",
+   "description": "A genuinely compact flagship: a 6.1-inch 120 Hz OLED screen that fits a pocket, a 48 MP camera with optical stabilisation and IP67 protection. Wireless charging and 5G round out the package.",
+   "images": [
+    "phone-black-03",
+    "phone-black-04"
+   ],
+   "specs": {
+    "screen_in": 6.1,
+    "refresh_hz": 120,
+    "battery_mah": 4200,
+    "camera_mp": 48,
+    "five_g": true,
+    "water_rating": "IP67",
+    "chipset": "Octa-core, 3.2 GHz"
+   },
+   "optionAxes": [
+    {
+     "key": "storage",
+     "label": "Storage"
+    },
+    {
+     "key": "color",
+     "label": "Color"
+    }
+   ],
+   "variants": [
+    {
+     "sku": "FR-ZIP3-128GB-BLACK",
+     "options": {
+      "storage": "128 GB",
+      "color": "Black"
+     },
+     "price": 599.99,
+     "stock": 60
+    },
+    {
+     "sku": "FR-ZIP3-128GB-WHITE",
+     "options": {
+      "storage": "128 GB",
+      "color": "White"
+     },
+     "price": 599.99,
+     "stock": 2
+    },
+    {
+     "sku": "FR-ZIP3-256GB-BLACK",
+     "options": {
+      "storage": "256 GB",
+      "color": "Black"
+     },
+     "price": 679.99,
+     "stock": 10
+    },
+    {
+     "sku": "FR-ZIP3-256GB-WHITE",
+     "options": {
+      "storage": "256 GB",
+      "color": "White"
+     },
+     "price": 679.99,
+     "stock": 25
+    }
+   ],
+   "featured": false,
+   "published": true,
+   "createdAt": "2026-06-11T02:00:00Z"
+  },
+  {
+   "slug": "ferrow-titan-rugged-5g",
+   "name": "Ferrow Titan Rugged 5G",
+   "brand": "Ferrow",
+   "category": "phones",
+   "description": "Built for job sites and long hikes, with a reinforced frame, an IP68 rating and an enormous 8000 mAh battery. The 6.6-inch screen stays readable in direct sun, and a 64 MP camera captures detail when it counts.",
+   "images": [
+    "phone-black-02",
+    "phone-black-04",
+    "phone-black-03"
+   ],
+   "specs": {
+    "screen_in": 6.6,
+    "refresh_hz": 90,
+    "battery_mah": 8000,
+    "camera_mp": 64,
+    "five_g": true,
+    "water_rating": "IP68",
+    "chipset": "Octa-core, 2.6 GHz"
+   },
+   "optionAxes": [
+    {
+     "key": "storage",
+     "label": "Storage"
+    }
+   ],
+   "variants": [
+    {
+     "sku": "FR-TITAN-128GB",
+     "options": {
+      "storage": "128 GB"
+     },
+     "price": 549.99,
+     "stock": 100
+    },
+    {
+     "sku": "FR-TITAN-256GB",
+     "options": {
+      "storage": "256 GB"
+     },
+     "price": 619.99,
+     "stock": 0
+    }
+   ],
+   "featured": false,
+   "published": true,
+   "createdAt": "2026-06-13T00:36:00Z"
+  },
+  {
+   "slug": "nordvik-ember-7",
+   "name": "Nordvik Ember 7",
+   "brand": "Nordvik",
+   "category": "phones",
+   "description": "A fast, tidy phone with a 6.3-inch 120 Hz screen, a 50 MP dual camera and a 4800 mAh battery with quick charging. The matte glass back resists fingerprints, and IP68 sealing is standard.",
+   "images": [
+    "phone-black-04",
+    "phone-black-03",
+    "phone-black-02"
+   ],
+   "specs": {
+    "screen_in": 6.3,
+    "refresh_hz": 120,
+    "battery_mah": 4800,
+    "camera_mp": 50,
+    "five_g": true,
+    "water_rating": "IP68",
+    "chipset": "Octa-core, 3.0 GHz"
+   },
+   "optionAxes": [
+    {
+     "key": "storage",
+     "label": "Storage"
+    },
+    {
+     "key": "color",
+     "label": "Color"
+    }
+   ],
+   "variants": [
+    {
+     "sku": "NV-EMB7-256GB-BLACK",
+     "options": {
+      "storage": "256 GB",
+      "color": "Black"
+     },
+     "price": 649.99,
+     "stock": 80
+    },
+    {
+     "sku": "NV-EMB7-256GB-WHITE",
+     "options": {
+      "storage": "256 GB",
+      "color": "White"
+     },
+     "price": 649.99,
+     "stock": 8
+    },
+    {
+     "sku": "NV-EMB7-512GB-BLACK",
+     "options": {
+      "storage": "512 GB",
+      "color": "Black"
+     },
+     "price": 749.99,
+     "stock": 30
+    },
+    {
+     "sku": "NV-EMB7-512GB-WHITE",
+     "options": {
+      "storage": "512 GB",
+      "color": "White"
+     },
+     "price": 749.99,
+     "stock": 10
+    }
+   ],
+   "featured": false,
+   "published": true,
+   "createdAt": "2026-06-14T16:12:00Z"
+  },
+  {
+   "slug": "arcwing-slate-14",
+   "name": "Arcwing Slate 14",
+   "brand": "Arcwing",
+   "category": "laptops",
+   "description": "A 14-inch ultraportable at just 1.19 kg, with a sharp 2.8K display, a quiet Core Ultra 7 processor and up to 18 hours of battery life. The aluminium chassis feels premium and the keyboard is a pleasure for long writing sessions.",
+   "images": [
+    "laptop-silver-01",
+    "laptop-dark-04"
+   ],
+   "specs": {
+    "screen_in": 14,
+    "ram_gb": 16,
+    "cpu_class": "Core Ultra 7",
+    "gpu": "Integrated",
+    "battery_hours": 18,
+    "os": "Windows 11",
+    "weight_kg": 1.19
+   },
+   "optionAxes": [
+    {
+     "key": "storage",
+     "label": "Storage"
+    },
+    {
+     "key": "color",
+     "label": "Color"
+    }
+   ],
+   "variants": [
+    {
+     "sku": "AW-SLT14-512GB-SILVER",
+     "options": {
+      "storage": "512 GB",
+      "color": "Silver"
+     },
+     "price": 1199.99,
+     "stock": 18
+    },
+    {
+     "sku": "AW-SLT14-512GB-BLACK",
+     "options": {
+      "storage": "512 GB",
+      "color": "Black"
+     },
+     "price": 1199.99,
+     "stock": 45
+    },
+    {
+     "sku": "AW-SLT14-1TB-SILVER",
+     "options": {
+      "storage": "1 TB",
+      "color": "Silver"
+     },
+     "price": 1349.99,
+     "stock": 15
+    },
+    {
+     "sku": "AW-SLT14-1TB-BLACK",
+     "options": {
+      "storage": "1 TB",
+      "color": "Black"
+     },
+     "price": 1349.99,
+     "stock": 80
+    }
+   ],
+   "featured": true,
+   "published": true,
+   "createdAt": "2026-06-16T14:48:00Z"
+  },
+  {
+   "slug": "arcwing-slate-13",
+   "name": "Arcwing Slate 13",
+   "brand": "Arcwing",
+   "category": "laptops",
+   "description": "The lightest Slate yet: a 13.3-inch screen, 1.05 kg of weight and 15 hours away from the charger. A Core Ultra 5 chip keeps office work, video calls and browsing effortless.",
+   "images": [
+    "laptop-silver-02"
+   ],
+   "specs": {
+    "screen_in": 13.3,
+    "ram_gb": 8,
+    "cpu_class": "Core Ultra 5",
+    "gpu": "Integrated",
+    "battery_hours": 15,
+    "os": "Windows 11",
+    "weight_kg": 1.05
+   },
+   "optionAxes": [
+    {
+     "key": "storage",
+     "label": "Storage"
+    },
+    {
+     "key": "color",
+     "label": "Color"
+    }
+   ],
+   "variants": [
+    {
+     "sku": "AW-SLT13-256GB-SILVER",
+     "options": {
+      "storage": "256 GB",
+      "color": "Silver"
+     },
+     "price": 799.99,
+     "stock": 40
+    },
+    {
+     "sku": "AW-SLT13-256GB-BLACK",
+     "options": {
+      "storage": "256 GB",
+      "color": "Black"
+     },
+     "price": 799.99,
+     "stock": 45
+    },
+    {
+     "sku": "AW-SLT13-512GB-SILVER",
+     "options": {
+      "storage": "512 GB",
+      "color": "Silver"
+     },
+     "price": 899.99,
+     "stock": 0
+    },
+    {
+     "sku": "AW-SLT13-512GB-BLACK",
+     "options": {
+      "storage": "512 GB",
+      "color": "Black"
+     },
+     "price": 899.99,
+     "stock": 60
+    }
+   ],
+   "featured": false,
+   "published": true,
+   "createdAt": "2026-06-18T13:24:00Z"
+  },
+  {
+   "slug": "arcwing-atlas-16-pro",
+   "name": "Arcwing Atlas 16 Pro",
+   "brand": "Arcwing",
+   "category": "laptops",
+   "description": "A 16-inch workstation-class laptop with a Ryzen 9 processor, 32 GB of memory and an RTX 4070 for rendering and machine-learning work. A vapour-chamber cooler keeps clocks high under load. Coming soon.",
+   "images": [
+    "laptop-dark-04",
+    "laptop-silver-02"
+   ],
+   "specs": {
+    "screen_in": 16,
+    "ram_gb": 32,
+    "cpu_class": "Ryzen 9",
+    "gpu": "RTX 4070",
+    "battery_hours": 9,
+    "os": "Windows 11",
+    "weight_kg": 2.1
+   },
+   "optionAxes": [
+    {
+     "key": "storage",
+     "label": "Storage"
+    }
+   ],
+   "variants": [
+    {
+     "sku": "AW-ATL16-1TB",
+     "options": {
+      "storage": "1 TB"
+     },
+     "price": 2299.0,
+     "stock": 1
+    },
+    {
+     "sku": "AW-ATL16-2TB",
+     "options": {
+      "storage": "2 TB"
+     },
+     "price": 2699.0,
+     "stock": 0
+    }
+   ],
+   "featured": false,
+   "published": false,
+   "createdAt": "2026-06-20T12:00:00Z"
+  },
+  {
+   "slug": "nordvik-forge-15",
+   "name": "Nordvik Forge 15",
+   "brand": "Nordvik",
+   "category": "laptops",
+   "description": "A 15.6-inch gaming laptop that stays cool and quiet at 1080p high settings, thanks to a Ryzen 7 processor and an RTX 4060. The 144 Hz display and per-key lighting suit both play and work.",
+   "images": [
+    "laptop-dark-04"
+   ],
+   "specs": {
+    "screen_in": 15.6,
+    "ram_gb": 16,
+    "cpu_class": "Ryzen 7",
+    "gpu": "RTX 4060",
+    "battery_hours": 7,
+    "os": "Windows 11",
+    "weight_kg": 2.3
+   },
+   "optionAxes": [
+    {
+     "key": "storage",
+     "label": "Storage"
+    }
+   ],
+   "variants": [
+    {
+     "sku": "NV-FRG15-512GB",
+     "options": {
+      "storage": "512 GB"
+     },
+     "price": 1399.99,
+     "stock": 12
+    },
+    {
+     "sku": "NV-FRG15-1TB",
+     "options": {
+      "storage": "1 TB"
+     },
+     "price": 1499.99,
+     "stock": 120
+    }
+   ],
+   "featured": false,
+   "published": true,
+   "createdAt": "2026-06-22T10:36:00Z"
+  },
+  {
+   "slug": "nordvik-forge-17",
+   "name": "Nordvik Forge 17",
+   "brand": "Nordvik",
+   "category": "laptops",
+   "description": "A desktop replacement with a 17.3-inch 165 Hz screen, a Ryzen 9 processor and an RTX 4070. Dual fans and a full-size keyboard keep marathon sessions comfortable, and an extra M.2 slot makes storage upgrades simple.",
+   "images": [
+    "laptop-dark-04",
+    "laptop-silver-03"
+   ],
+   "specs": {
+    "screen_in": 17.3,
+    "ram_gb": 32,
+    "cpu_class": "Ryzen 9",
+    "gpu": "RTX 4070",
+    "battery_hours": 6,
+    "os": "Windows 11",
+    "weight_kg": 2.8
+   },
+   "optionAxes": [
+    {
+     "key": "storage",
+     "label": "Storage"
+    }
+   ],
+   "variants": [
+    {
+     "sku": "NV-FRG17-1TB",
+     "options": {
+      "storage": "1 TB"
+     },
+     "price": 1899.99,
+     "stock": 60
+    },
+    {
+     "sku": "NV-FRG17-2TB",
+     "options": {
+      "storage": "2 TB"
+     },
+     "price": 2199.99,
+     "stock": 12
+    }
+   ],
+   "featured": false,
+   "published": true,
+   "createdAt": "2026-06-24T09:12:00Z"
+  },
+  {
+   "slug": "tessel-chrome-14",
+   "name": "Tessel Chrome 14",
+   "brand": "Tessel",
+   "category": "laptops",
+   "description": "A fast, secure 14-inch ChromeOS laptop for school, travel and everyday browsing. It boots in seconds, updates itself quietly and keeps going for 12 hours on a single charge.",
+   "images": [
+    "laptop-silver-03",
+    "laptop-silver-02"
+   ],
+   "specs": {
+    "screen_in": 14,
+    "ram_gb": 8,
+    "cpu_class": "Core Ultra 5",
+    "gpu": "Integrated",
+    "battery_hours": 12,
+    "os": "ChromeOS",
+    "weight_kg": 1.4
+   },
+   "optionAxes": [
+    {
+     "key": "storage",
+     "label": "Storage"
+    },
+    {
+     "key": "color",
+     "label": "Color"
+    }
+   ],
+   "variants": [
+    {
+     "sku": "TS-CHR14-128GB-SILVER",
+     "options": {
+      "storage": "128 GB",
+      "color": "Silver"
+     },
+     "price": 449.99,
+     "stock": 0
+    },
+    {
+     "sku": "TS-CHR14-128GB-BLACK",
+     "options": {
+      "storage": "128 GB",
+      "color": "Black"
+     },
+     "price": 449.99,
+     "stock": 45
+    },
+    {
+     "sku": "TS-CHR14-256GB-SILVER",
+     "options": {
+      "storage": "256 GB",
+      "color": "Silver"
+     },
+     "price": 519.99,
+     "stock": 18
+    },
+    {
+     "sku": "TS-CHR14-256GB-BLACK",
+     "options": {
+      "storage": "256 GB",
+      "color": "Black"
+     },
+     "price": 519.99,
+     "stock": 100
+    }
+   ],
+   "featured": false,
+   "published": true,
+   "createdAt": "2026-06-26T07:48:00Z"
+  },
+  {
+   "slug": "tessel-studio-16",
+   "name": "Tessel Studio 16",
+   "brand": "Tessel",
+   "category": "laptops",
+   "description": "A 16-inch creator laptop with a colour-accurate 4K display, a Ryzen 7 processor and an RTX 4050 for photo, video and 3D work. A full SD card slot and Thunderbolt-class ports keep your workflow moving.",
+   "images": [
+    "laptop-silver-02",
+    "laptop-dark-04"
+   ],
+   "specs": {
+    "screen_in": 16,
+    "ram_gb": 32,
+    "cpu_class": "Ryzen 7",
+    "gpu": "RTX 4050",
+    "battery_hours": 10,
+    "os": "Windows 11",
+    "weight_kg": 1.9
+   },
+   "optionAxes": [
+    {
+     "key": "storage",
+     "label": "Storage"
+    },
+    {
+     "key": "color",
+     "label": "Color"
+    }
+   ],
+   "variants": [
+    {
+     "sku": "TS-STU16-1TB-SILVER",
+     "options": {
+      "storage": "1 TB",
+      "color": "Silver"
+     },
+     "price": 1499.99,
+     "stock": 12
+    },
+    {
+     "sku": "TS-STU16-1TB-BLACK",
+     "options": {
+      "storage": "1 TB",
+      "color": "Black"
+     },
+     "price": 1499.99,
+     "stock": 3
+    },
+    {
+     "sku": "TS-STU16-2TB-SILVER",
+     "options": {
+      "storage": "2 TB",
+      "color": "Silver"
+     },
+     "price": 1799.99,
+     "stock": 24
+    },
+    {
+     "sku": "TS-STU16-2TB-BLACK",
+     "options": {
+      "storage": "2 TB",
+      "color": "Black"
+     },
+     "price": 1799.99,
+     "stock": 45
+    }
+   ],
+   "featured": false,
+   "published": true,
+   "createdAt": "2026-06-27T23:24:00Z"
+  },
+  {
+   "slug": "tessel-everyday-15",
+   "name": "Tessel Everyday 15",
+   "brand": "Tessel",
+   "category": "laptops",
+   "description": "A roomy 15.6-inch laptop for work, study and streaming, with a Ryzen 5 processor, a numeric keypad and a comfortable full-size keyboard. Battery life reaches 11 hours, and storage can be specified up to 1 TB.",
+   "images": [
+    "laptop-silver-03"
+   ],
+   "specs": {
+    "screen_in": 15.6,
+    "ram_gb": 16,
+    "cpu_class": "Ryzen 5",
+    "gpu": "Integrated",
+    "battery_hours": 11,
+    "os": "Windows 11",
+    "weight_kg": 1.7
+   },
+   "optionAxes": [
+    {
+     "key": "storage",
+     "label": "Storage"
+    },
+    {
+     "key": "color",
+     "label": "Color"
+    }
+   ],
+   "variants": [
+    {
+     "sku": "TS-EVD15-256GB-SILVER",
+     "options": {
+      "storage": "256 GB",
+      "color": "Silver"
+     },
+     "price": 649.99,
+     "stock": 45
+    },
+    {
+     "sku": "TS-EVD15-256GB-BLACK",
+     "options": {
+      "storage": "256 GB",
+      "color": "Black"
+     },
+     "price": 649.99,
+     "stock": 20
+    },
+    {
+     "sku": "TS-EVD15-512GB-SILVER",
+     "options": {
+      "storage": "512 GB",
+      "color": "Silver"
+     },
+     "price": 739.99,
+     "stock": 0
+    },
+    {
+     "sku": "TS-EVD15-512GB-BLACK",
+     "options": {
+      "storage": "512 GB",
+      "color": "Black"
+     },
+     "price": 739.99,
+     "stock": 1
+    },
+    {
+     "sku": "TS-EVD15-1TB-SILVER",
+     "options": {
+      "storage": "1 TB",
+      "color": "Silver"
+     },
+     "price": 849.99,
+     "stock": 12
+    },
+    {
+     "sku": "TS-EVD15-1TB-BLACK",
+     "options": {
+      "storage": "1 TB",
+      "color": "Black"
+     },
+     "price": 849.99,
+     "stock": 20
+    }
+   ],
+   "featured": false,
+   "published": true,
+   "createdAt": "2026-06-29T22:00:00Z"
+  },
+  {
+   "slug": "tessel-slate-11-pro",
+   "name": "Tessel Slate 11 Pro",
+   "brand": "Tessel",
+   "category": "tablets",
+   "description": "An 11-inch tablet with a fast 120 Hz display, 8 GB of memory and a pressure-sensitive stylus that attaches magnetically. At 470 g it is easy to hold for reading, sketching and note-taking, and the battery lasts 12 hours.",
+   "images": [
+    "tablet-black-02",
+    "tablet-black-04"
+   ],
+   "specs": {
+    "screen_in": 11,
+    "ram_gb": 8,
+    "battery_hours": 12,
+    "cellular": false,
+    "stylus_support": true,
+    "os": "Android",
+    "weight_g": 470
+   },
+   "optionAxes": [
+    {
+     "key": "storage",
+     "label": "Storage"
+    },
+    {
+     "key": "color",
+     "label": "Color"
+    }
+   ],
+   "variants": [
+    {
+     "sku": "TS-SLT11-128GB-BLACK",
+     "options": {
+      "storage": "128 GB",
+      "color": "Black"
+     },
+     "price": 599.99,
+     "stock": 30
+    },
+    {
+     "sku": "TS-SLT11-128GB-SILVER",
+     "options": {
+      "storage": "128 GB",
+      "color": "Silver"
+     },
+     "price": 599.99,
+     "stock": 1
+    },
+    {
+     "sku": "TS-SLT11-256GB-BLACK",
+     "options": {
+      "storage": "256 GB",
+      "color": "Black"
+     },
+     "price": 699.99,
+     "stock": 10
+    },
+    {
+     "sku": "TS-SLT11-256GB-SILVER",
+     "options": {
+      "storage": "256 GB",
+      "color": "Silver"
+     },
+     "price": 699.99,
+     "stock": 35
+    }
+   ],
+   "featured": true,
+   "published": true,
+   "createdAt": "2026-07-01T20:36:00Z"
+  },
+  {
+   "slug": "tessel-slate-11-pro-5g",
+   "name": "Tessel Slate 11 Pro 5G",
+   "brand": "Tessel",
+   "category": "tablets",
+   "description": "Everything in the Slate 11 Pro with a built-in 5G modem, so your notes, email and video calls follow you beyond Wi-Fi. A nano-SIM and eSIM are both supported.",
+   "images": [
+    "tablet-black-02"
+   ],
+   "specs": {
+    "screen_in": 11,
+    "ram_gb": 8,
+    "battery_hours": 11,
+    "cellular": true,
+    "stylus_support": true,
+    "os": "Android",
+    "weight_g": 480
+   },
+   "optionAxes": [
+    {
+     "key": "storage",
+     "label": "Storage"
+    }
+   ],
+   "variants": [
+    {
+     "sku": "TS-SLT11C-256GB",
+     "options": {
+      "storage": "256 GB"
+     },
+     "price": 749.99,
+     "stock": 10
+    },
+    {
+     "sku": "TS-SLT11C-512GB",
+     "options": {
+      "storage": "512 GB"
+     },
+     "price": 899.99,
+     "stock": 35
+    }
+   ],
+   "featured": false,
+   "published": true,
+   "createdAt": "2026-07-03T19:12:00Z"
+  },
+  {
+   "slug": "korvane-pad-10",
+   "name": "Korvane Pad 10",
+   "brand": "Korvane",
+   "category": "tablets",
+   "description": "A simple, sturdy 10.4-inch tablet for streaming, reading and video calls. Dual speakers and a bright screen make it a great family device at a friendly price.",
+   "images": [
+    "tablet-black-01"
+   ],
+   "specs": {
+    "screen_in": 10.4,
+    "ram_gb": 4,
+    "battery_hours": 10,
+    "cellular": false,
+    "stylus_support": false,
+    "os": "Android",
+    "weight_g": 460
+   },
+   "optionAxes": [
+    {
+     "key": "storage",
+     "label": "Storage"
+    },
+    {
+     "key": "color",
+     "label": "Color"
+    }
+   ],
+   "variants": [
+    {
+     "sku": "KV-PAD10-64GB-BLACK",
+     "options": {
+      "storage": "64 GB",
+      "color": "Black"
+     },
+     "price": 249.99,
+     "stock": 24
+    },
+    {
+     "sku": "KV-PAD10-64GB-SILVER",
+     "options": {
+      "storage": "64 GB",
+      "color": "Silver"
+     },
+     "price": 249.99,
+     "stock": 18
+    },
+    {
+     "sku": "KV-PAD10-128GB-BLACK",
+     "options": {
+      "storage": "128 GB",
+      "color": "Black"
+     },
+     "price": 299.99,
+     "stock": 0
+    },
+    {
+     "sku": "KV-PAD10-128GB-SILVER",
+     "options": {
+      "storage": "128 GB",
+      "color": "Silver"
+     },
+     "price": 299.99,
+     "stock": 0
+    }
+   ],
+   "featured": false,
+   "published": true,
+   "createdAt": "2026-07-05T17:48:00Z"
+  },
+  {
+   "slug": "korvane-pad-12-plus",
+   "name": "Korvane Pad 12 Plus",
+   "brand": "Korvane",
+   "category": "tablets",
+   "description": "A large 12.4-inch tablet with four speakers, a 90 Hz display and a stylus in the box. Split-screen multitasking and a keyboard cover option turn it into a capable second screen for work.",
+   "images": [
+    "tablet-black-04",
+    "tablet-black-02"
+   ],
+   "specs": {
+    "screen_in": 12.4,
+    "ram_gb": 8,
+    "battery_hours": 13,
+    "cellular": false,
+    "stylus_support": true,
+    "os": "Android",
+    "weight_g": 580
+   },
+   "optionAxes": [
+    {
+     "key": "storage",
+     "label": "Storage"
+    },
+    {
+     "key": "color",
+     "label": "Color"
+    }
+   ],
+   "variants": [
+    {
+     "sku": "KV-PAD12-128GB-BLACK",
+     "options": {
+      "storage": "128 GB",
+      "color": "Black"
+     },
+     "price": 449.99,
+     "stock": 6
+    },
+    {
+     "sku": "KV-PAD12-128GB-SILVER",
+     "options": {
+      "storage": "128 GB",
+      "color": "Silver"
+     },
+     "price": 449.99,
+     "stock": 2
+    },
+    {
+     "sku": "KV-PAD12-256GB-BLACK",
+     "options": {
+      "storage": "256 GB",
+      "color": "Black"
+     },
+     "price": 529.99,
+     "stock": 80
+    },
+    {
+     "sku": "KV-PAD12-256GB-SILVER",
+     "options": {
+      "storage": "256 GB",
+      "color": "Silver"
+     },
+     "price": 529.99,
+     "stock": 2
+    }
+   ],
+   "featured": false,
+   "published": true,
+   "createdAt": "2026-07-07T16:24:00Z"
+  },
+  {
+   "slug": "arcwing-canvas-13",
+   "name": "Arcwing Canvas 13",
+   "brand": "Arcwing",
+   "category": "tablets",
+   "description": "A 13-inch Windows 2-in-1 with a detachable keyboard, a 3:2 touchscreen and 16 GB of memory to handle full desktop apps. A kickstand and pen support make it as comfortable for sketching as for spreadsheets.",
+   "images": [
+    "tablet-black-04",
+    "tablet-black-01"
+   ],
+   "specs": {
+    "screen_in": 13,
+    "ram_gb": 16,
+    "battery_hours": 9,
+    "cellular": false,
+    "stylus_support": true,
+    "os": "Windows 11",
+    "weight_g": 780
+   },
+   "optionAxes": [
+    {
+     "key": "storage",
+     "label": "Storage"
+    }
+   ],
+   "variants": [
+    {
+     "sku": "AW-CNV13-256GB",
+     "options": {
+      "storage": "256 GB"
+     },
+     "price": 1099.99,
+     "stock": 0
+    },
+    {
+     "sku": "AW-CNV13-512GB",
+     "options": {
+      "storage": "512 GB"
+     },
+     "price": 1249.99,
+     "stock": 75
+    },
+    {
+     "sku": "AW-CNV13-1TB",
+     "options": {
+      "storage": "1 TB"
+     },
+     "price": 1399.99,
+     "stock": 6
+    }
+   ],
+   "featured": false,
+   "published": true,
+   "createdAt": "2026-07-09T15:00:00Z"
+  },
+  {
+   "slug": "arcwing-canvas-go-10",
+   "name": "Arcwing Canvas Go 10",
+   "brand": "Arcwing",
+   "category": "tablets",
+   "description": "A compact 10.5-inch Windows tablet with built-in 5G for field work, inspections and travel. It runs standard desktop software and supports a stylus for forms and signatures.",
+   "images": [
+    "tablet-black-01",
+    "tablet-black-04"
+   ],
+   "specs": {
+    "screen_in": 10.5,
+    "ram_gb": 8,
+    "battery_hours": 8,
+    "cellular": true,
+    "stylus_support": true,
+    "os": "Windows 11",
+    "weight_g": 580
+   },
+   "optionAxes": [
+    {
+     "key": "storage",
+     "label": "Storage"
+    }
+   ],
+   "variants": [
+    {
+     "sku": "AW-CNVGO-128GB",
+     "options": {
+      "storage": "128 GB"
+     },
+     "price": 699.99,
+     "stock": 25
+    },
+    {
+     "sku": "AW-CNVGO-256GB",
+     "options": {
+      "storage": "256 GB"
+     },
+     "price": 799.99,
+     "stock": 0
+    }
+   ],
+   "featured": false,
+   "published": true,
+   "createdAt": "2026-07-11T06:36:00Z"
+  },
+  {
+   "slug": "ferrow-reader-8",
+   "name": "Ferrow Reader 8",
+   "brand": "Ferrow",
+   "category": "tablets",
+   "description": "A pocketable 8.3-inch tablet that excels at reading, comics and web browsing. At 320 g with a paper-friendly eye-comfort mode, it is easy to hold one-handed for hours.",
+   "images": [
+    "tablet-black-03"
+   ],
+   "specs": {
+    "screen_in": 8.3,
+    "ram_gb": 4,
+    "battery_hours": 14,
+    "cellular": false,
+    "stylus_support": false,
+    "os": "Android",
+    "weight_g": 320
+   },
+   "optionAxes": [
+    {
+     "key": "storage",
+     "label": "Storage"
+    },
+    {
+     "key": "color",
+     "label": "Color"
+    }
+   ],
+   "variants": [
+    {
+     "sku": "FR-RDR8-32GB-BLACK",
+     "options": {
+      "storage": "32 GB",
+      "color": "Black"
+     },
+     "price": 159.99,
+     "stock": 50
+    },
+    {
+     "sku": "FR-RDR8-32GB-SILVER",
+     "options": {
+      "storage": "32 GB",
+      "color": "Silver"
+     },
+     "price": 159.99,
+     "stock": 45
+    },
+    {
+     "sku": "FR-RDR8-64GB-BLACK",
+     "options": {
+      "storage": "64 GB",
+      "color": "Black"
+     },
+     "price": 189.99,
+     "stock": 0
+    },
+    {
+     "sku": "FR-RDR8-64GB-SILVER",
+     "options": {
+      "storage": "64 GB",
+      "color": "Silver"
+     },
+     "price": 189.99,
+     "stock": 35
+    }
+   ],
+   "featured": false,
+   "published": true,
+   "createdAt": "2026-07-13T05:12:00Z"
+  },
+  {
+   "slug": "nordvik-sketch-11",
+   "name": "Nordvik Sketch 11",
+   "brand": "Nordvik",
+   "category": "tablets",
+   "description": "A tablet tuned for drawing, with a laminated 11-inch screen, 4096 pressure levels and a low-latency stylus included. Palm rejection works as you would expect, and a textured finish feels close to paper.",
+   "images": [
+    "tablet-black-04",
+    "tablet-black-03"
+   ],
+   "specs": {
+    "screen_in": 11,
+    "ram_gb": 8,
+    "battery_hours": 11,
+    "cellular": false,
+    "stylus_support": true,
+    "os": "Android",
+    "weight_g": 520
+   },
+   "optionAxes": [
+    {
+     "key": "storage",
+     "label": "Storage"
+    }
+   ],
+   "variants": [
+    {
+     "sku": "NV-SKT11-128GB",
+     "options": {
+      "storage": "128 GB"
+     },
+     "price": 429.99,
+     "stock": 35
+    },
+    {
+     "sku": "NV-SKT11-256GB",
+     "options": {
+      "storage": "256 GB"
+     },
+     "price": 499.99,
+     "stock": 12
+    }
+   ],
+   "featured": false,
+   "published": true,
+   "createdAt": "2026-07-15T03:48:00Z"
+  },
+  {
+   "slug": "quietline-studio-anc",
+   "name": "Quietline Studio ANC",
+   "brand": "Quietline",
+   "category": "headphones",
+   "description": "Over-ear wireless headphones with adaptive noise cancelling that quiets a train carriage or an open-plan office. Plush memory-foam pads, 40 mm drivers and 40 hours of battery make them a comfortable all-day listen.",
+   "images": [
+    "headphones-black-01",
+    "headphones-green-02"
+   ],
+   "specs": {
+    "form_factor": "Over-ear",
+    "anc": true,
+    "battery_hours": 40,
+    "multipoint": true,
+    "driver_mm": 40,
+    "weight_g": 254
+   },
+   "optionAxes": [
+    {
+     "key": "color",
+     "label": "Color"
+    }
+   ],
+   "variants": [
+    {
+     "sku": "QL-STUANC-BLACK",
+     "options": {
+      "color": "Black"
+     },
+     "price": 299.99,
+     "stock": 1
+    },
+    {
+     "sku": "QL-STUANC-GREEN",
+     "options": {
+      "color": "Green"
+     },
+     "price": 299.99,
+     "stock": 0
+    },
+    {
+     "sku": "QL-STUANC-RED",
+     "options": {
+      "color": "Red"
+     },
+     "price": 299.99,
+     "stock": 24
+    }
+   ],
+   "featured": true,
+   "published": true,
+   "createdAt": "2026-07-17T02:24:00Z"
+  },
+  {
+   "slug": "quietline-studio-lite",
+   "name": "Quietline Studio Lite",
+   "brand": "Quietline",
+   "category": "headphones",
+   "description": "A lighter take on the Studio with the same warm, balanced sound but no noise cancelling, which stretches battery life to 50 hours. Foldable and light at 240 g, they slip easily into a bag.",
+   "images": [
+    "headphones-black-01"
+   ],
+   "specs": {
+    "form_factor": "Over-ear",
+    "anc": false,
+    "battery_hours": 50,
+    "multipoint": false,
+    "driver_mm": 40,
+    "weight_g": 240
+   },
+   "optionAxes": [
+    {
+     "key": "color",
+     "label": "Color"
+    }
+   ],
+   "variants": [
+    {
+     "sku": "QL-STULT-BLACK",
+     "options": {
+      "color": "Black"
+     },
+     "price": 129.99,
+     "stock": 10
+    },
+    {
+     "sku": "QL-STULT-GREEN",
+     "options": {
+      "color": "Green"
+     },
+     "price": 129.99,
+     "stock": 50
+    },
+    {
+     "sku": "QL-STULT-RED",
+     "options": {
+      "color": "Red"
+     },
+     "price": 129.99,
+     "stock": 18
+    }
+   ],
+   "featured": false,
+   "published": true,
+   "createdAt": "2026-07-19T01:00:00Z"
+  },
+  {
+   "slug": "quietline-studio-max",
+   "name": "Quietline Studio Max",
+   "brand": "Quietline",
+   "category": "headphones",
+   "description": "Our most ambitious over-ear: 50 mm drivers with deep, controlled bass, hybrid noise cancelling and a hinged aluminium frame. Choose fabric or leather ear pads to suit your taste.",
+   "images": [
+    "headphones-green-02",
+    "headphones-black-01"
+   ],
+   "specs": {
+    "form_factor": "Over-ear",
+    "anc": true,
+    "battery_hours": 30,
+    "multipoint": true,
+    "driver_mm": 50,
+    "weight_g": 280
+   },
+   "optionAxes": [
+    {
+     "key": "color",
+     "label": "Color"
+    },
+    {
+     "key": "pads",
+     "label": "Ear pads"
+    }
+   ],
+   "variants": [
+    {
+     "sku": "QL-STUMAX-BLACK-FABRIC",
+     "options": {
+      "color": "Black",
+      "pads": "Fabric"
+     },
+     "price": 349.99,
+     "stock": 50
+    },
+    {
+     "sku": "QL-STUMAX-BLACK-LEATHE",
+     "options": {
+      "color": "Black",
+      "pads": "Leather"
+     },
+     "price": 369.99,
+     "stock": 24
+    },
+    {
+     "sku": "QL-STUMAX-GREEN-FABRIC",
+     "options": {
+      "color": "Green",
+      "pads": "Fabric"
+     },
+     "price": 349.99,
+     "stock": 25
+    },
+    {
+     "sku": "QL-STUMAX-GREEN-LEATHE",
+     "options": {
+      "color": "Green",
+      "pads": "Leather"
+     },
+     "price": 369.99,
+     "stock": 50
+    },
+    {
+     "sku": "QL-STUMAX-RED-FABRIC",
+     "options": {
+      "color": "Red",
+      "pads": "Fabric"
+     },
+     "price": 349.99,
+     "stock": 24
+    },
+    {
+     "sku": "QL-STUMAX-RED-LEATHE",
+     "options": {
+      "color": "Red",
+      "pads": "Leather"
+     },
+     "price": 369.99,
+     "stock": 80
+    }
+   ],
+   "featured": false,
+   "published": true,
+   "createdAt": "2026-07-20T23:36:00Z"
+  },
+  {
+   "slug": "korvane-pulse-on-ear",
+   "name": "Korvane Pulse On-Ear",
+   "brand": "Korvane",
+   "category": "headphones",
+   "description": "Compact on-ear headphones with a punchy, fun sound signature and 30 hours of playback. Multipoint pairing lets you switch from laptop to phone without touching a menu.",
+   "images": [
+    "headphones-red-03",
+    "headphones-black-01"
+   ],
+   "specs": {
+    "form_factor": "On-ear",
+    "anc": false,
+    "battery_hours": 30,
+    "multipoint": true,
+    "driver_mm": 40,
+    "weight_g": 190
+   },
+   "optionAxes": [
+    {
+     "key": "color",
+     "label": "Color"
+    }
+   ],
+   "variants": [
+    {
+     "sku": "KV-PULSE-RED",
+     "options": {
+      "color": "Red"
+     },
+     "price": 79.99,
+     "stock": 10
+    },
+    {
+     "sku": "KV-PULSE-BLACK",
+     "options": {
+      "color": "Black"
+     },
+     "price": 79.99,
+     "stock": 45
+    }
+   ],
+   "featured": false,
+   "published": true,
+   "createdAt": "2026-07-22T22:12:00Z"
+  },
+  {
+   "slug": "ferrow-riff-wireless",
+   "name": "Ferrow Riff Wireless",
+   "brand": "Ferrow",
+   "category": "headphones",
+   "description": "Colourful, lightweight on-ear headphones with a 25-hour battery and a sturdy folding hinge. Easy Bluetooth pairing and a built-in microphone make them a solid first pair for school or the commute.",
+   "images": [
+    "headphones-red-03"
+   ],
+   "specs": {
+    "form_factor": "On-ear",
+    "anc": false,
+    "battery_hours": 25,
+    "multipoint": false,
+    "driver_mm": 32,
+    "weight_g": 170
+   },
+   "optionAxes": [
+    {
+     "key": "color",
+     "label": "Color"
+    }
+   ],
+   "variants": [
+    {
+     "sku": "FR-RIFF-RED",
+     "options": {
+      "color": "Red"
+     },
+     "price": 59.99,
+     "stock": 40
+    },
+    {
+     "sku": "FR-RIFF-BLACK",
+     "options": {
+      "color": "Black"
+     },
+     "price": 59.99,
+     "stock": 4
+    }
+   ],
+   "featured": false,
+   "published": true,
+   "createdAt": "2026-07-24T13:48:00Z"
+  },
+  {
+   "slug": "nordvik-concert-pro",
+   "name": "Nordvik Concert Pro",
+   "brand": "Nordvik",
+   "category": "headphones",
+   "description": "Reference-grade wireless over-ears with 45 mm beryllium-coated drivers and adaptive noise cancelling. A premium leather headband, a hard travel case and a 38-hour battery come standard.",
+   "images": [
+    "headphones-green-02"
+   ],
+   "specs": {
+    "form_factor": "Over-ear",
+    "anc": true,
+    "battery_hours": 38,
+    "multipoint": true,
+    "driver_mm": 45,
+    "weight_g": 310
+   },
+   "optionAxes": [
+    {
+     "key": "color",
+     "label": "Color"
+    }
+   ],
+   "variants": [
+    {
+     "sku": "NV-CONC-BLACK",
+     "options": {
+      "color": "Black"
+     },
+     "price": 449.0,
+     "stock": 10
+    },
+    {
+     "sku": "NV-CONC-GREEN",
+     "options": {
+      "color": "Green"
+     },
+     "price": 449.0,
+     "stock": 60
+    }
+   ],
+   "featured": false,
+   "published": true,
+   "createdAt": "2026-07-26T12:24:00Z"
+  },
+  {
+   "slug": "orbitra-echo-wireless-headset",
+   "name": "Orbitra Echo Wireless Headset",
+   "brand": "Orbitra",
+   "category": "headphones",
+   "description": "A wireless on-ear gaming headset with a detachable boom microphone, a low-latency 2.4 GHz dongle and a huge 60-hour battery. The cushioned headband stays comfortable through long sessions.",
+   "images": [
+    "headphones-black-01",
+    "headphones-red-03"
+   ],
+   "specs": {
+    "form_factor": "On-ear",
+    "anc": false,
+    "battery_hours": 60,
+    "multipoint": false,
+    "driver_mm": 50,
+    "weight_g": 340
+   },
+   "optionAxes": [
+    {
+     "key": "color",
+     "label": "Color"
+    }
+   ],
+   "variants": [
+    {
+     "sku": "OR-ECHO-RED",
+     "options": {
+      "color": "Red"
+     },
+     "price": 149.99,
+     "stock": 15
+    },
+    {
+     "sku": "OR-ECHO-BLACK",
+     "options": {
+      "color": "Black"
+     },
+     "price": 149.99,
+     "stock": 10
+    }
+   ],
+   "featured": false,
+   "published": true,
+   "createdAt": "2026-07-28T11:00:00Z"
+  },
+  {
+   "slug": "quietline-buds-pro",
+   "name": "Quietline Buds Pro",
+   "brand": "Quietline",
+   "category": "earbuds",
+   "description": "True wireless earbuds with strong adaptive noise cancelling, a natural transparency mode and eight hours of listening per charge. The pocketable case adds three more charges and supports wireless charging.",
+   "images": [
+    "earbuds-black-01",
+    "earbuds-pink-03"
+   ],
+   "specs": {
+    "anc": true,
+    "battery_hours": 8,
+    "total_hours": 32,
+    "water_rating": "IPX4",
+    "wireless_charging": true,
+    "fit": "In-ear"
+   },
+   "optionAxes": [
+    {
+     "key": "color",
+     "label": "Color"
+    }
+   ],
+   "variants": [
+    {
+     "sku": "QL-BUDSP-BLACK",
+     "options": {
+      "color": "Black"
+     },
+     "price": 179.99,
+     "stock": 18
+    },
+    {
+     "sku": "QL-BUDSP-PINK",
+     "options": {
+      "color": "Pink"
+     },
+     "price": 179.99,
+     "stock": 25
+    },
+    {
+     "sku": "QL-BUDSP-WHITE",
+     "options": {
+      "color": "White"
+     },
+     "price": 179.99,
+     "stock": 1
+    }
+   ],
+   "featured": true,
+   "published": true,
+   "createdAt": "2026-07-30T09:36:00Z"
+  },
+  {
+   "slug": "quietline-buds-air",
+   "name": "Quietline Buds Air",
+   "brand": "Quietline",
+   "category": "earbuds",
+   "description": "Lightweight semi-in-ear earbuds with a balanced sound and a comfortable, secure fit. Seven hours of playback and a slim charging case make them easy to carry all day.",
+   "images": [
+    "earbuds-pink-03",
+    "earbuds-black-01"
+   ],
+   "specs": {
+    "anc": false,
+    "battery_hours": 7,
+    "total_hours": 28,
+    "water_rating": "IPX4",
+    "wireless_charging": false,
+    "fit": "Semi-in-ear"
+   },
+   "optionAxes": [
+    {
+     "key": "color",
+     "label": "Color"
+    }
+   ],
+   "variants": [
+    {
+     "sku": "QL-BUDSA-PINK",
+     "options": {
+      "color": "Pink"
+     },
+     "price": 89.99,
+     "stock": 75
+    },
+    {
+     "sku": "QL-BUDSA-BLACK",
+     "options": {
+      "color": "Black"
+     },
+     "price": 89.99,
+     "stock": 2
+    },
+    {
+     "sku": "QL-BUDSA-WHITE",
+     "options": {
+      "color": "White"
+     },
+     "price": 89.99,
+     "stock": 6
+    }
+   ],
+   "featured": false,
+   "published": true,
+   "createdAt": "2026-08-01T08:12:00Z"
+  },
+  {
+   "slug": "korvane-drop-2",
+   "name": "Korvane Drop 2",
+   "brand": "Korvane",
+   "category": "earbuds",
+   "description": "Noise-cancelling earbuds with a dependable IPX5 rating and a snug, secure fit for workouts. Dual microphones keep your voice clear on calls in busy streets.",
+   "images": [
+    "earbuds-black-04",
+    "earbuds-pink-03"
+   ],
+   "specs": {
+    "anc": true,
+    "battery_hours": 6,
+    "total_hours": 24,
+    "water_rating": "IPX5",
+    "wireless_charging": false,
+    "fit": "In-ear"
+   },
+   "optionAxes": [
+    {
+     "key": "color",
+     "label": "Color"
+    }
+   ],
+   "variants": [
+    {
+     "sku": "KV-DROP2-BLACK",
+     "options": {
+      "color": "Black"
+     },
+     "price": 129.99,
+     "stock": 10
+    },
+    {
+     "sku": "KV-DROP2-PINK",
+     "options": {
+      "color": "Pink"
+     },
+     "price": 129.99,
+     "stock": 0
+    },
+    {
+     "sku": "KV-DROP2-WHITE",
+     "options": {
+      "color": "White"
+     },
+     "price": 129.99,
+     "stock": 8
+    }
+   ],
+   "featured": false,
+   "published": true,
+   "createdAt": "2026-08-03T06:48:00Z"
+  },
+  {
+   "slug": "korvane-drop-2-lite",
+   "name": "Korvane Drop 2 Lite",
+   "brand": "Korvane",
+   "category": "earbuds",
+   "description": "A pocket-friendly pair that nails the basics: clear sound, a stable Bluetooth connection and touch controls. Five hours per charge, with a compact case for the rest.",
+   "images": [
+    "earbuds-black-04"
+   ],
+   "specs": {
+    "anc": false,
+    "battery_hours": 5,
+    "total_hours": 20,
+    "water_rating": "IPX4",
+    "wireless_charging": false,
+    "fit": "In-ear"
+   },
+   "optionAxes": [
+    {
+     "key": "color",
+     "label": "Color"
+    }
+   ],
+   "variants": [
+    {
+     "sku": "KV-DROP2L-BLACK",
+     "options": {
+      "color": "Black"
+     },
+     "price": 59.99,
+     "stock": 25
+    },
+    {
+     "sku": "KV-DROP2L-PINK",
+     "options": {
+      "color": "Pink"
+     },
+     "price": 59.99,
+     "stock": 6
+    }
+   ],
+   "featured": false,
+   "published": true,
+   "createdAt": "2026-08-05T05:24:00Z"
+  },
+  {
+   "slug": "ferrow-stride-sport-buds",
+   "name": "Ferrow Stride Sport Buds",
+   "brand": "Ferrow",
+   "category": "earbuds",
+   "description": "Sweat-proof earbuds designed for running, with an IPX7 rating and secure stabiliser fins. Nine hours of battery life and a bass-forward tuning keep you moving.",
+   "images": [
+    "earbuds-black-04",
+    "earbuds-black-01"
+   ],
+   "specs": {
+    "anc": false,
+    "battery_hours": 9,
+    "total_hours": 36,
+    "water_rating": "IPX7",
+    "wireless_charging": false,
+    "fit": "In-ear"
+   },
+   "optionAxes": [
+    {
+     "key": "color",
+     "label": "Color"
+    }
+   ],
+   "variants": [
+    {
+     "sku": "FR-STRIDE-BLACK",
+     "options": {
+      "color": "Black"
+     },
+     "price": 69.99,
+     "stock": 2
+    },
+    {
+     "sku": "FR-STRIDE-PINK",
+     "options": {
+      "color": "Pink"
+     },
+     "price": 69.99,
+     "stock": 1
+    }
+   ],
+   "featured": false,
+   "published": true,
+   "createdAt": "2026-08-06T21:00:00Z"
+  },
+  {
+   "slug": "nordvik-resonance-anc",
+   "name": "Nordvik Resonance ANC",
+   "brand": "Nordvik",
+   "category": "earbuds",
+   "description": "Premium earbuds with hybrid noise cancelling, a wide soundstage and ten hours of playback on a single charge. The aluminium wireless charging case doubles as a stand.",
+   "images": [
+    "earbuds-black-01"
+   ],
+   "specs": {
+    "anc": true,
+    "battery_hours": 10,
+    "total_hours": 40,
+    "water_rating": "IPX5",
+    "wireless_charging": true,
+    "fit": "In-ear"
+   },
+   "optionAxes": [
+    {
+     "key": "color",
+     "label": "Color"
+    }
+   ],
+   "variants": [
+    {
+     "sku": "NV-RESON-BLACK",
+     "options": {
+      "color": "Black"
+     },
+     "price": 219.99,
+     "stock": 35
+    },
+    {
+     "sku": "NV-RESON-PINK",
+     "options": {
+      "color": "Pink"
+     },
+     "price": 219.99,
+     "stock": 0
+    }
+   ],
+   "featured": false,
+   "published": true,
+   "createdAt": "2026-08-08T19:36:00Z"
+  },
+  {
+   "slug": "orbitra-latency-zero",
+   "name": "Orbitra Latency Zero",
+   "brand": "Orbitra",
+   "category": "earbuds",
+   "description": "Gaming earbuds with a 2.4 GHz USB-C dongle that keeps lag under 30 ms, plus Bluetooth for your phone. Six hours of play per charge and a three-microphone array for clear voice chat.",
+   "images": [
+    "earbuds-black-01",
+    "earbuds-black-04"
+   ],
+   "specs": {
+    "anc": false,
+    "battery_hours": 6,
+    "total_hours": 24,
+    "water_rating": "IPX4",
+    "wireless_charging": false,
+    "fit": "In-ear"
+   },
+   "optionAxes": [
+    {
+     "key": "bundle",
+     "label": "Bundle"
+    }
+   ],
+   "variants": [
+    {
+     "sku": "OR-LATZ-BLUETO",
+     "options": {
+      "bundle": "Bluetooth only"
+     },
+     "price": 79.99,
+     "stock": 8
+    },
+    {
+     "sku": "OR-LATZ-WITHUS",
+     "options": {
+      "bundle": "With USB-C dongle"
+     },
+     "price": 99.99,
+     "stock": 45
+    }
+   ],
+   "featured": false,
+   "published": true,
+   "createdAt": "2026-08-10T18:12:00Z"
+  },
+  {
+   "slug": "quietline-cube-portable",
+   "name": "Quietline Cube Portable",
+   "brand": "Quietline",
+   "category": "speakers",
+   "description": "A square Bluetooth speaker with a woven grille and a leather loop for hanging from a bag or hook. It delivers room-filling 20 W sound, lasts 12 hours and shrugs off splashes.",
+   "images": [
+    "speaker-white-01",
+    "speaker-black-02"
+   ],
+   "specs": {
+    "size_class": "Portable",
+    "battery_hours": 12,
+    "output_w": 20,
+    "water_rating": "IPX5",
+    "stereo_pairing": true,
+    "weight_g": 480
+   },
+   "optionAxes": [
+    {
+     "key": "color",
+     "label": "Color"
+    }
+   ],
+   "variants": [
+    {
+     "sku": "QL-CUBE-WHITE",
+     "options": {
+      "color": "White"
+     },
+     "price": 89.99,
+     "stock": 12
+    },
+    {
+     "sku": "QL-CUBE-BLACK",
+     "options": {
+      "color": "Black"
+     },
+     "price": 89.99,
+     "stock": 0
+    }
+   ],
+   "featured": false,
+   "published": true,
+   "createdAt": "2026-08-12T16:48:00Z"
+  },
+  {
+   "slug": "quietline-cube-mini",
+   "name": "Quietline Cube Mini",
+   "brand": "Quietline",
+   "category": "speakers",
+   "description": "A tiny cylinder speaker that fills a desk or bedside table with clear sound. It runs for 8 hours and is light enough to clip to a backpack.",
+   "images": [
+    "speaker-white-03"
+   ],
+   "specs": {
+    "size_class": "Mini",
+    "battery_hours": 8,
+    "output_w": 5,
+    "water_rating": "IPX5",
+    "stereo_pairing": false,
+    "weight_g": 150
+   },
+   "optionAxes": [
+    {
+     "key": "color",
+     "label": "Color"
+    }
+   ],
+   "variants": [
+    {
+     "sku": "QL-CUBEM-WHITE",
+     "options": {
+      "color": "White"
+     },
+     "price": 29.99,
+     "stock": 24
+    },
+    {
+     "sku": "QL-CUBEM-BLACK",
+     "options": {
+      "color": "Black"
+     },
+     "price": 29.99,
+     "stock": 18
+    }
+   ],
+   "featured": false,
+   "published": true,
+   "createdAt": "2026-08-14T15:24:00Z"
+  },
+  {
+   "slug": "quietline-hall",
+   "name": "Quietline Hall",
+   "brand": "Quietline",
+   "category": "speakers",
+   "description": "A big portable speaker for the garden, the kitchen or a gathering. Two woofers deliver 40 W of powerful sound for up to 20 hours, and the IPX5 body handles rain.",
+   "images": [
+    "speaker-white-04"
+   ],
+   "specs": {
+    "size_class": "Large portable",
+    "battery_hours": 20,
+    "output_w": 40,
+    "water_rating": "IPX5",
+    "stereo_pairing": true,
+    "weight_g": 1900
+   },
+   "optionAxes": [
+    {
+     "key": "color",
+     "label": "Color"
+    }
+   ],
+   "variants": [
+    {
+     "sku": "QL-HALL-WHITE",
+     "options": {
+      "color": "White"
+     },
+     "price": 149.99,
+     "stock": 5
+    },
+    {
+     "sku": "QL-HALL-BLACK",
+     "options": {
+      "color": "Black"
+     },
+     "price": 149.99,
+     "stock": 80
+    }
+   ],
+   "featured": false,
+   "published": true,
+   "createdAt": "2026-08-16T14:00:00Z"
+  },
+  {
+   "slug": "korvane-pebble",
+   "name": "Korvane Pebble",
+   "brand": "Korvane",
+   "category": "speakers",
+   "description": "A pebble-sized Bluetooth speaker with a surprisingly full sound for its size. It is easy to pair, easy to carry and comes in three colours.",
+   "images": [
+    "speaker-white-03",
+    "speaker-white-01"
+   ],
+   "specs": {
+    "size_class": "Mini",
+    "battery_hours": 10,
+    "output_w": 6,
+    "water_rating": "IPX5",
+    "stereo_pairing": true,
+    "weight_g": 170
+   },
+   "optionAxes": [
+    {
+     "key": "color",
+     "label": "Color"
+    }
+   ],
+   "variants": [
+    {
+     "sku": "KV-PEBBLE-WHITE",
+     "options": {
+      "color": "White"
+     },
+     "price": 24.99,
+     "stock": 75
+    },
+    {
+     "sku": "KV-PEBBLE-BLACK",
+     "options": {
+      "color": "Black"
+     },
+     "price": 24.99,
+     "stock": 24
+    },
+    {
+     "sku": "KV-PEBBLE-GREY",
+     "options": {
+      "color": "Grey"
+     },
+     "price": 24.99,
+     "stock": 35
+    }
+   ],
+   "featured": false,
+   "published": true,
+   "createdAt": "2026-08-18T12:36:00Z"
+  },
+  {
+   "slug": "nordvik-kiln",
+   "name": "Nordvik Kiln",
+   "brand": "Nordvik",
+   "category": "speakers",
+   "description": "A premium portable with a dense aluminium grille and a rich, tuned-by-ear sound. 30 W of output, a 16-hour battery and a waterproof IPX7 body make it equally at home on a shelf or a beach.",
+   "images": [
+    "speaker-black-02",
+    "speaker-white-01"
+   ],
+   "specs": {
+    "size_class": "Portable",
+    "battery_hours": 16,
+    "output_w": 30,
+    "water_rating": "IPX7",
+    "stereo_pairing": true,
+    "weight_g": 1100
+   },
+   "optionAxes": [
+    {
+     "key": "color",
+     "label": "Color"
+    }
+   ],
+   "variants": [
+    {
+     "sku": "NV-KILN-BLACK",
+     "options": {
+      "color": "Black"
+     },
+     "price": 199.0,
+     "stock": 45
+    },
+    {
+     "sku": "NV-KILN-WHITE",
+     "options": {
+      "color": "White"
+     },
+     "price": 199.0,
+     "stock": 30
+    }
+   ],
+   "featured": false,
+   "published": true,
+   "createdAt": "2026-08-20T04:12:00Z"
+  },
+  {
+   "slug": "ferrow-bump-xl",
+   "name": "Ferrow Bump XL",
+   "brand": "Ferrow",
+   "category": "speakers",
+   "description": "A party-ready speaker with 60 W of output, deep bass and an auto-adjusting light bar. Pair two together for true stereo, and run it for up to 24 hours between charges.",
+   "images": [
+    "speaker-white-04",
+    "speaker-black-02"
+   ],
+   "specs": {
+    "size_class": "Large portable",
+    "battery_hours": 24,
+    "output_w": 60,
+    "water_rating": "IPX5",
+    "stereo_pairing": true,
+    "weight_g": 3200
+   },
+   "optionAxes": [
+    {
+     "key": "color",
+     "label": "Color"
+    }
+   ],
+   "variants": [
+    {
+     "sku": "FR-BUMPXL-WHITE",
+     "options": {
+      "color": "White"
+     },
+     "price": 199.99,
+     "stock": 4
+    },
+    {
+     "sku": "FR-BUMPXL-BLACK",
+     "options": {
+      "color": "Black"
+     },
+     "price": 199.99,
+     "stock": 12
+    }
+   ],
+   "featured": false,
+   "published": true,
+   "createdAt": "2026-08-22T02:48:00Z"
+  },
+  {
+   "slug": "lumenor-aura-portable",
+   "name": "Lumenor Aura Portable",
+   "brand": "Lumenor",
+   "category": "speakers",
+   "description": "A pocketable speaker with a soft ambient light ring and a fully waterproof body. It plays for 10 hours, floats in a pool and pairs with a second Aura for stereo.",
+   "images": [
+    "speaker-white-01"
+   ],
+   "specs": {
+    "size_class": "Portable",
+    "battery_hours": 10,
+    "output_w": 12,
+    "water_rating": "IPX7",
+    "stereo_pairing": true,
+    "weight_g": 360
+   },
+   "optionAxes": [
+    {
+     "key": "color",
+     "label": "Color"
+    }
+   ],
+   "variants": [
+    {
+     "sku": "LM-AURA-WHITE",
+     "options": {
+      "color": "White"
+     },
+     "price": 59.99,
+     "stock": 20
+    },
+    {
+     "sku": "LM-AURA-BLACK",
+     "options": {
+      "color": "Black"
+     },
+     "price": 59.99,
+     "stock": 45
+    },
+    {
+     "sku": "LM-AURA-GREY",
+     "options": {
+      "color": "Grey"
+     },
+     "price": 59.99,
+     "stock": 0
+    }
+   ],
+   "featured": false,
+   "published": true,
+   "createdAt": "2026-08-24T01:24:00Z"
+  },
+  {
+   "slug": "orbitra-pace-2",
+   "name": "Orbitra Pace 2",
+   "brand": "Orbitra",
+   "category": "wearables",
+   "description": "A slim fitness band with a bright AMOLED screen, 24-hour heart-rate and sleep tracking and a 14-day battery. Swim-proof to 5 ATM, it syncs workouts to your phone automatically.",
+   "images": [
+    "band-black-04"
+   ],
+   "specs": {
+    "kind": "Fitness band",
+    "display_in": 1.1,
+    "battery_days": 14,
+    "gps": false,
+    "water_atm": 5,
+    "nfc_pay": false
+   },
+   "optionAxes": [
+    {
+     "key": "color",
+     "label": "Color"
+    },
+    {
+     "key": "size",
+     "label": "Strap size"
+    }
+   ],
+   "variants": [
+    {
+     "sku": "OR-PACE2-BLACK-SM",
+     "options": {
+      "color": "Black",
+      "size": "S/M"
+     },
+     "price": 49.99,
+     "stock": 24
+    },
+    {
+     "sku": "OR-PACE2-BLACK-L",
+     "options": {
+      "color": "Black",
+      "size": "L"
+     },
+     "price": 49.99,
+     "stock": 15
+    },
+    {
+     "sku": "OR-PACE2-BLUE-SM",
+     "options": {
+      "color": "Blue",
+      "size": "S/M"
+     },
+     "price": 49.99,
+     "stock": 45
+    },
+    {
+     "sku": "OR-PACE2-BLUE-L",
+     "options": {
+      "color": "Blue",
+      "size": "L"
+     },
+     "price": 49.99,
+     "stock": 35
+    }
+   ],
+   "featured": false,
+   "published": true,
+   "createdAt": "2026-08-26T00:00:00Z"
+  },
+  {
+   "slug": "lumenor-tempo",
+   "name": "Lumenor Tempo",
+   "brand": "Lumenor",
+   "category": "wearables",
+   "description": "A refined round smartwatch with a minimalist dial, sleep and stress tracking, and contactless payments. A 5-day battery and swappable straps let it dress up or work out.",
+   "images": [
+    "watch-white-01",
+    "watch-round-03"
+   ],
+   "specs": {
+    "kind": "Smartwatch",
+    "display_in": 1.3,
+    "battery_days": 5,
+    "gps": false,
+    "water_atm": 5,
+    "nfc_pay": true
+   },
+   "optionAxes": [
+    {
+     "key": "color",
+     "label": "Color"
+    },
+    {
+     "key": "strap",
+     "label": "Strap"
+    }
+   ],
+   "variants": [
+    {
+     "sku": "LM-TEMPO-WHITE-SILICO",
+     "options": {
+      "color": "White",
+      "strap": "Silicone"
+     },
+     "price": 149.99,
+     "stock": 60
+    },
+    {
+     "sku": "LM-TEMPO-WHITE-LEATHE",
+     "options": {
+      "color": "White",
+      "strap": "Leather"
+     },
+     "price": 179.99,
+     "stock": 80
+    },
+    {
+     "sku": "LM-TEMPO-BLACK-SILICO",
+     "options": {
+      "color": "Black",
+      "strap": "Silicone"
+     },
+     "price": 149.99,
+     "stock": 24
+    },
+    {
+     "sku": "LM-TEMPO-BLACK-LEATHE",
+     "options": {
+      "color": "Black",
+      "strap": "Leather"
+     },
+     "price": 179.99,
+     "stock": 45
+    }
+   ],
+   "featured": true,
+   "published": true,
+   "createdAt": "2026-08-27T22:36:00Z"
+  },
+  {
+   "slug": "lumenor-tempo-gps",
+   "name": "Lumenor Tempo GPS",
+   "brand": "Lumenor",
+   "category": "wearables",
+   "description": "An adventure-ready Tempo with dual-band GPS, 10 ATM water resistance and 7 days of battery. A sapphire-glass 1.4-inch display stays crisp outdoors, and it comes in two case sizes.",
+   "images": [
+    "watch-round-03",
+    "watch-white-01"
+   ],
+   "specs": {
+    "kind": "Smartwatch",
+    "display_in": 1.4,
+    "battery_days": 7,
+    "gps": true,
+    "water_atm": 10,
+    "nfc_pay": true
+   },
+   "optionAxes": [
+    {
+     "key": "color",
+     "label": "Color"
+    },
+    {
+     "key": "size",
+     "label": "Case size"
+    }
+   ],
+   "variants": [
+    {
+     "sku": "LM-TEMPOG-BLACK-41MM",
+     "options": {
+      "color": "Black",
+      "size": "41 mm"
+     },
+     "price": 229.99,
+     "stock": 120
+    },
+    {
+     "sku": "LM-TEMPOG-BLACK-45MM",
+     "options": {
+      "color": "Black",
+      "size": "45 mm"
+     },
+     "price": 259.99,
+     "stock": 12
+    },
+    {
+     "sku": "LM-TEMPOG-SILVER-41MM",
+     "options": {
+      "color": "Silver",
+      "size": "41 mm"
+     },
+     "price": 229.99,
+     "stock": 20
+    },
+    {
+     "sku": "LM-TEMPOG-SILVER-45MM",
+     "options": {
+      "color": "Silver",
+      "size": "45 mm"
+     },
+     "price": 259.99,
+     "stock": 35
+    }
+   ],
+   "featured": false,
+   "published": true,
+   "createdAt": "2026-08-29T21:12:00Z"
+  },
+  {
+   "slug": "korvane-cadence-square",
+   "name": "Korvane Cadence Square",
+   "brand": "Korvane",
+   "category": "wearables",
+   "description": "A square-faced smartwatch with a vivid 1.7-inch display, built-in GPS and four days of battery. Track workouts, glance at notifications and pay at the till from your wrist.",
+   "images": [
+    "watch-green-02",
+    "watch-white-01"
+   ],
+   "specs": {
+    "kind": "Smartwatch",
+    "display_in": 1.7,
+    "battery_days": 4,
+    "gps": true,
+    "water_atm": 5,
+    "nfc_pay": true
+   },
+   "optionAxes": [
+    {
+     "key": "color",
+     "label": "Color"
+    }
+   ],
+   "variants": [
+    {
+     "sku": "KV-CADSQ-GREEN",
+     "options": {
+      "color": "Green"
+     },
+     "price": 179.99,
+     "stock": 0
+    },
+    {
+     "sku": "KV-CADSQ-WHITE",
+     "options": {
+      "color": "White"
+     },
+     "price": 179.99,
+     "stock": 0
+    },
+    {
+     "sku": "KV-CADSQ-BLACK",
+     "options": {
+      "color": "Black"
+     },
+     "price": 179.99,
+     "stock": 3
+    }
+   ],
+   "featured": false,
+   "published": true,
+   "createdAt": "2026-08-31T19:48:00Z"
+  },
+  {
+   "slug": "arcwing-tide-2",
+   "name": "Arcwing Tide 2",
+   "brand": "Arcwing",
+   "category": "wearables",
+   "description": "A titanium-cased smartwatch for athletes, with multi-band GPS, a sapphire dial and a 10-day battery. Detailed recovery metrics and offline maps make it a serious training companion.",
+   "images": [
+    "watch-round-03"
+   ],
+   "specs": {
+    "kind": "Smartwatch",
+    "display_in": 1.4,
+    "battery_days": 10,
+    "gps": true,
+    "water_atm": 10,
+    "nfc_pay": true
+   },
+   "optionAxes": [
+    {
+     "key": "color",
+     "label": "Color"
+    },
+    {
+     "key": "size",
+     "label": "Case size"
+    }
+   ],
+   "variants": [
+    {
+     "sku": "AW-TIDE2-BLACK-42MM",
+     "options": {
+      "color": "Black",
+      "size": "42 mm"
+     },
+     "price": 349.0,
+     "stock": 0
+    },
+    {
+     "sku": "AW-TIDE2-BLACK-46MM",
+     "options": {
+      "color": "Black",
+      "size": "46 mm"
+     },
+     "price": 399.0,
+     "stock": 60
+    },
+    {
+     "sku": "AW-TIDE2-SILVER-42MM",
+     "options": {
+      "color": "Silver",
+      "size": "42 mm"
+     },
+     "price": 349.0,
+     "stock": 45
+    },
+    {
+     "sku": "AW-TIDE2-SILVER-46MM",
+     "options": {
+      "color": "Silver",
+      "size": "46 mm"
+     },
+     "price": 399.0,
+     "stock": 15
+    }
+   ],
+   "featured": false,
+   "published": true,
+   "createdAt": "2026-09-02T11:24:00Z"
+  },
+  {
+   "slug": "ferrow-trail-gps",
+   "name": "Ferrow Trail GPS",
+   "brand": "Ferrow",
+   "category": "wearables",
+   "description": "A rugged outdoor watch with three-satellite GPS, a barometric altimeter and a 14-day battery. Its reinforced bezel and 10 ATM rating are made for the trail and the swim lane.",
+   "images": [
+    "watch-round-03",
+    "watch-green-02"
+   ],
+   "specs": {
+    "kind": "Smartwatch",
+    "display_in": 1.4,
+    "battery_days": 14,
+    "gps": true,
+    "water_atm": 10,
+    "nfc_pay": false
+   },
+   "optionAxes": [
+    {
+     "key": "color",
+     "label": "Color"
+    }
+   ],
+   "variants": [
+    {
+     "sku": "FR-TRAIL-BLACK",
+     "options": {
+      "color": "Black"
+     },
+     "price": 269.99,
+     "stock": 40
+    },
+    {
+     "sku": "FR-TRAIL-GREEN",
+     "options": {
+      "color": "Green"
+     },
+     "price": 269.99,
+     "stock": 15
+    }
+   ],
+   "featured": false,
+   "published": true,
+   "createdAt": "2026-09-04T10:00:00Z"
+  },
+  {
+   "slug": "lumenor-heritage-r2",
+   "name": "Lumenor Heritage R2",
+   "brand": "Lumenor",
+   "category": "cameras",
+   "description": "A newly built 35 mm rangefinder in the classic style, with a bright coupled viewfinder and a sharp fixed 40 mm f/2.0 lens. A built-in light meter keeps exposures accurate, and the all-metal body is made to last decades.",
+   "images": [
+    "camera-vintage-02"
+   ],
+   "specs": {
+    "format": "35 mm film",
+    "body_style": "Rangefinder",
+    "autofocus": false,
+    "light_meter": true,
+    "weight_g": 560,
+    "lens": "40 mm f/2.0, fixed"
+   },
+   "optionAxes": [
+    {
+     "key": "finish",
+     "label": "Finish"
+    },
+    {
+     "key": "strap",
+     "label": "Strap"
+    }
+   ],
+   "variants": [
+    {
+     "sku": "LM-HERR2-BLACK-STANDA",
+     "options": {
+      "finish": "Black",
+      "strap": "Standard"
+     },
+     "price": 549.99,
+     "stock": 12
+    },
+    {
+     "sku": "LM-HERR2-BLACK-LEATHE",
+     "options": {
+      "finish": "Black",
+      "strap": "Leather"
+     },
+     "price": 589.99,
+     "stock": 20
+    },
+    {
+     "sku": "LM-HERR2-SILVER-STANDA",
+     "options": {
+      "finish": "Silver",
+      "strap": "Standard"
+     },
+     "price": 549.99,
+     "stock": 18
+    },
+    {
+     "sku": "LM-HERR2-SILVER-LEATHE",
+     "options": {
+      "finish": "Silver",
+      "strap": "Leather"
+     },
+     "price": 589.99,
+     "stock": 60
+    }
+   ],
+   "featured": false,
+   "published": true,
+   "createdAt": "2026-09-06T08:36:00Z"
+  },
+  {
+   "slug": "lumenor-heritage-r4-premier",
+   "name": "Lumenor Heritage R4 Premier",
+   "brand": "Lumenor",
+   "category": "cameras",
+   "description": "A hand-finished 35 mm rangefinder with a brass top plate, a fast fixed 50 mm f/1.4 lens and a bright, high-contrast viewfinder. Leather trim and a built-in light meter make it the Heritage for photographers who shoot film every day.",
+   "images": [
+    "camera-vintage-02",
+    "camera-vintage-01"
+   ],
+   "specs": {
+    "format": "35 mm film",
+    "body_style": "Rangefinder",
+    "autofocus": false,
+    "light_meter": true,
+    "weight_g": 620,
+    "lens": "50 mm f/1.4, fixed"
+   },
+   "optionAxes": [
+    {
+     "key": "finish",
+     "label": "Finish"
+    }
+   ],
+   "variants": [
+    {
+     "sku": "LM-HERR4-BLACK",
+     "options": {
+      "finish": "Black"
+     },
+     "price": 1299.0,
+     "stock": 1
+    },
+    {
+     "sku": "LM-HERR4-SILVER",
+     "options": {
+      "finish": "Silver"
+     },
+     "price": 1299.0,
+     "stock": 5
+    }
+   ],
+   "featured": true,
+   "published": true,
+   "createdAt": "2026-09-08T07:12:00Z"
+  },
+  {
+   "slug": "tessel-boxcam-120",
+   "name": "Tessel Boxcam 120",
+   "brand": "Tessel",
+   "category": "cameras",
+   "description": "A simple box camera that makes 6x6 cm negatives on 120 film, with one shutter speed, a fixed-focus lens and a viewfinder you look down into. It is a charming way to slow down and make pictures with a distinctive soft glow.",
+   "images": [
+    "camera-vintage-01"
+   ],
+   "specs": {
+    "format": "120 film",
+    "body_style": "Box camera",
+    "autofocus": false,
+    "light_meter": false,
+    "weight_g": 650,
+    "lens": "Fixed meniscus, f/11"
+   },
+   "optionAxes": [
+    {
+     "key": "finish",
+     "label": "Finish"
+    },
+    {
+     "key": "bundle",
+     "label": "Bundle"
+    }
+   ],
+   "variants": [
+    {
+     "sku": "TS-BOX120-WALNUT-CAMERA",
+     "options": {
+      "finish": "Walnut",
+      "bundle": "Camera only"
+     },
+     "price": 129.99,
+     "stock": 12
+    },
+    {
+     "sku": "TS-BOX120-WALNUT-WITH3F",
+     "options": {
+      "finish": "Walnut",
+      "bundle": "With 3 film rolls"
+     },
+     "price": 154.99,
+     "stock": 25
+    }
+   ],
+   "featured": false,
+   "published": true,
+   "createdAt": "2026-09-10T05:48:00Z"
+  },
+  {
+   "slug": "tessel-field-4x5",
+   "name": "Tessel Field 4x5",
+   "brand": "Tessel",
+   "category": "cameras",
+   "description": "A hand-assembled 4x5 field camera in walnut and brass that folds flat for travel. Full front and rear movements give architectural and landscape photographers control over perspective and focus.",
+   "images": [
+    "camera-vintage-03"
+   ],
+   "specs": {
+    "format": "4x5 sheet film",
+    "body_style": "View camera",
+    "autofocus": false,
+    "light_meter": false,
+    "weight_g": 2800,
+    "lens": "Interchangeable, bellows mount"
+   },
+   "optionAxes": [
+    {
+     "key": "finish",
+     "label": "Finish"
+    },
+    {
+     "key": "lens",
+     "label": "Lens"
+    }
+   ],
+   "variants": [
+    {
+     "sku": "TS-FLD45-WALNUT-BODYON",
+     "options": {
+      "finish": "Walnut",
+      "lens": "Body only"
+     },
+     "price": 899.0,
+     "stock": 40
+    },
+    {
+     "sku": "TS-FLD45-WALNUT-WITH15",
+     "options": {
+      "finish": "Walnut",
+      "lens": "With 150 mm lens"
+     },
+     "price": 1299.0,
+     "stock": 5
+    }
+   ],
+   "featured": false,
+   "published": true,
+   "createdAt": "2026-09-12T04:24:00Z"
+  },
+  {
+   "slug": "nordvik-dx-24-dslr",
+   "name": "Nordvik DX-24 DSLR",
+   "brand": "Nordvik",
+   "category": "cameras",
+   "description": "A 24 MP digital SLR in a compact, all-black body with the classic film-camera look: a bright optical viewfinder, 5 fps burst shooting and 1080p video. Long battery life and a comfortable grip make it a capable first step into interchangeable lenses.",
+   "images": [
+    "camera-black-04"
+   ],
+   "specs": {
+    "format": "Digital",
+    "body_style": "DSLR",
+    "autofocus": true,
+    "light_meter": true,
+    "weight_g": 760,
+    "lens": "Interchangeable, bayonet mount"
+   },
+   "optionAxes": [
+    {
+     "key": "bundle",
+     "label": "Bundle"
+    }
+   ],
+   "variants": [
+    {
+     "sku": "NV-DX24-BODYON",
+     "options": {
+      "bundle": "Body only"
+     },
+     "price": 849.99,
+     "stock": 18
+    },
+    {
+     "sku": "NV-DX24-1855MM",
+     "options": {
+      "bundle": "18-55 mm kit lens"
+     },
+     "price": 999.99,
+     "stock": 80
+    },
+    {
+     "sku": "NV-DX24-KITLEN",
+     "options": {
+      "bundle": "Kit lens, bag and 64 GB card"
+     },
+     "price": 1099.99,
+     "stock": 10
+    }
+   ],
+   "featured": false,
+   "published": true,
+   "createdAt": "2026-09-14T03:00:00Z"
+  },
+  {
+   "slug": "nordvik-fx-1-film-slr",
+   "name": "Nordvik FX-1 Film SLR",
+   "brand": "Nordvik",
+   "category": "cameras",
+   "description": "A manual 35 mm SLR in the classic mould, with a bright pentaprism viewfinder, a built-in light meter and a rugged all-metal body. Pair it with the optional 50 mm f/1.8 lens and you have everything needed to learn film photography properly.",
+   "images": [
+    "camera-black-04",
+    "camera-vintage-02"
+   ],
+   "specs": {
+    "format": "35 mm film",
+    "body_style": "SLR",
+    "autofocus": false,
+    "light_meter": true,
+    "weight_g": 690,
+    "lens": "Interchangeable, bayonet mount"
+   },
+   "optionAxes": [
+    {
+     "key": "bundle",
+     "label": "Bundle"
+    },
+    {
+     "key": "finish",
+     "label": "Finish"
+    }
+   ],
+   "variants": [
+    {
+     "sku": "NV-FX1-BODYON-BLACK",
+     "options": {
+      "bundle": "Body only",
+      "finish": "Black"
+     },
+     "price": 399.99,
+     "stock": 0
+    },
+    {
+     "sku": "NV-FX1-BODYON-SILVER",
+     "options": {
+      "bundle": "Body only",
+      "finish": "Silver"
+     },
+     "price": 399.99,
+     "stock": 12
+    },
+    {
+     "sku": "NV-FX1-WITH50-BLACK",
+     "options": {
+      "bundle": "With 50 mm f/1.8 lens",
+      "finish": "Black"
+     },
+     "price": 519.99,
+     "stock": 50
+    },
+    {
+     "sku": "NV-FX1-WITH50-SILVER",
+     "options": {
+      "bundle": "With 50 mm f/1.8 lens",
+      "finish": "Silver"
+     },
+     "price": 519.99,
+     "stock": 25
+    }
+   ],
+   "featured": false,
+   "published": true,
+   "createdAt": "2026-09-15T18:36:00Z"
+  },
+  {
+   "slug": "orbitra-nova-wireless-controller",
+   "name": "Orbitra Nova Wireless Controller",
+   "brand": "Orbitra",
+   "category": "gaming",
+   "description": "A premium wireless controller with Hall-effect sticks that never drift, programmable rear paddles and a 1000 Hz polling rate for instant response. The textured grips stay comfortable through long sessions.",
+   "images": [
+    "controller-purple-01"
+   ],
+   "specs": {
+    "platform": "PC + Console",
+    "connection": "Wireless",
+    "polling_rate_hz": 1000,
+    "hall_effect": true,
+    "back_buttons": true,
+    "weight_g": 245
+   },
+   "optionAxes": [
+    {
+     "key": "color",
+     "label": "Color"
+    },
+    {
+     "key": "bundle",
+     "label": "Bundle"
+    }
+   ],
+   "variants": [
+    {
+     "sku": "OR-NOVA-PURPLE-CONTRO",
+     "options": {
+      "color": "Purple",
+      "bundle": "Controller"
+     },
+     "price": 69.99,
+     "stock": 25
+    },
+    {
+     "sku": "OR-NOVA-PURPLE-WITHCH",
+     "options": {
+      "color": "Purple",
+      "bundle": "With charging dock"
+     },
+     "price": 89.99,
+     "stock": 4
+    },
+    {
+     "sku": "OR-NOVA-BLACK-CONTRO",
+     "options": {
+      "color": "Black",
+      "bundle": "Controller"
+     },
+     "price": 69.99,
+     "stock": 45
+    },
+    {
+     "sku": "OR-NOVA-BLACK-WITHCH",
+     "options": {
+      "color": "Black",
+      "bundle": "With charging dock"
+     },
+     "price": 89.99,
+     "stock": 1
+    }
+   ],
+   "featured": true,
+   "published": true,
+   "createdAt": "2026-09-17T17:12:00Z"
+  },
+  {
+   "slug": "orbitra-neon-controller",
+   "name": "Orbitra Neon Controller",
+   "brand": "Orbitra",
+   "category": "gaming",
+   "description": "A vivid purple controller with a bold, lit-up look and modern internals: wired and wireless connectivity, responsive triggers and a solid, balanced shape. A great pick for couch co-op.",
+   "images": [
+    "controller-purple-01",
+    "controller-black-03"
+   ],
+   "specs": {
+    "platform": "PC + Console",
+    "connection": "Wired + Wireless",
+    "polling_rate_hz": 500,
+    "hall_effect": false,
+    "back_buttons": false,
+    "weight_g": 255
+   },
+   "optionAxes": [
+    {
+     "key": "color",
+     "label": "Color"
+    }
+   ],
+   "variants": [
+    {
+     "sku": "OR-NEON-PURPLE",
+     "options": {
+      "color": "Purple"
+     },
+     "price": 54.99,
+     "stock": 0
+    },
+    {
+     "sku": "OR-NEON-BLACK",
+     "options": {
+      "color": "Black"
+     },
+     "price": 54.99,
+     "stock": 40
+    }
+   ],
+   "featured": false,
+   "published": true,
+   "createdAt": "2026-09-19T15:48:00Z"
+  },
+  {
+   "slug": "ferrow-retro-six-pad",
+   "name": "Ferrow Retro Six Pad",
+   "brand": "Ferrow",
+   "category": "gaming",
+   "description": "A wired six-button pad in a classic shape, ideal for fighting games and retro emulators. A crisp D-pad and a 2 m cable work with any PC.",
+   "images": [
+    "controller-white-02"
+   ],
+   "specs": {
+    "platform": "PC",
+    "connection": "Wired",
+    "polling_rate_hz": 125,
+    "hall_effect": false,
+    "back_buttons": false,
+    "weight_g": 160
+   },
+   "optionAxes": [
+    {
+     "key": "color",
+     "label": "Color"
+    }
+   ],
+   "variants": [
+    {
+     "sku": "FR-RET6-WHITE",
+     "options": {
+      "color": "White"
+     },
+     "price": 24.99,
+     "stock": 30
+    },
+    {
+     "sku": "FR-RET6-BLACK",
+     "options": {
+      "color": "Black"
+     },
+     "price": 24.99,
+     "stock": 50
+    }
+   ],
+   "featured": false,
+   "published": true,
+   "createdAt": "2026-09-21T14:24:00Z"
+  },
+  {
+   "slug": "voltrix-strike-wired-gamepad",
+   "name": "Voltrix Strike Wired Gamepad",
+   "brand": "Voltrix",
+   "category": "gaming",
+   "description": "A no-fuss wired gamepad for PC with dual analog sticks, a familiar button layout and plug-and-play setup. Built tough and priced to be a spare for friends.",
+   "images": [
+    "controller-black-03"
+   ],
+   "specs": {
+    "platform": "PC",
+    "connection": "Wired",
+    "polling_rate_hz": 1000,
+    "hall_effect": false,
+    "back_buttons": false,
+    "weight_g": 280
+   },
+   "optionAxes": [
+    {
+     "key": "cable",
+     "label": "Cable length"
+    }
+   ],
+   "variants": [
+    {
+     "sku": "VX-STRIKE-2M",
+     "options": {
+      "cable": "2 m"
+     },
+     "price": 29.99,
+     "stock": 24
+    },
+    {
+     "sku": "VX-STRIKE-3M",
+     "options": {
+      "cable": "3 m"
+     },
+     "price": 34.99,
+     "stock": 10
+    }
+   ],
+   "featured": false,
+   "published": true,
+   "createdAt": "2026-09-23T13:00:00Z"
+  },
+  {
+   "slug": "ferrow-axis-elite",
+   "name": "Ferrow Axis Elite",
+   "brand": "Ferrow",
+   "category": "gaming",
+   "description": "A tournament-grade controller with Hall-effect sticks, four remappable rear paddles and swappable thumbsticks. Wired and wireless modes let you play anywhere, and a carry case is available.",
+   "images": [
+    "controller-purple-01",
+    "controller-white-02"
+   ],
+   "specs": {
+    "platform": "PC + Console",
+    "connection": "Wired + Wireless",
+    "polling_rate_hz": 1000,
+    "hall_effect": true,
+    "back_buttons": true,
+    "weight_g": 270
+   },
+   "optionAxes": [
+    {
+     "key": "color",
+     "label": "Color"
+    },
+    {
+     "key": "bundle",
+     "label": "Bundle"
+    }
+   ],
+   "variants": [
+    {
+     "sku": "FR-AXIS-PURPLE-CONTRO",
+     "options": {
+      "color": "Purple",
+      "bundle": "Controller"
+     },
+     "price": 149.99,
+     "stock": 30
+    },
+    {
+     "sku": "FR-AXIS-PURPLE-WITHCA",
+     "options": {
+      "color": "Purple",
+      "bundle": "With carry case"
+     },
+     "price": 174.99,
+     "stock": 18
+    },
+    {
+     "sku": "FR-AXIS-BLACK-CONTRO",
+     "options": {
+      "color": "Black",
+      "bundle": "Controller"
+     },
+     "price": 149.99,
+     "stock": 120
+    },
+    {
+     "sku": "FR-AXIS-BLACK-WITHCA",
+     "options": {
+      "color": "Black",
+      "bundle": "With carry case"
+     },
+     "price": 174.99,
+     "stock": 0
+    }
+   ],
+   "featured": false,
+   "published": true,
+   "createdAt": "2026-09-25T11:36:00Z"
+  },
+  {
+   "slug": "orbitra-nova-lite",
+   "name": "Orbitra Nova Lite",
+   "brand": "Orbitra",
+   "category": "gaming",
+   "description": "The easy way into Orbitra: a lightweight wireless controller with comfortable grips and responsive triggers. Pair it with a PC or console in seconds and play for 30 hours before charging.",
+   "images": [
+    "controller-purple-01",
+    "controller-white-02",
+    "controller-black-03"
+   ],
+   "specs": {
+    "platform": "PC + Console",
+    "connection": "Wireless",
+    "polling_rate_hz": 250,
+    "hall_effect": false,
+    "back_buttons": false,
+    "weight_g": 210
+   },
+   "optionAxes": [
+    {
+     "key": "color",
+     "label": "Color"
+    }
+   ],
+   "variants": [
+    {
+     "sku": "OR-NOVAL-PURPLE",
+     "options": {
+      "color": "Purple"
+     },
+     "price": 39.99,
+     "stock": 6
+    },
+    {
+     "sku": "OR-NOVAL-BLACK",
+     "options": {
+      "color": "Black"
+     },
+     "price": 39.99,
+     "stock": 10
+    }
+   ],
+   "featured": false,
+   "published": true,
+   "createdAt": "2026-09-27T10:12:00Z"
+  },
+  {
+   "slug": "brimley-slab-10k",
+   "name": "Brimley Slab 10K",
+   "brand": "Brimley",
+   "category": "chargers-power",
+   "description": "A slim 10,000 mAh power bank with a 30 W USB-C port and a USB-A port, enough to charge a phone two or three times. The anodised aluminium shell resists scratches and fits any jacket pocket.",
+   "images": [
+    "powerbank-silver-01",
+    "powerbank-marble-02"
+   ],
+   "specs": {
+    "capacity_mah": 10000,
+    "max_output_w": 30,
+    "ports": 2,
+    "wireless_charging": false,
+    "airline_safe": true,
+    "weight_g": 210
+   },
+   "optionAxes": [
+    {
+     "key": "color",
+     "label": "Color"
+    }
+   ],
+   "variants": [
+    {
+     "sku": "BR-SLAB10-SILVER",
+     "options": {
+      "color": "Silver"
+     },
+     "price": 39.99,
+     "stock": 0
+    },
+    {
+     "sku": "BR-SLAB10-MARBLE",
+     "options": {
+      "color": "Marble"
+     },
+     "price": 39.99,
+     "stock": 25
+    }
+   ],
+   "featured": false,
+   "published": true,
+   "createdAt": "2026-09-29T01:48:00Z"
+  },
+  {
+   "slug": "brimley-slab-20k",
+   "name": "Brimley Slab 20K",
+   "brand": "Brimley",
+   "category": "chargers-power",
+   "description": "A 20,000 mAh power bank with 65 W USB-C Power Delivery, strong enough to top up a laptop. A digital readout shows remaining capacity, and three ports charge several devices together.",
+   "images": [
+    "powerbank-silver-03",
+    "powerbank-silver-01"
+   ],
+   "specs": {
+    "capacity_mah": 20000,
+    "max_output_w": 65,
+    "ports": 3,
+    "wireless_charging": false,
+    "airline_safe": true,
+    "weight_g": 430
+   },
+   "optionAxes": [
+    {
+     "key": "color",
+     "label": "Color"
+    }
+   ],
+   "variants": [
+    {
+     "sku": "BR-SLAB20-SILVER",
+     "options": {
+      "color": "Silver"
+     },
+     "price": 79.99,
+     "stock": 60
+    },
+    {
+     "sku": "BR-SLAB20-BLACK",
+     "options": {
+      "color": "Black"
+     },
+     "price": 79.99,
+     "stock": 80
+    }
+   ],
+   "featured": false,
+   "published": true,
+   "createdAt": "2026-10-01T00:24:00Z"
+  },
+  {
+   "slug": "brimley-slab-40k-station",
+   "name": "Brimley Slab 40K Station",
+   "brand": "Brimley",
+   "category": "chargers-power",
+   "description": "Our largest power bank: 40,000 mAh (about 148 Wh) and 140 W output to run a laptop, a phone and a tablet at the same time. At over 100 Wh it needs airline approval to fly, so it suits the desk and the car better than the carry-on. Optionally bundled with a 140 W USB-C cable.",
+   "images": [
+    "powerbank-silver-03"
+   ],
+   "specs": {
+    "capacity_mah": 40000,
+    "max_output_w": 140,
+    "ports": 4,
+    "wireless_charging": false,
+    "airline_safe": false,
+    "weight_g": 920
+   },
+   "optionAxes": [
+    {
+     "key": "bundle",
+     "label": "Bundle"
+    }
+   ],
+   "variants": [
+    {
+     "sku": "BR-SLAB40-POWERB",
+     "options": {
+      "bundle": "Power bank"
+     },
+     "price": 109.99,
+     "stock": 15
+    },
+    {
+     "sku": "BR-SLAB40-WITH10",
+     "options": {
+      "bundle": "With 140 W cable"
+     },
+     "price": 124.99,
+     "stock": 0
+    }
+   ],
+   "featured": false,
+   "published": true,
+   "createdAt": "2026-10-02T23:00:00Z"
+  },
+  {
+   "slug": "voltrix-marble-10k-wireless",
+   "name": "Voltrix Marble 10K Wireless",
+   "brand": "Voltrix",
+   "category": "chargers-power",
+   "description": "A 10,000 mAh power bank with a wireless charging pad on top, plus a 22.5 W USB-C port for fast wired top-ups. The swirled marble finish is unique to every unit.",
+   "images": [
+    "powerbank-marble-02"
+   ],
+   "specs": {
+    "capacity_mah": 10000,
+    "max_output_w": 22.5,
+    "ports": 2,
+    "wireless_charging": true,
+    "airline_safe": true,
+    "weight_g": 260
+   },
+   "optionAxes": [
+    {
+     "key": "color",
+     "label": "Color"
+    }
+   ],
+   "variants": [
+    {
+     "sku": "VX-MARB10-MARBLE",
+     "options": {
+      "color": "Marble"
+     },
+     "price": 49.99,
+     "stock": 12
+    },
+    {
+     "sku": "VX-MARB10-SILVER",
+     "options": {
+      "color": "Silver"
+     },
+     "price": 49.99,
+     "stock": 8
+    }
+   ],
+   "featured": false,
+   "published": true,
+   "createdAt": "2026-10-04T21:36:00Z"
+  },
+  {
+   "slug": "voltrix-link-10k",
+   "name": "Voltrix Link 10K",
+   "brand": "Voltrix",
+   "category": "chargers-power",
+   "description": "A 10,000 mAh power bank with a 3-in-1 cable built in, so you never hunt for the right connector. Multiple tips cover most phones, and a USB-C output handles fast charging.",
+   "images": [
+    "powerbank-silver-04"
+   ],
+   "specs": {
+    "capacity_mah": 10000,
+    "max_output_w": 22.5,
+    "ports": 3,
+    "wireless_charging": false,
+    "airline_safe": true,
+    "weight_g": 250
+   },
+   "optionAxes": [
+    {
+     "key": "color",
+     "label": "Color"
+    }
+   ],
+   "variants": [
+    {
+     "sku": "VX-LINK10-SILVER",
+     "options": {
+      "color": "Silver"
+     },
+     "price": 44.99,
+     "stock": 100
+    },
+    {
+     "sku": "VX-LINK10-MARBLE",
+     "options": {
+      "color": "Marble"
+     },
+     "price": 44.99,
+     "stock": 18
+    },
+    {
+     "sku": "VX-LINK10-BLACK",
+     "options": {
+      "color": "Black"
+     },
+     "price": 44.99,
+     "stock": 18
+    }
+   ],
+   "featured": false,
+   "published": true,
+   "createdAt": "2026-10-06T20:12:00Z"
+  },
+  {
+   "slug": "nordvik-peak-20k",
+   "name": "Nordvik Peak 20K",
+   "brand": "Nordvik",
+   "category": "chargers-power",
+   "description": "A fast 20,000 mAh power bank with 100 W USB-C output that recharges itself in under two hours. Its fire-retardant casing and temperature monitoring add a layer of safety.",
+   "images": [
+    "powerbank-silver-01",
+    "powerbank-silver-03"
+   ],
+   "specs": {
+    "capacity_mah": 20000,
+    "max_output_w": 100,
+    "ports": 3,
+    "wireless_charging": false,
+    "airline_safe": true,
+    "weight_g": 440
+   },
+   "optionAxes": [
+    {
+     "key": "color",
+     "label": "Color"
+    }
+   ],
+   "variants": [
+    {
+     "sku": "NV-PEAK20-SILVER",
+     "options": {
+      "color": "Silver"
+     },
+     "price": 89.99,
+     "stock": 0
+    },
+    {
+     "sku": "NV-PEAK20-BLACK",
+     "options": {
+      "color": "Black"
+     },
+     "price": 89.99,
+     "stock": 10
+    }
+   ],
+   "featured": false,
+   "published": true,
+   "createdAt": "2026-10-08T18:48:00Z"
+  },
+  {
+   "slug": "ferrow-pocket-5k-slim",
+   "name": "Ferrow Pocket 5K Slim",
+   "brand": "Ferrow",
+   "category": "chargers-power",
+   "description": "A credit-card-thin 5,000 mAh power bank that slides into a wallet or back pocket. It provides one full phone charge with a 20 W USB-C port.",
+   "images": [
+    "powerbank-silver-01"
+   ],
+   "specs": {
+    "capacity_mah": 5000,
+    "max_output_w": 20,
+    "ports": 2,
+    "wireless_charging": false,
+    "airline_safe": true,
+    "weight_g": 110
+   },
+   "optionAxes": [
+    {
+     "key": "color",
+     "label": "Color"
+    }
+   ],
+   "variants": [
+    {
+     "sku": "FR-POCK5-SILVER",
+     "options": {
+      "color": "Silver"
+     },
+     "price": 24.99,
+     "stock": 60
+    },
+    {
+     "sku": "FR-POCK5-MARBLE",
+     "options": {
+      "color": "Marble"
+     },
+     "price": 24.99,
+     "stock": 0
+    },
+    {
+     "sku": "FR-POCK5-BLACK",
+     "options": {
+      "color": "Black"
+     },
+     "price": 24.99,
+     "stock": 0
+    }
+   ],
+   "featured": false,
+   "published": true,
+   "createdAt": "2026-10-10T17:24:00Z"
+  },
+  {
+   "slug": "lumenor-mag-10k-wireless",
+   "name": "Lumenor Mag 10K Wireless",
+   "brand": "Lumenor",
+   "category": "chargers-power",
+   "description": "A 10,000 mAh magnetic power bank that snaps to the back of a compatible phone and charges at 15 W without a cable. A USB-C port handles wired charging and pass-through.",
+   "images": [
+    "powerbank-marble-02",
+    "powerbank-silver-01"
+   ],
+   "specs": {
+    "capacity_mah": 10000,
+    "max_output_w": 20,
+    "ports": 2,
+    "wireless_charging": true,
+    "airline_safe": true,
+    "weight_g": 240
+   },
+   "optionAxes": [
+    {
+     "key": "color",
+     "label": "Color"
+    }
+   ],
+   "variants": [
+    {
+     "sku": "LM-MAG10-MARBLE",
+     "options": {
+      "color": "Marble"
+     },
+     "price": 59.99,
+     "stock": 12
+    },
+    {
+     "sku": "LM-MAG10-SILVER",
+     "options": {
+      "color": "Silver"
+     },
+     "price": 59.99,
+     "stock": 8
+    }
+   ],
+   "featured": false,
+   "published": true,
+   "createdAt": "2026-10-12T09:00:00Z"
+  },
+  {
+   "slug": "brimley-7-port-switched-usb-hub",
+   "name": "Brimley 7-Port Switched USB Hub",
+   "brand": "Brimley",
+   "category": "cables-hubs",
+   "description": "Seven USB 3.0 ports with individual on/off switches, so you can cut power to a device without unplugging it. Each port runs at 5 Gbps, and the 1 m lead reaches behind most monitors.",
+   "images": [
+    "hub-black-01"
+   ],
+   "specs": {
+    "kind": "Hub",
+    "connectors": "7-port USB-A hub",
+    "usb_standard": "USB 3.0",
+    "data_gbps": 5,
+    "braided": false
+   },
+   "optionAxes": [
+    {
+     "key": "color",
+     "label": "Color"
+    }
+   ],
+   "variants": [
+    {
+     "sku": "BR-HUB7-BLACK",
+     "options": {
+      "color": "Black"
+     },
+     "price": 29.99,
+     "stock": 75
+    },
+    {
+     "sku": "BR-HUB7-WHITE",
+     "options": {
+      "color": "White"
+     },
+     "price": 29.99,
+     "stock": 35
+    }
+   ],
+   "featured": false,
+   "published": true,
+   "createdAt": "2026-10-14T07:36:00Z"
+  },
+  {
+   "slug": "voltrix-7-port-powered-hub",
+   "name": "Voltrix 7-Port Powered Hub",
+   "brand": "Voltrix",
+   "category": "cables-hubs",
+   "description": "A powered 7-port USB 3.0 hub that keeps external drives and webcams happy, with a dedicated wall adapter for stable power. Ideal for desks that always run short of ports.",
+   "images": [
+    "hub-black-01",
+    "cable-black-04"
+   ],
+   "specs": {
+    "kind": "Hub",
+    "connectors": "7-port USB-A hub",
+    "usb_standard": "USB 3.0",
+    "data_gbps": 5,
+    "braided": false
+   },
+   "optionAxes": [
+    {
+     "key": "plug",
+     "label": "Plug type"
+    }
+   ],
+   "variants": [
+    {
+     "sku": "VX-HUB7P-US",
+     "options": {
+      "plug": "US"
+     },
+     "price": 44.99,
+     "stock": 4
+    },
+    {
+     "sku": "VX-HUB7P-UK",
+     "options": {
+      "plug": "UK"
+     },
+     "price": 44.99,
+     "stock": 50
+    },
+    {
+     "sku": "VX-HUB7P-EU",
+     "options": {
+      "plug": "EU"
+     },
+     "price": 44.99,
+     "stock": 40
+    }
+   ],
+   "featured": false,
+   "published": true,
+   "createdAt": "2026-10-16T06:12:00Z"
+  },
+  {
+   "slug": "brimley-usb-a-to-usb-b-device-cable",
+   "name": "Brimley USB-A to USB-B Device Cable",
+   "brand": "Brimley",
+   "category": "cables-hubs",
+   "description": "The cable that connects printers, scanners, audio interfaces and keyboards. USB 2.0 speed, shielded for reliable data, with a strain-relieved plug at each end.",
+   "images": [
+    "cable-black-04"
+   ],
+   "specs": {
+    "kind": "Cable",
+    "connectors": "USB-A to USB-B",
+    "usb_standard": "USB 2.0",
+    "data_gbps": 0.48,
+    "braided": false
+   },
+   "optionAxes": [
+    {
+     "key": "length",
+     "label": "Length"
+    }
+   ],
+   "variants": [
+    {
+     "sku": "BR-AB-18M",
+     "options": {
+      "length": "1.8 m"
+     },
+     "price": 7.99,
+     "stock": 0
+    },
+    {
+     "sku": "BR-AB-3M",
+     "options": {
+      "length": "3 m"
+     },
+     "price": 11.99,
+     "stock": 2
+    },
+    {
+     "sku": "BR-AB-5M",
+     "options": {
+      "length": "5 m"
+     },
+     "price": 15.99,
+     "stock": 100
+    }
+   ],
+   "featured": false,
+   "published": true,
+   "createdAt": "2026-10-18T04:48:00Z"
+  },
+  {
+   "slug": "brimley-usb-a-to-usb-c-charge-cable",
+   "name": "Brimley USB-A to USB-C Charge Cable",
+   "brand": "Brimley",
+   "category": "cables-hubs",
+   "description": "A sturdy USB-A to USB-C cable for charging and syncing phones, tablets and earbuds. A flexible jacket resists tangles and kinks.",
+   "images": [
+    "cable-white-02"
+   ],
+   "specs": {
+    "kind": "Cable",
+    "connectors": "USB-A to USB-C",
+    "usb_standard": "USB 2.0",
+    "data_gbps": 0.48,
+    "braided": false
+   },
+   "optionAxes": [
+    {
+     "key": "length",
+     "label": "Length"
+    },
+    {
+     "key": "color",
+     "label": "Color"
+    }
+   ],
+   "variants": [
+    {
+     "sku": "BR-AC-1M-WHITE",
+     "options": {
+      "length": "1 m",
+      "color": "White"
+     },
+     "price": 9.99,
+     "stock": 60
+    },
+    {
+     "sku": "BR-AC-1M-BLACK",
+     "options": {
+      "length": "1 m",
+      "color": "Black"
+     },
+     "price": 9.99,
+     "stock": 15
+    },
+    {
+     "sku": "BR-AC-2M-WHITE",
+     "options": {
+      "length": "2 m",
+      "color": "White"
+     },
+     "price": 12.99,
+     "stock": 25
+    },
+    {
+     "sku": "BR-AC-2M-BLACK",
+     "options": {
+      "length": "2 m",
+      "color": "Black"
+     },
+     "price": 12.99,
+     "stock": 75
+    }
+   ],
+   "featured": false,
+   "published": true,
+   "createdAt": "2026-10-20T03:24:00Z"
+  },
+  {
+   "slug": "voltrix-usb-cable-kit",
+   "name": "Voltrix USB Cable Kit",
+   "brand": "Voltrix",
+   "category": "cables-hubs",
+   "description": "A drawer-rescuing kit of USB-A cables with the connectors that are still lurking in older gear, including Micro-USB, Mini-USB and USB-C. Every cable is the same short, tidy length.",
+   "images": [
+    "cable-blue-03"
+   ],
+   "specs": {
+    "kind": "Cable",
+    "connectors": "Multi-connector kit",
+    "usb_standard": "USB 2.0",
+    "data_gbps": 0.48,
+    "braided": false
+   },
+   "optionAxes": [
+    {
+     "key": "pack",
+     "label": "Pack"
+    }
+   ],
+   "variants": [
+    {
+     "sku": "VX-KIT-3CABLE",
+     "options": {
+      "pack": "3 cables"
+     },
+     "price": 14.99,
+     "stock": 4
+    },
+    {
+     "sku": "VX-KIT-5CABLE",
+     "options": {
+      "pack": "5 cables"
+     },
+     "price": 22.99,
+     "stock": 40
+    }
+   ],
+   "featured": false,
+   "published": true,
+   "createdAt": "2026-10-22T02:00:00Z"
+  },
+  {
+   "slug": "voltrix-braided-usb-a-to-usb-c-cable",
+   "name": "Voltrix Braided USB-A to USB-C Cable",
+   "brand": "Voltrix",
+   "category": "cables-hubs",
+   "description": "A durable USB-A to USB-C cable wrapped in woven nylon, rated for thousands of bends. USB 3.2 Gen 1 delivers fast transfers at 5 Gbps and quick charging.",
+   "images": [
+    "cable-white-02",
+    "cable-black-04"
+   ],
+   "specs": {
+    "kind": "Cable",
+    "connectors": "USB-A to USB-C",
+    "usb_standard": "USB 3.2 Gen 1",
+    "data_gbps": 5,
+    "braided": true
+   },
+   "optionAxes": [
+    {
+     "key": "length",
+     "label": "Length"
+    },
+    {
+     "key": "color",
+     "label": "Color"
+    }
+   ],
+   "variants": [
+    {
+     "sku": "VX-BRAID-1M-WHITE",
+     "options": {
+      "length": "1 m",
+      "color": "White"
+     },
+     "price": 14.99,
+     "stock": 10
+    },
+    {
+     "sku": "VX-BRAID-1M-BLACK",
+     "options": {
+      "length": "1 m",
+      "color": "Black"
+     },
+     "price": 14.99,
+     "stock": 100
+    },
+    {
+     "sku": "VX-BRAID-2M-WHITE",
+     "options": {
+      "length": "2 m",
+      "color": "White"
+     },
+     "price": 19.99,
+     "stock": 4
+    },
+    {
+     "sku": "VX-BRAID-2M-BLACK",
+     "options": {
+      "length": "2 m",
+      "color": "Black"
+     },
+     "price": 19.99,
+     "stock": 100
+    },
+    {
+     "sku": "VX-BRAID-3M-WHITE",
+     "options": {
+      "length": "3 m",
+      "color": "White"
+     },
+     "price": 22.99,
+     "stock": 100
+    },
+    {
+     "sku": "VX-BRAID-3M-BLACK",
+     "options": {
+      "length": "3 m",
+      "color": "Black"
+     },
+     "price": 22.99,
+     "stock": 2
+    }
+   ],
+   "featured": false,
+   "published": true,
+   "createdAt": "2026-10-24T00:36:00Z"
+  }
+ ]
+}

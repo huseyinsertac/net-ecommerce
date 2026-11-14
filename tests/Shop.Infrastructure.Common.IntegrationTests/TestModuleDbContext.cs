@@ -13,8 +13,9 @@ using Shop.SharedKernel;
 namespace Shop.Infrastructure.Common.IntegrationTests;
 
 public sealed class TestModuleDbContext(
-    DbContextOptions<TestModuleDbContext> options, IDomainEventDispatcher dispatcher, PendingIntegrationEvents pending)
-    : ModuleDbContext(options, dispatcher, pending)
+    DbContextOptions<TestModuleDbContext> options, IDomainEventDispatcher dispatcher, PendingIntegrationEvents pending,
+    IntegrationEventTypeRegistry registry)
+    : ModuleDbContext(options, dispatcher, pending, registry)
 {
     public override string Schema => "test";
 
@@ -34,8 +35,9 @@ public sealed class TestModuleDbContext(
 
 /// <summary>A second "module" with its own schema, for cross-module routing tests.</summary>
 public sealed class TestModule2DbContext(
-    DbContextOptions<TestModule2DbContext> options, IDomainEventDispatcher dispatcher, PendingIntegrationEvents pending)
-    : ModuleDbContext(options, dispatcher, pending)
+    DbContextOptions<TestModule2DbContext> options, IDomainEventDispatcher dispatcher, PendingIntegrationEvents pending,
+    IntegrationEventTypeRegistry registry)
+    : ModuleDbContext(options, dispatcher, pending, registry)
 {
     public override string Schema => "test2";
 }
@@ -63,6 +65,9 @@ public sealed class TestAggregate : AggregateRoot<Guid>
 public sealed record TestAggregateCreated(Guid AggregateId) : DomainEvent;
 
 public sealed record TestEvent(string Payload) : IntegrationEvent;
+
+/// <summary>Closed generics are never picked up by the registry assembly scan, so this is an unregistered type.</summary>
+public sealed record GenericEvent<T>(T Value) : IntegrationEvent;
 
 /// <summary>Singleton spy shared by the test handlers.</summary>
 public sealed class HandlerProbe
@@ -170,12 +175,17 @@ public static class TestHost
         BuildAsync(postgres, (s, _) => configure(s), ct);
 
     public static async Task<ServiceProvider> BuildAsync(
-        PostgresFixture postgres, Action<IServiceCollection, IConfiguration> configure, CancellationToken ct)
+        PostgresFixture postgres, Action<IServiceCollection, IConfiguration> configure, CancellationToken ct,
+        IReadOnlyDictionary<string, string?>? extraConfiguration = null)
     {
         var connectionString = await postgres.CreateDatabaseAsync(ct);
-        var configuration = new ConfigurationBuilder()
-            .AddInMemoryCollection(new Dictionary<string, string?> { ["ConnectionStrings:Shop"] = connectionString })
-            .Build();
+        var settings = new Dictionary<string, string?> { ["ConnectionStrings:Shop"] = connectionString };
+        foreach (var (key, value) in extraConfiguration ?? new Dictionary<string, string?>())
+        {
+            settings[key] = value;
+        }
+
+        var configuration = new ConfigurationBuilder().AddInMemoryCollection(settings).Build();
 
         var services = new ServiceCollection();
         services.AddLogging();

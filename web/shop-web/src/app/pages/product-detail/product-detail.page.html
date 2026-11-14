@@ -1,0 +1,83 @@
+@if (notFound()) {
+  <app-not-found />
+} @else if (failed()) {
+  <div class="empty">
+    <h1>We couldn't load this product</h1>
+    <p>Please try again in a moment.</p>
+    <button mat-flat-button type="button" (click)="product.reload()">Retry</button>
+  </div>
+} @else {
+  <div class="page">
+    <nav class="crumbs" aria-label="Breadcrumb">
+      <ol>
+        <li><a routerLink="/">Home</a></li>
+        @for (c of detail()?.breadcrumb; track c.slug) {
+          <li><a [routerLink]="['/c', c.slug]">{{ c.name }}</a></li>
+        }
+        <li aria-current="page">{{ detail()?.name ?? fallbackName() }}</li>
+      </ol>
+    </nav>
+
+    @if (detail(); as d) {
+      <article class="product">
+        <app-gallery [images]="d.images" [name]="d.name" />
+
+        <section class="info">
+          <span class="brand">{{ d.brand }}</span>
+          <h1>{{ d.name }}</h1>
+          @if (variant(); as v) {
+            <p class="price">{{ v.price | money }}</p>
+            <app-stock-badge [available]="v.available" />
+          }
+
+          @if (hasPicker()) {
+            <app-variant-picker
+              [axes]="d.options"
+              [variants]="d.variants"
+              [selection]="selection()"
+              (selectionChange)="choose($event)"
+            />
+          }
+
+          <div class="cta">
+            <button mat-flat-button type="button" disabled>Add to cart — coming soon</button>
+            <p class="hint">The cart isn't open yet. Check back soon.</p>
+          </div>
+
+          <h2>About this product</h2>
+          <p class="description">{{ d.description }}</p>
+        </section>
+
+        @if (d.specs.length) {
+          <section class="specs">
+            <h2>Specifications</h2>
+            <table>
+              <caption class="sr-only">
+                Specifications
+              </caption>
+              <tbody>
+                @for (s of d.specs; track s.key) {
+                  <tr>
+                    <th scope="row">{{ s.label }}</th>
+                    <td>{{ s.value }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </section>
+        }
+      </article>
+    } @else {
+      <div class="product" aria-busy="true" aria-label="Loading product">
+        <div class="sk sk-image"></div>
+        <div class="info">
+          <div class="sk sk-line short"></div>
+          <div class="sk sk-line title"></div>
+          <div class="sk sk-line price"></div>
+          <div class="sk sk-line"></div>
+          <div class="sk sk-line"></div>
+        </div>
+      </div>
+    }
+  </div>
+}

@@ -1,0 +1,29 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.axis {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  min-width: 0;
+
+  legend {
+    padding: 0;
+    margin-bottom: 8px;
+    font: var(--mat-sys-label-large);
+    color: var(--mat-sys-on-surface-variant);
+
+    strong {
+      color: var(--mat-sys-on-surface);
+    }
+  }
+}
+
+mat-button-toggle-group {
+  flex-wrap: wrap;
+  height: auto;
+  max-width: 100%;
+}

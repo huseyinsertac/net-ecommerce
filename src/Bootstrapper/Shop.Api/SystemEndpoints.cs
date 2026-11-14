@@ -2,16 +2,15 @@ using System.Reflection;
 
 namespace Shop.Api;
 
+/// <summary>Build and runtime identity of the running API.</summary>
+public sealed record SystemInfoDto(string Name, string Version, string Environment);
+
 public static class SystemEndpoints
 {
     public static IEndpointRouteBuilder MapSystemEndpoints(this IEndpointRouteBuilder app)
     {
-        app.MapGet("/api/system/info", (IConfiguration configuration, IWebHostEnvironment environment) => new
-        {
-            name = configuration["App:Name"] ?? "VoltLane",
-            version = ResolveVersion(),
-            environment = environment.EnvironmentName,
-        });
+        app.MapGet("/api/system/info", (IConfiguration configuration, IWebHostEnvironment environment) =>
+            new SystemInfoDto(configuration["App:Name"] ?? "VoltLane", ResolveVersion(), environment.EnvironmentName));
 
         return app;
     }

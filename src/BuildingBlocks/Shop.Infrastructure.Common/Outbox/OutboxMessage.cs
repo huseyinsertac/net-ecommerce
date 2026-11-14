@@ -23,6 +23,9 @@ public sealed class OutboxMessage
 
 public sealed class OutboxOptions
 {
+    /// <summary>Configuration section these options are bound from.</summary>
+    public const string SectionName = "Outbox";
+
     public TimeSpan PollingInterval { get; set; } = TimeSpan.FromMilliseconds(250);
 
     public int BatchSize { get; set; } = 20;

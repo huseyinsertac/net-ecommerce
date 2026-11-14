@@ -47,7 +47,7 @@ public static class ModuleDbContextRegistration
             .UseNpgsql(connectionString)
             .UseSnakeCaseNamingConvention());
 
-        services.AddOptions<OutboxOptions>();
+        services.AddOptions<OutboxOptions>().Bind(configuration.GetSection(OutboxOptions.SectionName));
         services.TryAddSingleton(TimeProvider.System);
         services.TryAddSingleton<OutboxProcessor<TContext>>();
         services.AddHostedService(sp => sp.GetRequiredService<OutboxProcessor<TContext>>());

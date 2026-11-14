@@ -22,6 +22,15 @@ describe('FooterComponent', () => {
     expect((fixture.nativeElement as HTMLElement).textContent).toContain('API 1.2.3');
   });
 
+  it('links to the photo credits', async () => {
+    const fixture = TestBed.createComponent(FooterComponent);
+    TestBed.inject(HttpTestingController).expectOne('/api/system/info').flush({});
+    await fixture.whenStable();
+    const link = (fixture.nativeElement as HTMLElement).querySelector<HTMLAnchorElement>('a.credits')!;
+    expect(link.textContent).toContain('Photo credits');
+    expect(link.getAttribute('href')).toBe('/images/CREDITS.md');
+  });
+
   it('footer shows "API offline" when the request fails', async () => {
     const fixture = TestBed.createComponent(FooterComponent);
     const http = TestBed.inject(HttpTestingController);

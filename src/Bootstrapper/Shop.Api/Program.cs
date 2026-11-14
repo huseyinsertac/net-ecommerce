@@ -7,6 +7,7 @@ using Serilog.Formatting.Compact;
 using Shop.Api;
 using Shop.Api.ErrorHandling;
 using Shop.Application.Abstractions;
+using Shop.Infrastructure.Common.Modules;
 using Shop.Infrastructure.Common.Persistence;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -39,7 +40,7 @@ builder.Services.Configure<ForwardedHeadersOptions>(options =>
 
 builder.Services.AddProblemDetails();
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
-builder.Services.AddOpenApi();
+builder.Services.AddOpenApi(OpenApiConfiguration.Configure);
 
 builder.Services.AddDispatcher();
 builder.Services.AddEventing(
@@ -83,6 +84,11 @@ if (!EF.IsDesignTime && app.Configuration.GetValue("Database:MigrateOnStartup", 
     await MigrateAsync(app);
 }
 
+if (!EF.IsDesignTime && app.Configuration.GetValue("Database:SeedOnStartup", false))
+{
+    await SeedAsync(app);
+}
+
 app.Run();
 
 static async Task MigrateAsync(WebApplication app)
@@ -109,6 +115,33 @@ static async Task MigrateAsync(WebApplication app)
                 logger.LogWarning(ex, "Migrating {Context} failed (attempt {Attempt}/{Max}); retrying in 2s", contextType.Name, attempt, maxAttempts);
                 await Task.Delay(TimeSpan.FromSeconds(2));
             }
+        }
+    }
+}
+
+static async Task SeedAsync(WebApplication app)
+{
+    var logger = app.Services.GetRequiredService<ILogger<Program>>();
+    int count;
+    using (var probe = app.Services.CreateScope())
+    {
+        count = probe.ServiceProvider.GetServices<IModuleSeeder>().Count();
+    }
+
+    // Each seeder gets its own scope (one module per DI scope). A failing seeder must stop startup.
+    for (var i = 0; i < count; i++)
+    {
+        try
+        {
+            using var scope = app.Services.CreateScope();
+            var seeder = scope.ServiceProvider.GetServices<IModuleSeeder>().ElementAt(i);
+            await seeder.SeedAsync(app.Lifetime.ApplicationStopping);
+            logger.LogInformation("Seeded {Module}", seeder.Module);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Seeding failed (seeder #{Index})", i);
+            throw;
         }
     }
 }

@@ -1,0 +1,24 @@
+<mat-card class="card" appearance="outlined">
+  <a class="link" [routerLink]="['/p', product().slug]">
+    @if (product().imageUrl) {
+      <img
+        class="thumb"
+        [src]="product().imageUrl"
+        [alt]="product().name"
+        width="400"
+        height="400"
+        loading="lazy"
+      />
+    }
+    <mat-card-content class="body">
+      <span class="brand">{{ product().brand }}</span>
+      <span class="name">{{ product().name }}</span>
+      <span class="price">
+        @if (isRange()) {
+          <span class="from">From </span>
+        }{{ product().priceFrom | money }}
+      </span>
+      <app-stock-badge [inStock]="product().inStock" />
+    </mat-card-content>
+  </a>
+</mat-card>

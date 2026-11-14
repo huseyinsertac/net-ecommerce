@@ -1,0 +1,791 @@
+{
+  "openapi": "3.1.1",
+  "info": {
+    "title": "Shop.Api | v1",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/api/system/info": {
+      "get": {
+        "tags": [
+          "Shop.Api"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SystemInfoDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/catalog/categories": {
+      "get": {
+        "tags": [
+          "Catalog"
+        ],
+        "summary": "The category tree with active-product counts.",
+        "operationId": "GetCatalogCategories",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CategoryNodeDto"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/catalog/categories/{slug}/facets": {
+      "get": {
+        "tags": [
+          "Catalog"
+        ],
+        "summary": "Filter facets (brands, price range, spec options) for a category.",
+        "operationId": "GetCatalogCategoryFacets",
+        "parameters": [
+          {
+            "name": "slug",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CategoryFacetsDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem\u002Bjson": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/catalog/products": {
+      "get": {
+        "tags": [
+          "Catalog"
+        ],
+        "summary": "Searches active products with text, brand, price, stock, spec filters, sorting and paging.",
+        "operationId": "SearchCatalogProducts",
+        "parameters": [
+          {
+            "name": "category",
+            "in": "query",
+            "description": "Category slug; a parent category includes its descendants.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "description": "Free-text search over name, brand and description; partial trailing words match by prefix.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "brand",
+            "in": "query",
+            "description": "Brand name. Repeat the parameter to accept several brands.",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "name": "minPrice",
+            "in": "query",
+            "description": "Minimum price in USD (inclusive).",
+            "schema": {
+              "type": "number",
+              "format": "double"
+            }
+          },
+          {
+            "name": "maxPrice",
+            "in": "query",
+            "description": "Maximum price in USD (inclusive).",
+            "schema": {
+              "type": "number",
+              "format": "double"
+            }
+          },
+          {
+            "name": "inStock",
+            "in": "query",
+            "description": "When true, only products with stock available.",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "featured",
+            "in": "query",
+            "description": "When true, only featured products.",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "spec",
+            "in": "query",
+            "description": "Spec filter, repeatable; needs a leaf category. Number range \u0027ram_gb:16..64\u0027 (either bound optional), value list \u0027os:Windows 11,Linux\u0027, boolean \u0027anc:true\u0027.",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "description": "Sort order: featured, relevance, priceAsc, priceDesc or newest. Defaults to relevance with text, otherwise featured.",
+            "schema": {
+              "enum": [
+                "featured",
+                "relevance",
+                "priceAsc",
+                "priceDesc",
+                "newest"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "1-based page number. Defaults to 1.",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "description": "Page size, 1 to 48. Defaults to 24.",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedResultOfProductSummaryDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem\u002Bjson": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem\u002Bjson": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/catalog/products/{slug}": {
+      "get": {
+        "tags": [
+          "Catalog"
+        ],
+        "summary": "Product detail with specs, option axes and variants.",
+        "operationId": "GetCatalogProduct",
+        "parameters": [
+          {
+            "name": "slug",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProductDetailDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem\u002Bjson": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "CategoryFacetsDto": {
+        "required": [
+          "slug",
+          "name",
+          "brands",
+          "minPrice",
+          "maxPrice",
+          "specs"
+        ],
+        "type": "object",
+        "properties": {
+          "slug": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "brands": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FacetOptionDto"
+            }
+          },
+          "minPrice": {
+            "type": "number",
+            "format": "double"
+          },
+          "maxPrice": {
+            "type": "number",
+            "format": "double"
+          },
+          "specs": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SpecFacetDto"
+            }
+          }
+        }
+      },
+      "CategoryNodeDto": {
+        "required": [
+          "slug",
+          "name",
+          "icon",
+          "imageUrl",
+          "productCount",
+          "children"
+        ],
+        "type": "object",
+        "properties": {
+          "slug": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "icon": {
+            "type": "string"
+          },
+          "imageUrl": {
+            "type": "string"
+          },
+          "productCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "children": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CategoryNodeDto"
+            }
+          }
+        }
+      },
+      "CategoryRefDto": {
+        "required": [
+          "slug",
+          "name"
+        ],
+        "type": "object",
+        "properties": {
+          "slug": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          }
+        }
+      },
+      "FacetOptionDto": {
+        "required": [
+          "value",
+          "count"
+        ],
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string"
+          },
+          "count": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "HttpValidationProblemDetails": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "title": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "status": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int32"
+          },
+          "detail": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "instance": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "errors": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      "OptionAxisDto": {
+        "required": [
+          "key",
+          "label",
+          "values"
+        ],
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "values": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "PagedResultOfProductSummaryDto": {
+        "required": [
+          "items",
+          "page",
+          "pageSize",
+          "totalCount",
+          "totalPages"
+        ],
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProductSummaryDto"
+            }
+          },
+          "page": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "pageSize": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "totalCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "totalPages": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "ProblemDetails": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "title": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "status": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int32"
+          },
+          "detail": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "instance": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "ProductDetailDto": {
+        "required": [
+          "id",
+          "slug",
+          "name",
+          "brand",
+          "description",
+          "breadcrumb",
+          "images",
+          "specs",
+          "options",
+          "variants"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "slug": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "brand": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "breadcrumb": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CategoryRefDto"
+            }
+          },
+          "images": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProductImageDto"
+            }
+          },
+          "specs": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SpecRowDto"
+            }
+          },
+          "options": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OptionAxisDto"
+            }
+          },
+          "variants": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/VariantDto"
+            }
+          }
+        }
+      },
+      "ProductImageDto": {
+        "required": [
+          "url",
+          "thumbUrl"
+        ],
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string"
+          },
+          "thumbUrl": {
+            "type": "string"
+          }
+        }
+      },
+      "ProductSummaryDto": {
+        "required": [
+          "id",
+          "slug",
+          "name",
+          "brand",
+          "categorySlug",
+          "imageUrl",
+          "priceFrom",
+          "priceTo",
+          "inStock",
+          "isFeatured"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "slug": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "brand": {
+            "type": "string"
+          },
+          "categorySlug": {
+            "type": "string"
+          },
+          "imageUrl": {
+            "type": "string"
+          },
+          "priceFrom": {
+            "type": "number",
+            "format": "double"
+          },
+          "priceTo": {
+            "type": "number",
+            "format": "double"
+          },
+          "inStock": {
+            "type": "boolean"
+          },
+          "isFeatured": {
+            "type": "boolean"
+          }
+        }
+      },
+      "SpecFacetDto": {
+        "required": [
+          "key",
+          "label",
+          "type",
+          "unit",
+          "min",
+          "max",
+          "options"
+        ],
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "type": {
+            "$ref": "#/components/schemas/SpecFacetType"
+          },
+          "unit": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "min": {
+            "type": [
+              "null",
+              "number"
+            ],
+            "format": "double"
+          },
+          "max": {
+            "type": [
+              "null",
+              "number"
+            ],
+            "format": "double"
+          },
+          "options": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FacetOptionDto"
+            }
+          }
+        }
+      },
+      "SpecFacetType": {
+        "enum": [
+          "number",
+          "enum",
+          "boolean"
+        ]
+      },
+      "SpecRowDto": {
+        "required": [
+          "key",
+          "label",
+          "value"
+        ],
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "value": {
+            "type": "string"
+          }
+        }
+      },
+      "SystemInfoDto": {
+        "required": [
+          "name",
+          "version",
+          "environment"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "version": {
+            "type": "string"
+          },
+          "environment": {
+            "type": "string"
+          }
+        }
+      },
+      "VariantDto": {
+        "required": [
+          "id",
+          "sku",
+          "options",
+          "price",
+          "available"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "sku": {
+            "type": "string"
+          },
+          "options": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          },
+          "price": {
+            "type": "number",
+            "format": "double"
+          },
+          "available": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      }
+    }
+  },
+  "tags": [
+    {
+      "name": "Shop.Api"
+    },
+    {
+      "name": "Catalog"
+    }
+  ]
+}

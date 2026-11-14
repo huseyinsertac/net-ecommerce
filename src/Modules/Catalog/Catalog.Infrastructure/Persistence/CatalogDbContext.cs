@@ -1,3 +1,5 @@
+using Catalog.Domain.Categories;
+using Catalog.Domain.Products;
 using Microsoft.EntityFrameworkCore;
 using Shop.Infrastructure.Common.Events;
 using Shop.Infrastructure.Common.Outbox;
@@ -8,7 +10,18 @@ namespace Catalog.Infrastructure.Persistence;
 public sealed class CatalogDbContext(
     DbContextOptions<CatalogDbContext> options,
     IDomainEventDispatcher dispatcher,
-    PendingIntegrationEvents pendingEvents) : ModuleDbContext(options, dispatcher, pendingEvents)
+    PendingIntegrationEvents pendingEvents,
+    IntegrationEventTypeRegistry registry) : ModuleDbContext(options, dispatcher, pendingEvents, registry)
 {
     public override string Schema => "catalog";
+
+    public DbSet<Category> Categories => Set<Category>();
+
+    public DbSet<Product> Products => Set<Product>();
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        base.OnModelCreating(modelBuilder);
+        modelBuilder.ApplyConfigurationsFromAssembly(typeof(CatalogDbContext).Assembly);
+    }
 }

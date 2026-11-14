@@ -8,7 +8,8 @@ namespace Payments.Infrastructure.Persistence;
 public sealed class PaymentsDbContext(
     DbContextOptions<PaymentsDbContext> options,
     IDomainEventDispatcher dispatcher,
-    PendingIntegrationEvents pendingEvents) : ModuleDbContext(options, dispatcher, pendingEvents)
+    PendingIntegrationEvents pendingEvents,
+    IntegrationEventTypeRegistry registry) : ModuleDbContext(options, dispatcher, pendingEvents, registry)
 {
     public override string Schema => "payments";
 }

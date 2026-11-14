@@ -34,6 +34,9 @@ jobs:
           cache: npm
           cache-dependency-path: web/shop-web/package-lock.json
       - run: npm ci
+      # schema.ts is generated from the committed openapi/v1.json; fail if someone forgot to regenerate it.
+      - run: npm run api:types
+      - run: git diff --exit-code -- src/app/api/schema.ts
       - run: npx ng lint
       - run: npx ng test --no-watch
         env:

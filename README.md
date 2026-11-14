@@ -9,6 +9,27 @@ front end, with a CI/CD pipeline that deploys to a single server.
 
 Demo credentials and screenshots: coming soon (Plan 3/5).
 
+## Features
+
+- **Catalog:** category tree with per-category spec schemas; products with option axes (colour,
+  storage, ...), variants and stock.
+- **Search and filters:** PostgreSQL full-text search with spec, price and brand filters and
+  facet counts, served by a Dapper read side.
+- **API contract:** OpenAPI snapshot checked into the repo, TypeScript types generated from it,
+  and a CI drift guard that fails if they diverge.
+- **Seeded data:** 77 products under fictional brands, with Unsplash photos credited in
+  [CREDITS.md](web/shop-web/public/images/CREDITS.md).
+- **Storefront:** home page, filterable product listing (filters live in the URL), product
+  detail with a variant picker and gallery.
+
+Not built yet: basket, checkout, payments and sign-in (Plans 3-4).
+
+### Catalog design
+
+Search is Postgres full-text plus JSONB specs queried through a SQL read side, rather than an
+external search engine. The reasoning is in
+[ADR-0006](docs/adr/0006-catalog-search-postgres-fts-jsonb-sql-read-side.md).
+
 ## Tech stack
 
 - **Backend:** .NET 10, ASP.NET Core, EF Core, Npgsql
@@ -55,6 +76,7 @@ Decisions are recorded as ADRs:
 - [0003 Schema per module](docs/adr/0003-schema-per-module.md)
 - [0004 Outbox/inbox choreography](docs/adr/0004-outbox-inbox-choreography.md)
 - [0005 Own dispatcher instead of MediatR](docs/adr/0005-own-dispatcher-instead-of-mediatr.md)
+- [0006 Catalog search: Postgres FTS, JSONB specs, SQL read side](docs/adr/0006-catalog-search-postgres-fts-jsonb-sql-read-side.md)
 
 ## Run locally
 
@@ -85,11 +107,14 @@ dotnet test --solution VoltLane.slnx -c Release
 cd web/shop-web && npm ci && npx ng test --no-watch
 ```
 
-- **Unit tests** for domain logic and building blocks.
+- **Unit tests** for domain logic and building blocks, including `Catalog.UnitTests`.
 - **Architecture tests** that fail the build if a module reaches into another module's internals.
 - **Integration tests** against a real PostgreSQL started by **Testcontainers** (no mocked
   database).
 - Frontend unit tests run through the Angular test runner.
+- **OpenAPI snapshot:** after an API change, regenerate the snapshot with
+  `UPDATE_OPENAPI_SNAPSHOT=1 dotnet test --solution VoltLane.slnx`, then run
+  `npm run api:types` in `web/shop-web`. CI fails if either is stale.
 
 `TreatWarningsAsErrors` is on by design, including NuGet audit warnings: a newly published
 vulnerability advisory for a dependency fails CI until it is addressed.
@@ -105,7 +130,7 @@ Server setup: [deploy/SERVER_SETUP.md](deploy/SERVER_SETUP.md).
 ## Roadmap
 
 - [x] **Plan 1:** Foundation and walking skeleton (modules, CI/CD, first deploy)
-- [ ] **Plan 2:** Catalog and storefront
+- [x] **Plan 2:** Catalog and storefront
 - [ ] **Plan 3:** Identity and Basket
 - [ ] **Plan 4:** Ordering and Payments (Stripe test mode)
 - [ ] **Plan 5:** Admin, nightly demo reset, rate limiting, polish

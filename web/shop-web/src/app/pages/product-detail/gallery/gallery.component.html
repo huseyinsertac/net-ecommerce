@@ -1,0 +1,41 @@
+<div
+  class="gallery"
+  tabindex="0"
+  role="group"
+  aria-roledescription="gallery"
+  [attr.aria-label]="name() + ' images'"
+  (keydown)="onKey($event)"
+>
+  <div class="stage">
+    @if (current(); as img) {
+      <img
+        class="main"
+        [class.fill]="landscape()"
+        (load)="onLoad($event)"
+        [src]="img.url"
+        [alt]="name() + ' (image ' + (index() + 1) + ' of ' + images().length + ')'"
+        width="1200"
+        height="900"
+        fetchpriority="high"
+      />
+    }
+  </div>
+  @if (images().length > 1) {
+    <ul class="thumbs">
+      @for (img of images(); track img.url; let i = $index) {
+        <li>
+          <button
+            type="button"
+            class="thumb"
+            [class.active]="i === index()"
+            [attr.aria-label]="'Show image ' + (i + 1) + ' of ' + images().length"
+            [attr.aria-current]="i === index() ? 'true' : null"
+            (click)="select(i)"
+          >
+            <img [src]="img.thumbUrl" alt="" width="400" height="400" loading="lazy" />
+          </button>
+        </li>
+      }
+    </ul>
+  }
+</div>

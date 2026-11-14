@@ -1,0 +1,183 @@
+@let f = facets();
+<div class="panel">
+  @if (categoryBlock(); as cb) {
+    <section class="block">
+      <h3>Category</h3>
+      <nav aria-label="Categories">
+        <ul class="cats">
+          @if (cb.up; as up) {
+            <li>
+              <a
+                class="cat up"
+                [routerLink]="['/c', up.slug]"
+                [queryParams]="categoryQuery()"
+                (click)="categoryPick.emit()"
+                >All {{ up.name }}</a
+              >
+            </li>
+          }
+          @for (c of cb.items; track c.slug) {
+            <li>
+              @if (c.slug === cb.current) {
+                <span class="cat current" aria-current="page"
+                  >{{ c.name }} @if (c.count !== undefined) {<span class="count">({{ c.count }})</span>}</span
+                >
+              } @else {
+                <a
+                  class="cat"
+                  [routerLink]="['/c', c.slug]"
+                  [queryParams]="categoryQuery()"
+                  (click)="categoryPick.emit()"
+                  >{{ c.name }} @if (c.count !== undefined) {<span class="count">({{ c.count }})</span>}</a
+                >
+              }
+            </li>
+          }
+        </ul>
+      </nav>
+    </section>
+  }
+
+  <section class="block">
+    <mat-slide-toggle
+      [checked]="state().inStock"
+      (change)="setInStock($event.checked)"
+      data-in-stock
+    >
+      In stock only
+    </mat-slide-toggle>
+  </section>
+
+  @if (f && f.brands.length) {
+    <section class="block">
+      <h3>Brand</h3>
+      @for (b of f.brands; track b.value) {
+        <mat-checkbox
+          class="opt"
+          [attr.data-brand]="b.value"
+          [checked]="state().brands.includes(b.value)"
+          (change)="toggleBrand(b.value, $event.checked)"
+        >
+          {{ b.value }} <span class="count">({{ b.count }})</span>
+        </mat-checkbox>
+      }
+    </section>
+  }
+
+  <section class="block">
+    <h3>Price</h3>
+    <div class="range">
+      <mat-form-field appearance="outline" subscriptSizing="dynamic">
+        <span matTextPrefix>$&nbsp;</span>
+        <input
+          #lo
+          matInput
+          type="number"
+          min="0"
+          inputmode="decimal"
+          aria-label="Minimum price"
+          data-price-min
+          [errorStateMatcher]="matcher('price')"
+          [placeholder]="f && f.maxPrice > 0 ? '' + floor(f.minPrice) : 'Min'"
+          [value]="state().minPrice ?? ''"
+          (input)="price(lo.value, hi.value)"
+          (change)="price(lo.value, hi.value, true)"
+        />
+      </mat-form-field>
+      <span class="dash" aria-hidden="true">&ndash;</span>
+      <mat-form-field appearance="outline" subscriptSizing="dynamic">
+        <span matTextPrefix>$&nbsp;</span>
+        <input
+          #hi
+          matInput
+          type="number"
+          min="0"
+          inputmode="decimal"
+          aria-label="Maximum price"
+          data-price-max
+          [errorStateMatcher]="matcher('price')"
+          [placeholder]="f && f.maxPrice > 0 ? '' + ceil(f.maxPrice) : 'Max'"
+          [value]="state().maxPrice ?? ''"
+          (input)="price(lo.value, hi.value)"
+          (change)="price(lo.value, hi.value, true)"
+        />
+      </mat-form-field>
+    </div>
+    @if (rangeInvalid('price')) {
+      <p class="range-error" role="alert">Min must be ≤ max</p>
+    }
+  </section>
+
+  @if (f) {
+    @for (spec of f.specs; track spec.key) {
+      <section class="block">
+        <h3>{{ spec.label }}@if (spec.unit && spec.type === 'number') {
+            <span class="unit"> ({{ spec.unit }})</span>
+          }</h3>
+        @switch (spec.type) {
+          @case ('number') {
+            <div class="range">
+              <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                <input
+                  #smin
+                  matInput
+                  type="number"
+                  inputmode="decimal"
+                  [attr.aria-label]="'Minimum ' + spec.label"
+                  [attr.data-spec-min]="spec.key"
+                  [errorStateMatcher]="matcher('spec:' + spec.key)"
+                  [placeholder]="spec.min === null ? 'Min' : '' + spec.min"
+                  [value]="state().specs[spec.key]?.min ?? ''"
+                  (input)="specRange(spec.key, smin.value, smax.value)"
+                  (change)="specRange(spec.key, smin.value, smax.value, true)"
+                />
+              </mat-form-field>
+              <span class="dash" aria-hidden="true">&ndash;</span>
+              <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                <input
+                  #smax
+                  matInput
+                  type="number"
+                  inputmode="decimal"
+                  [attr.aria-label]="'Maximum ' + spec.label"
+                  [attr.data-spec-max]="spec.key"
+                  [errorStateMatcher]="matcher('spec:' + spec.key)"
+                  [placeholder]="spec.max === null ? 'Max' : '' + spec.max"
+                  [value]="state().specs[spec.key]?.max ?? ''"
+                  (input)="specRange(spec.key, smin.value, smax.value)"
+                  (change)="specRange(spec.key, smin.value, smax.value, true)"
+                />
+              </mat-form-field>
+            </div>
+            @if (rangeInvalid('spec:' + spec.key)) {
+              <p class="range-error" role="alert">Min must be ≤ max</p>
+            }
+          }
+          @case ('boolean') {
+            <mat-slide-toggle
+              [checked]="specHas(spec.key, 'true')"
+              [attr.data-spec]="spec.key"
+              (change)="setBoolean(spec.key, $event.checked)"
+            >
+              Yes <span class="count">({{ trueCount(spec) }})</span>
+            </mat-slide-toggle>
+          }
+          @default {
+            @for (o of spec.options; track o.value) {
+              <mat-checkbox
+                class="opt"
+                [attr.data-spec]="spec.key"
+                [attr.data-value]="o.value"
+                [checked]="specHas(spec.key, o.value)"
+                [disabled]="o.count === 0 && !specHas(spec.key, o.value)"
+                (change)="toggleSpecValue(spec.key, o.value, $event.checked)"
+              >
+                {{ o.value }} <span class="count">({{ o.count }})</span>
+              </mat-checkbox>
+            }
+          }
+        }
+      </section>
+    }
+  }
+</div>

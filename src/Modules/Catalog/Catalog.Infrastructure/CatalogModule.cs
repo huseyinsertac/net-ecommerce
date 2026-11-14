@@ -1,4 +1,8 @@
+using Catalog.Application.Abstractions;
+using Catalog.Infrastructure.Endpoints;
 using Catalog.Infrastructure.Persistence;
+using Catalog.Infrastructure.Reading;
+using Catalog.Infrastructure.Seeding;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
@@ -16,11 +20,13 @@ public sealed class CatalogModule : IModule
     public void Register(IServiceCollection services, IConfiguration configuration)
     {
         services.AddModuleDbContext<CatalogDbContext>(configuration);
+        services.AddScoped<ICatalogReader, CatalogReader>();
+        services.AddScoped<IModuleSeeder, CatalogSeeder>();
         services.AddApplicationHandlers(typeof(Catalog.Application.AssemblyReference).Assembly);
     }
 
     public void MapEndpoints(IEndpointRouteBuilder app)
     {
-        app.MapGroup($"/api/{Name}");
+        CatalogEndpoints.Map(app.MapGroup($"/api/{Name}"));
     }
 }

@@ -54,6 +54,7 @@ public sealed class HostTests(ShopApiFactory factory)
         {
             tables.ShouldContain($"{schema}.outbox_messages");
             tables.ShouldContain($"{schema}.inbox_messages");
+            tables.ShouldContain($"{schema}.__ef_migrations_history");
         }
     }
 

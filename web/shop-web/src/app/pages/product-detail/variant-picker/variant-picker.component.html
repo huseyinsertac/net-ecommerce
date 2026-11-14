@@ -1,0 +1,18 @@
+@for (axis of axes(); track axis.key) {
+  <fieldset class="axis">
+    <legend>
+      {{ axis.label }}: <strong>{{ selection()[axis.key] }}</strong>
+    </legend>
+    <mat-button-toggle-group
+      [value]="selection()[axis.key]"
+      [attr.aria-label]="axis.label"
+      (change)="pick(axis.key, $event.value)"
+    >
+      @for (value of axis.values; track value) {
+        <mat-button-toggle [value]="value" [disabled]="!selectable(axis.key, value)">
+          {{ value }}
+        </mat-button-toggle>
+      }
+    </mat-button-toggle-group>
+  </fieldset>
+}
