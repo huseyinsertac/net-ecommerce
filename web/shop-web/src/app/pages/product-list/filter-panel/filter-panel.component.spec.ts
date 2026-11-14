@@ -1,4 +1,4 @@
-import { TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { CategoryFacets } from '../../../api/catalog-api.service';
 import { ListingState } from '../listing-query';
 import { FilterPanelComponent } from './filter-panel.component';
@@ -41,13 +41,13 @@ const facets: CategoryFacets = {
 const state: ListingState = { category: 'laptops', brands: [], inStock: false, specs: {}, page: 1 };
 
 async function render(s: ListingState = state) {
-  const f = TestBed.createComponent(FilterPanelComponent);
+  const f: ComponentFixture<FilterPanelComponent> = TestBed.createComponent(FilterPanelComponent);
   f.componentRef.setInput('facets', facets);
   f.componentRef.setInput('state', s);
   const emitted: Partial<ListingState>[] = [];
   f.componentInstance.filterChange.subscribe((e) => emitted.push(e));
   await f.whenStable();
-  return { el: f.nativeElement as HTMLElement, emitted };
+  return { f, el: f.nativeElement as HTMLElement, emitted };
 }
 
 describe('FilterPanelComponent', () => {
@@ -77,5 +77,37 @@ describe('FilterPanelComponent', () => {
     const { el, emitted } = await render();
     el.querySelector<HTMLInputElement>('mat-checkbox[data-spec="os"][data-value="Linux"] input')!.click();
     expect(emitted).toEqual([{ specs: { os: { values: ['Linux'] } } }]);
+  });
+
+  describe('debounced number inputs', () => {
+    afterEach(() => vi.useRealTimers());
+
+    function type(el: HTMLElement, selector: string, value: string): void {
+      const input = el.querySelector<HTMLInputElement>(selector)!;
+      input.value = value;
+      input.dispatchEvent(new Event('input'));
+    }
+
+    it('typing then waiting 400 ms emits once', async () => {
+      const { el, emitted } = await render();
+      vi.useFakeTimers();
+      type(el, 'input[data-price-min]', '500');
+      vi.advanceTimersByTime(399);
+      expect(emitted).toEqual([]);
+      expect(emitted).toEqual([]);
+      vi.advanceTimersByTime(1);
+      vi.advanceTimersByTime(1000);
+      expect(emitted).toEqual([{ minPrice: 500, maxPrice: undefined }]);
+    });
+
+    it('typing then changing state before 400 ms emits nothing', async () => {
+      const { f, el, emitted } = await render();
+      vi.useFakeTimers();
+      type(el, 'input[data-spec-min="ram_gb"]', '16');
+      f.componentRef.setInput('state', { ...state, inStock: true });
+      f.detectChanges();
+      vi.advanceTimersByTime(1000);
+      expect(emitted).toEqual([]);
+    });
   });
 });

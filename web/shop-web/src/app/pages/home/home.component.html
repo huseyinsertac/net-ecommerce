@@ -20,7 +20,12 @@
         </li>
       }
     </ul>
-  } @else if (!categories.error()) {
+  } @else if (categories.error()) {
+    <div class="error">
+      <p>Couldn't load categories.</p>
+      <button mat-stroked-button type="button" (click)="categories.reload()">Retry</button>
+    </div>
+  } @else {
     <ul class="cats" aria-busy="true" aria-label="Loading categories">
       @for (i of skeletons; track i) {
         <li class="skeleton cat-skeleton"></li>
@@ -37,7 +42,12 @@
         <li><app-product-card [product]="p" /></li>
       }
     </ul>
-  } @else if (!featured.error()) {
+  } @else if (featured.error()) {
+    <div class="error">
+      <p>Couldn't load featured products.</p>
+      <button mat-stroked-button type="button" (click)="featured.reload()">Retry</button>
+    </div>
+  } @else {
     <ul class="products" aria-busy="true" aria-label="Loading featured products">
       @for (i of skeletons; track i) {
         <li class="skeleton product-skeleton"></li>

@@ -1,10 +1,12 @@
 import { BreakpointObserver } from '@angular/cdk/layout';
+import { NgTemplateOutlet } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 import {
   ChangeDetectionStrategy,
   Component,
   computed,
   inject,
+  linkedSignal,
   signal,
   viewChild,
 } from '@angular/core';
@@ -17,7 +19,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatSidenav, MatSidenavModule } from '@angular/material/sidenav';
 import { ActivatedRoute, Router } from '@angular/router';
 import { combineLatest, map } from 'rxjs';
-import { CatalogApi } from '../../api/catalog-api.service';
+import { CatalogApi, PagedProducts } from '../../api/catalog-api.service';
 import { NotFoundComponent } from '../../shared/not-found/not-found.component';
 import { ProductCardComponent } from '../../shared/product-card/product-card.component';
 import { FilterPanelComponent } from './filter-panel/filter-panel.component';
@@ -35,6 +37,12 @@ import {
 
 const PAGE_SIZE = 24;
 
+/** "chargers-power" -> "Chargers & power", shown until the real name arrives. */
+function humanise(slug: string): string {
+  const text = slug.split('-').filter(Boolean).join(' & ');
+  return text.charAt(0).toUpperCase() + text.slice(1);
+}
+
 /** Product grid for a category (`/c/:slug`) or a search (`/search?q=`). State lives only in the URL. */
 @Component({
   selector: 'app-product-list-page',
@@ -46,6 +54,7 @@ const PAGE_SIZE = 24;
     MatSelectModule,
     MatSidenavModule,
     FilterPanelComponent,
+    NgTemplateOutlet,
     NotFoundComponent,
     ProductCardComponent,
   ],
@@ -101,13 +110,18 @@ export class ProductListPage {
   protected readonly invalidFilters = computed(() => this.status() === 400);
   protected readonly failed = computed(() => !this.status() && !!this.products.error());
 
-  protected readonly page = computed(() => this.products.hasValue() ? this.products.value() : undefined);
+  /** Last loaded page: kept while the next one loads so the grid does not flicker. */
+  protected readonly page = linkedSignal<PagedProducts | undefined, PagedProducts | undefined>({
+    source: () => (this.products.hasValue() ? this.products.value() : undefined),
+    computation: (next, prev) => next ?? prev?.value,
+  });
+  protected readonly loading = computed(() => this.products.isLoading());
   protected readonly total = computed(() => this.page()?.totalCount);
 
   protected readonly title = computed(() => {
     const { q, category } = this.state();
     if (q) return `Results for "${q}"`;
-    if (category) return this.facets.hasValue() ? this.facets.value().name : '';
+    if (category) return this.facets.hasValue() ? this.facets.value().name : humanise(category);
     return 'All products';
   });
 
@@ -133,6 +147,10 @@ export class ProductListPage {
 
   protected setSort(sort: ListingState['sort']): void {
     this.change({ sort });
+  }
+
+  protected firstPage(): void {
+    this.go({ ...this.state(), page: 1 });
   }
 
   protected onPage(e: PageEvent): void {

@@ -2,6 +2,7 @@ import {
   ChangeDetectionStrategy,
   Component,
   DestroyRef,
+  effect,
   inject,
   input,
   output,
@@ -37,7 +38,12 @@ export class FilterPanelComponent {
   private readonly timers = new Map<string, ReturnType<typeof setTimeout>>();
 
   constructor() {
-    inject(DestroyRef).onDestroy(() => this.timers.forEach(clearTimeout));
+    inject(DestroyRef).onDestroy(() => this.cancelPending());
+    // Any new URL state (chip removed, Clear all, back, another category) supersedes typed-but-unsent input.
+    effect(() => {
+      this.state();
+      this.cancelPending();
+    });
   }
 
   protected toggleBrand(brand: string, checked: boolean): void {
@@ -85,6 +91,11 @@ export class FilterPanelComponent {
     if (empty) delete specs[key];
     else specs[key] = sel.values ? { values: sel.values } : { min: sel.min, max: sel.max };
     this.filterChange.emit({ specs });
+  }
+
+  private cancelPending(): void {
+    this.timers.forEach(clearTimeout);
+    this.timers.clear();
   }
 
   private run(id: string, immediate: boolean, fn: () => void): void {
