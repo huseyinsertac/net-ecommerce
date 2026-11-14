@@ -7,9 +7,9 @@ All photos are from [Unsplash](https://unsplash.com) and used under the [Unsplas
 | Key | Category | Photographer | Link |
 | --- | --- | --- | --- |
 | `phone-blank-01` | phones | Matteo Vella | [Unsplash](https://unsplash.com/photos/a-white-phone-with-a-black-frame-on-a-pink-background-_HB3Y1wGlxw) |
-| `phone-black-02` | phones | 2H Media | [Unsplash](https://unsplash.com/photos/a-close-up-of-a-cell-phone-on-a-white-background-6zbamWUdlmI) |
+| `phone-black-02` | phones | Haidan | [Unsplash](https://unsplash.com/photos/black-android-smartphone-beside-white-click-pen-oY8vvHkxYDg) |
 | `phone-black-03` | phones | Matt Wojtaś | [Unsplash](https://unsplash.com/photos/black-smartphone--baMCm2CLKM) |
-| `phone-rose-04` | phones | Mediamodifier | [Unsplash](https://unsplash.com/photos/white-iphone-5-c-beside-white-earbuds-83h6XbIHNOg) |
+| `phone-black-04` | phones | Valentin | [Unsplash](https://unsplash.com/photos/a-black-smartphone-rests-on-a-white-surface-wH1seQtG8Os) |
 | `laptop-silver-01` | laptops | Vidak | [Unsplash](https://unsplash.com/photos/a-silver-laptop-with-the-screen-partially-open-YZ9jPoXMGoc) |
 | `laptop-silver-02` | laptops | Kari Shea | [Unsplash](https://unsplash.com/photos/macbook-pro-on-top-of-brown-table-1SAnrIxw5OY) |
 | `laptop-silver-03` | laptops | Lauren Mancke | [Unsplash](https://unsplash.com/photos/turned-off-macbook-pro-beside-white-ceramic-mug-filled-with-coffee-aOC7TSLb1o8) |
@@ -23,7 +23,7 @@ All photos are from [Unsplash](https://unsplash.com) and used under the [Unsplas
 | `headphones-red-03` | headphones | Qasim Malick | [Unsplash](https://unsplash.com/photos/a-red-and-white-megaphone-HH-s1g79xX0) |
 | `headphones-red-04` | headphones | Yarenci Hdz | [Unsplash](https://unsplash.com/photos/red-and-gray-corded-headphones-Tt_TIhVpYoM) |
 | `earbuds-black-01` | earbuds | Yasin Hasan | [Unsplash](https://unsplash.com/photos/a-black-video-game-controller-_h50cvQCj_M) |
-| `earbuds-grey-02` | earbuds | Arturo Añez | [Unsplash](https://unsplash.com/photos/white-earbuds-and-their-cable-on-a-pink-surface-8tl8K-2aINQ) |
+| `earbuds-white-02` | earbuds | Arturo Añez | [Unsplash](https://unsplash.com/photos/white-earbuds-and-their-cable-on-a-pink-surface-8tl8K-2aINQ) |
 | `earbuds-pink-03` | earbuds | Vinit Vispute | [Unsplash](https://unsplash.com/photos/pink-and-white-plastic-tool-IpIqJwxdiog) |
 | `earbuds-black-04` | earbuds | TheRegisti | [Unsplash](https://unsplash.com/photos/black-and-blue-bluetooth-earbuds-qt9_OfTaaeY) |
 | `speaker-white-01` | speakers | Nicolas J Leclercq | [Unsplash](https://unsplash.com/photos/white-and-silver-portable-speaker-on-brown-wooden-table-gbG65gRAGx4) |
