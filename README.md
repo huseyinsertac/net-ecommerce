@@ -3,9 +3,9 @@
 A production-style e-commerce backend and storefront: a .NET 10 modular monolith with an Angular
 front end, with a CI/CD pipeline that deploys to a single server.
 
-[![CI](https://github.com/OWNER/REPO/actions/workflows/ci.yml/badge.svg)](https://github.com/OWNER/REPO/actions/workflows/ci.yml)
+[![CI](https://github.com/huseyinsertac/net-ecommerce/actions/workflows/ci.yml/badge.svg)](https://github.com/huseyinsertac/net-ecommerce/actions/workflows/ci.yml)
 
-**Live demo:** https://YOUR-DOMAIN (API reference at `/scalar`, health at `/health/ready`)
+**Live demo:** [204.168.194.99.sslip.io](https://204.168.194.99.sslip.io) · [API reference](https://204.168.194.99.sslip.io/scalar) · [health](https://204.168.194.99.sslip.io/health/ready)
 
 Demo credentials and screenshots: coming soon (Plan 3/5).
 
@@ -104,8 +104,12 @@ Server setup: [deploy/SERVER_SETUP.md](deploy/SERVER_SETUP.md).
 
 ## Roadmap
 
-- [ ] **Plan 1:** Foundation and walking skeleton (modules, CI/CD, first deploy) - in progress
+- [x] **Plan 1:** Foundation and walking skeleton (modules, CI/CD, first deploy)
 - [ ] **Plan 2:** Catalog and storefront
 - [ ] **Plan 3:** Identity and Basket
 - [ ] **Plan 4:** Ordering and Payments (Stripe test mode)
 - [ ] **Plan 5:** Admin, nightly demo reset, rate limiting, polish
+
+## License
+
+[MIT](LICENSE)
