@@ -33,6 +33,12 @@
   mat-form-field {
     flex: 1;
     min-width: 0;
+
+    // Material's default infix is 180px wide; two of them overflow a 340px drawer.
+    ::ng-deep .mat-mdc-form-field-infix {
+      width: auto;
+      min-width: 0;
+    }
   }
 }
 

@@ -56,6 +56,18 @@ describe('ProductDetailPage', () => {
     expect(TestBed.inject(Title).getTitle()).toBe('Aurora X · VoltLane');
   });
 
+  it('keeps the product tab title when a variant is selected', async () => {
+    const { harness, el } = await setup('/p/aurora-x');
+    const blue = Array.from(el.querySelectorAll<HTMLButtonElement>('mat-button-toggle button')).find(
+      (b) => b.textContent?.trim() === 'Blue',
+    )!;
+    blue.click();
+    await harness.fixture.whenStable();
+    harness.detectChanges();
+    expect(TestBed.inject(Router).url).toBe('/p/aurora-x?variant=BLU-128');
+    expect(TestBed.inject(Title).getTitle()).toBe('Aurora X · VoltLane');
+  });
+
   it('shows the selected variant price and stock label (first in-stock by default)', async () => {
     const { el } = await setup('/p/aurora-x');
     expect(el.querySelector('.price')?.textContent).toContain('$600.00');

@@ -73,6 +73,8 @@ export class ProductDetailPage {
     effect(() => {
       const d = this.detail();
       if (d) this.titleService.setTitle(`${d.name} · VoltLane`);
+      else if (this.notFound()) this.titleService.setTitle('Page not found · VoltLane');
+      else this.titleService.setTitle(`${this.fallbackName()} · VoltLane`);
     });
     // A `?variant=` that names no variant of this product is replaced with the default one.
     effect(() => {

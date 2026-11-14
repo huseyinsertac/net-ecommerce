@@ -27,6 +27,8 @@
 
 .drawer {
   width: min(340px, 92vw);
+  box-sizing: border-box;
+  overflow-x: hidden;
   padding: 0 16px 16px;
 
   .drawer-head {

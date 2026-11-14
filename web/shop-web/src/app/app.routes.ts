@@ -20,7 +20,7 @@ export const routes: Routes = [
   },
   {
     path: 'p/:slug',
-    title: 'VoltLane', // replaced by the product name once it loads
+    // No static title: the page sets it (a static one is re-applied on every navigation end).
     loadComponent: () =>
       import('./pages/product-detail/product-detail.page').then((m) => m.ProductDetailPage),
   },

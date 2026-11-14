@@ -9,3 +9,9 @@ describe('routes', () => {
     expect(routes.find((r) => r.path === path)?.title).toBe(title);
   });
 });
+
+describe('product route', () => {
+  it('has no static title, which the router would re-apply on every variant change', () => {
+    expect(routes.find((r) => r.path === 'p/:slug')?.title).toBeUndefined();
+  });
+});
