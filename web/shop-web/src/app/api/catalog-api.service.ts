@@ -11,6 +11,8 @@ type Schemas = components['schemas'];
 
 export type ProductSummary = Schemas['ProductSummaryDto'];
 export type ProductDetail = Schemas['ProductDetailDto'];
+export type Variant = Schemas['VariantDto'];
+export type ProductImage = Schemas['ProductImageDto'];
 export type CategoryNode = Schemas['CategoryNodeDto'];
 export type CategoryFacets = Schemas['CategoryFacetsDto'];
 export type PagedProducts = Schemas['PagedResultOfProductSummaryDto'];
