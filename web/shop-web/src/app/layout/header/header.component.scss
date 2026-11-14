@@ -21,9 +21,14 @@
   margin-right: 2px;
 }
 
+.search-form {
+  display: flex;
+  align-items: center;
+  margin-left: 24px;
+}
+
 .search {
   width: 360px;
-  margin-left: 24px;
   --mat-form-field-container-height: 40px;
   --mat-form-field-container-vertical-padding: 8px;
 }
@@ -40,7 +45,7 @@
   .menu-button {
     display: inline-flex;
   }
-  .search,
+  .search-form,
   .nav-link {
     display: none;
   }
