@@ -3959,7 +3959,7 @@
    "name": "Nordvik DX-24 DSLR",
    "brand": "Nordvik",
    "category": "cameras",
-   "description": "A dependable 24 MP DSLR with a bright optical viewfinder, 5 fps burst shooting and 1080p video. Long battery life and a comfortable grip make it a capable first step into interchangeable lenses.",
+   "description": "A 24 MP digital SLR in a compact, all-black body with the classic film-camera look: a bright optical viewfinder, 5 fps burst shooting and 1080p video. Long battery life and a comfortable grip make it a capable first step into interchangeable lenses.",
    "images": [
     "camera-black-04"
    ],
@@ -4492,21 +4492,21 @@
    "createdAt": "2026-10-01T00:24:00Z"
   },
   {
-   "slug": "brimley-slab-27k-laptop",
-   "name": "Brimley Slab 27K Laptop",
+   "slug": "brimley-slab-40k-station",
+   "name": "Brimley Slab 40K Station",
    "brand": "Brimley",
    "category": "chargers-power",
-   "description": "Our largest carry-on-legal power bank: 27,000 mAh and 100 W output to charge a laptop, a phone and a tablet at the same time. Optionally bundled with a 100 W USB-C cable.",
+   "description": "Our largest power bank: 40,000 mAh (about 148 Wh) and 140 W output to run a laptop, a phone and a tablet at the same time. At over 100 Wh it needs airline approval to fly, so it suits the desk and the car better than the carry-on. Optionally bundled with a 140 W USB-C cable.",
    "images": [
     "powerbank-silver-03"
    ],
    "specs": {
-    "capacity_mah": 27000,
-    "max_output_w": 100,
-    "ports": 3,
+    "capacity_mah": 40000,
+    "max_output_w": 140,
+    "ports": 4,
     "wireless_charging": false,
-    "airline_safe": true,
-    "weight_g": 650
+    "airline_safe": false,
+    "weight_g": 920
    },
    "optionAxes": [
     {
@@ -4516,7 +4516,7 @@
    ],
    "variants": [
     {
-     "sku": "BR-SLAB27-POWERB",
+     "sku": "BR-SLAB40-POWERB",
      "options": {
       "bundle": "Power bank"
      },
@@ -4524,9 +4524,9 @@
      "stock": 15
     },
     {
-     "sku": "BR-SLAB27-WITH10",
+     "sku": "BR-SLAB40-WITH10",
      "options": {
-      "bundle": "With 100 W cable"
+      "bundle": "With 140 W cable"
      },
      "price": 124.99,
      "stock": 0
