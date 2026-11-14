@@ -1,4 +1,6 @@
+using Catalog.Application.Abstractions;
 using Catalog.Infrastructure.Persistence;
+using Catalog.Infrastructure.Reading;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
@@ -16,6 +18,7 @@ public sealed class CatalogModule : IModule
     public void Register(IServiceCollection services, IConfiguration configuration)
     {
         services.AddModuleDbContext<CatalogDbContext>(configuration);
+        services.AddScoped<ICatalogReader, CatalogReader>();
         services.AddApplicationHandlers(typeof(Catalog.Application.AssemblyReference).Assembly);
     }
 

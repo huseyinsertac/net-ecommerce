@@ -61,4 +61,10 @@ public static class CatalogErrors
 
     public static Error ReleaseExceedsReserved(string sku) =>
         Error.Conflict("catalog.release_exceeds_reserved", $"Quantity exceeds the reserved stock for SKU '{sku}'.");
+
+    public static Error CategoryNotFound(string slug) =>
+        Error.NotFound("catalog.category_not_found", $"Category '{slug}' was not found.");
+
+    public static Error ProductNotFound(string slug) =>
+        Error.NotFound("catalog.product_not_found", $"Product '{slug}' was not found.");
 }
