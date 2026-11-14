@@ -24,7 +24,7 @@
     "kind": "product"
   },
   {
-    "key": "phone-black-04",
+    "key": "phone-rose-04",
     "unsplashId": "83h6XbIHNOg",
     "photographer": "Mediamodifier",
     "unsplashUrl": "https://unsplash.com/photos/white-iphone-5-c-beside-white-earbuds-83h6XbIHNOg",
@@ -64,7 +64,7 @@
     "kind": "product"
   },
   {
-    "key": "tablet-white-01",
+    "key": "tablet-black-01",
     "unsplashId": "ipgtlzD86O4",
     "photographer": "Kelly Sikkema",
     "unsplashUrl": "https://unsplash.com/photos/white-tablet-computer-on-gray-textile-ipgtlzD86O4",
@@ -80,7 +80,7 @@
     "kind": "product"
   },
   {
-    "key": "tablet-white-03",
+    "key": "tablet-black-03",
     "unsplashId": "xODSxohNj-w",
     "photographer": "Kelly Sikkema",
     "unsplashUrl": "https://unsplash.com/photos/white-rectangular-frame-on-brown-wooden-table-xODSxohNj-w",
@@ -88,7 +88,7 @@
     "kind": "product"
   },
   {
-    "key": "tablet-white-04",
+    "key": "tablet-black-04",
     "unsplashId": "wlKZih5iIGE",
     "photographer": "Dmitry Mashkin",
     "unsplashUrl": "https://unsplash.com/photos/black-ipad-on-white-table-wlKZih5iIGE",
@@ -120,7 +120,7 @@
     "kind": "product"
   },
   {
-    "key": "headphones-brown-04",
+    "key": "headphones-red-04",
     "unsplashId": "Tt_TIhVpYoM",
     "photographer": "Yarenci Hdz",
     "unsplashUrl": "https://unsplash.com/photos/red-and-gray-corded-headphones-Tt_TIhVpYoM",
@@ -136,7 +136,7 @@
     "kind": "product"
   },
   {
-    "key": "earbuds-black-02",
+    "key": "earbuds-grey-02",
     "unsplashId": "8tl8K-2aINQ",
     "photographer": "Arturo Añez",
     "unsplashUrl": "https://unsplash.com/photos/white-earbuds-and-their-cable-on-a-pink-surface-8tl8K-2aINQ",
@@ -152,7 +152,7 @@
     "kind": "product"
   },
   {
-    "key": "earbuds-red-04",
+    "key": "earbuds-black-04",
     "unsplashId": "qt9_OfTaaeY",
     "photographer": "TheRegisti",
     "unsplashUrl": "https://unsplash.com/photos/black-and-blue-bluetooth-earbuds-qt9_OfTaaeY",
@@ -168,7 +168,7 @@
     "kind": "product"
   },
   {
-    "key": "speaker-grey-02",
+    "key": "speaker-black-02",
     "unsplashId": "VSYq9nS-fY0",
     "photographer": "Jonas Jacobsson",
     "unsplashUrl": "https://unsplash.com/photos/selective-focus-photography-of-black-and-gray-portable-speaker-VSYq9nS-fY0",
@@ -248,10 +248,10 @@
     "kind": "product"
   },
   {
-    "key": "camera-silver-04",
-    "unsplashId": "88Y1icilxwU",
-    "photographer": "Hafsa LR",
-    "unsplashUrl": "https://unsplash.com/photos/brown-wooden-camera-hanging-on-gray-rope-88Y1icilxwU",
+    "key": "camera-black-04",
+    "unsplashId": "j4ecmy5-b4g",
+    "photographer": "Markus Spiske",
+    "unsplashUrl": "https://unsplash.com/photos/black-dslr-camera-j4ecmy5-b4g",
     "category": "cameras",
     "kind": "product"
   },
@@ -272,7 +272,7 @@
     "kind": "product"
   },
   {
-    "key": "controller-white-03",
+    "key": "controller-black-03",
     "unsplashId": "UCXxAKedX7k",
     "photographer": "Vitalii Abakumov",
     "unsplashUrl": "https://unsplash.com/photos/a-black-wired-game-controller-on-a-white-background-UCXxAKedX7k",
@@ -312,7 +312,7 @@
     "kind": "product"
   },
   {
-    "key": "powerbank-red-04",
+    "key": "powerbank-silver-04",
     "unsplashId": "UP_RojtnvTU",
     "photographer": "Markus Winkler",
     "unsplashUrl": "https://unsplash.com/photos/white-and-blue-coated-wires-UP_RojtnvTU",
