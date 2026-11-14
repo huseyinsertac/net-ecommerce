@@ -38,9 +38,9 @@
     mat-icon-button
     type="button"
     class="search-toggle"
-    aria-label="Toggle search"
+    [attr.aria-label]="searchOpen() ? 'Close search' : 'Open search'"
     [attr.aria-expanded]="searchOpen()"
-    (click)="searchOpen.set(!searchOpen())"
+    (click)="toggleSearch()"
   >
     <mat-icon fontSet="material-symbols-outlined">{{ searchOpen() ? 'close' : 'search' }}</mat-icon>
   </button>

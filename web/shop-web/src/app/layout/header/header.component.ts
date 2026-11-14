@@ -1,4 +1,13 @@
-import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  ElementRef,
+  Injector,
+  afterNextRender,
+  inject,
+  signal,
+  viewChild,
+} from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { MatBadgeModule } from '@angular/material/badge';
 import { MatButtonModule } from '@angular/material/button';
@@ -33,6 +42,8 @@ export class HeaderComponent {
   private readonly router = inject(Router);
   /** Phone layout only: whether the search row is expanded. */
   protected readonly searchOpen = signal(false);
+  private readonly injector = inject(Injector);
+  private readonly searchInput = viewChild<ElementRef<HTMLInputElement>>('q');
 
   /** Current `q` while on /search, else empty. */
   protected readonly currentQuery = toSignal(
@@ -47,6 +58,17 @@ export class HeaderComponent {
     ),
     { initialValue: '' },
   );
+
+  /** Opens/closes the phone search row; opening moves focus to the input after render. */
+  protected toggleSearch(): void {
+    const open = !this.searchOpen();
+    this.searchOpen.set(open);
+    if (open) {
+      afterNextRender(() => this.searchInput()?.nativeElement.focus(), {
+        injector: this.injector,
+      });
+    }
+  }
 
   protected search(event: Event, value: string): void {
     event.preventDefault();

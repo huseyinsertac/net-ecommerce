@@ -94,6 +94,8 @@ describe('HeaderComponent', () => {
     toggle.click();
     await fixture.whenStable();
     expect(form.classList.contains('open')).toBe(true);
+    expect(document.activeElement).toBe(el.querySelector('input'));
+    expect(toggle.getAttribute('aria-label')).toBe('Close search');
     expect(toggle.getAttribute('aria-expanded')).toBe('true');
     toggle.click();
     await fixture.whenStable();
