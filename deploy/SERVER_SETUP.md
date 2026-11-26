@@ -133,13 +133,26 @@ In the Stripe dashboard, switch to **test mode** (the toggle is at the top right
      - `checkout.session.expired`
 3. Open the new endpoint and reveal its **Signing secret** (it starts with `whsec_`).
 
-On the server, as root, run the block below. It reads each value without echoing it (so it never
-reaches the terminal or shell history), checks the prefix, appends it only if absent, and keeps the
-file private. Paste the key when prompted; nothing is printed back:
+On the server, as root, run the three blocks below in order, one at a time. The first two read a
+value each without echoing it (so it never reaches the terminal or shell history). They are separate
+blocks on purpose: pasting both `read` lines together can make the first prompt swallow the second line
+on terminals without bracketed paste.
+
+Block 1: paste this line, press Enter, then paste the secret key and press Enter (nothing is shown):
 
 ```bash
 read -rsp "Stripe secret key (sk_test_...): " SK; echo
+```
+
+Block 2: paste this line, press Enter, then paste the webhook signing secret and press Enter:
+
+```bash
 read -rsp "Stripe webhook signing secret (whsec_...): " WH; echo
+```
+
+Block 3 checks both prefixes, appends each value only if absent, and keeps the file private:
+
+```bash
 case "$SK" in sk_test_?*) ;; *) echo "Secret key must start with sk_test_"; false ;; esac &&
 case "$WH" in whsec_?*) ;; *) echo "Signing secret must start with whsec_"; false ;; esac &&
 {
