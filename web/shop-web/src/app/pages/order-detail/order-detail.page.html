@@ -1,0 +1,139 @@
+<div class="page">
+  @switch (view()) {
+    @case ('loading') {
+      <div class="skeletons" aria-busy="true" aria-label="Loading your order">
+        <div class="sk sk-head"></div>
+        @for (row of skeleton; track row) {
+          <div class="sk sk-row"></div>
+        }
+      </div>
+    }
+    @case ('notFound') {
+      <div class="empty">
+        <mat-icon class="empty-icon" fontSet="material-symbols-outlined">search_off</mat-icon>
+        <h1>Order not found</h1>
+        <p>We couldn't find that order on your account.</p>
+        <a mat-flat-button routerLink="/orders">Back to my orders</a>
+      </div>
+    }
+    @case ('error') {
+      <div class="empty">
+        <h1>We couldn't load this order</h1>
+        <p>Please try again in a moment.</p>
+        <button mat-flat-button type="button" (click)="load()">Retry</button>
+      </div>
+    }
+    @case ('ready') {
+      @let o = order()!;
+      <a class="back" routerLink="/orders">
+        <mat-icon fontSet="material-symbols-outlined">arrow_back</mat-icon> My orders
+      </a>
+
+      <header class="head">
+        <div>
+          <h1>Order {{ o.orderNumber }}</h1>
+          <p class="placed">
+            Placed on <time [attr.datetime]="o.placedAtUtc">{{ o.placedAtUtc | date: 'mediumDate' }}</time>
+          </p>
+        </div>
+        <app-order-status-chip [status]="o.status" />
+      </header>
+
+      @if (confirming()) {
+        <div class="banner info" role="status">
+          <mat-icon fontSet="material-symbols-outlined" class="spin">progress_activity</mat-icon>
+          <span>Confirming your payment…</span>
+        </div>
+      }
+      @if (showPaidBanner()) {
+        <div class="banner success" role="status">
+          <mat-icon fontSet="material-symbols-outlined">check_circle</mat-icon>
+          <span>Thank you! Order {{ o.orderNumber }} is paid.</span>
+        </div>
+      }
+      @if (showCancelledBanner()) {
+        <div class="banner warning" role="status">
+          <mat-icon fontSet="material-symbols-outlined">info</mat-icon>
+          <span class="grow">Payment not completed.</span>
+          @if (payUrl()) {
+            <button mat-flat-button type="button" (click)="payNow()">Pay now</button>
+          }
+        </div>
+      }
+
+      <div class="layout">
+        <div class="col">
+          <section class="card" aria-labelledby="items-h">
+            <h2 id="items-h">Items</h2>
+            <ul class="lines">
+              @for (line of o.lines; track line.variantId) {
+                <li class="line">
+                  @if (line.thumbnailUrl) {
+                    <img class="thumb" [src]="line.thumbnailUrl" alt="" width="64" height="64" loading="lazy" />
+                  } @else {
+                    <span class="thumb placeholder" aria-hidden="true">
+                      <mat-icon fontSet="material-symbols-outlined">image_not_supported</mat-icon>
+                    </span>
+                  }
+                  <div class="info">
+                    <span class="name">{{ line.productName }}</span>
+                    @if (line.optionsLabel) {
+                      <span class="muted">{{ line.optionsLabel }}</span>
+                    }
+                    <span class="muted">Qty {{ line.quantity }} × {{ line.unitPrice | money }}</span>
+                  </div>
+                  <strong class="line-total">{{ line.lineTotal | money }}</strong>
+                </li>
+              }
+            </ul>
+          </section>
+
+          <section class="card" aria-labelledby="ship-h">
+            <h2 id="ship-h">Shipping address</h2>
+            <address>
+              {{ o.shippingAddress.fullName }}<br />
+              {{ o.shippingAddress.line1 }}<br />
+              @if (o.shippingAddress.line2) {
+                {{ o.shippingAddress.line2 }}<br />
+              }
+              {{ o.shippingAddress.postalCode }} {{ o.shippingAddress.city }}<br />
+              {{ o.shippingAddress.country }}
+            </address>
+          </section>
+        </div>
+
+        <div class="col">
+          <section class="card" aria-labelledby="status-h">
+            <h2 id="status-h">Order status</h2>
+            <ol class="timeline">
+              @for (step of steps(); track step.label) {
+                <li [class]="step.state" [class.reached]="step.state === 'reached'">
+                  <span class="dot" aria-hidden="true">
+                    <mat-icon fontSet="material-symbols-outlined">{{
+                      step.state === 'reached' ? 'check' : step.state === 'cancelled' ? 'close' : ''
+                    }}</mat-icon>
+                  </span>
+                  <span class="step-body">
+                    <span class="step-label">{{ step.label }}</span>
+                    @if (step.at) {
+                      <time [attr.datetime]="step.at">{{ step.at | date: 'mediumDate' }}, {{ step.at | date: 'shortTime' }}</time>
+                    }
+                  </span>
+                </li>
+              }
+            </ol>
+          </section>
+
+          <section class="card totals" aria-labelledby="sum-h">
+            <h2 id="sum-h">Summary</h2>
+            <div class="row"><span>Subtotal</span><span>{{ o.subtotal | money }}</span></div>
+            @if (o.discount > 0) {
+              <div class="row discount"><span>Discount</span><span>−{{ o.discount | money }}</span></div>
+            }
+            <div class="row total"><span>Total</span><strong>{{ o.total | money }}</strong></div>
+          </section>
+        </div>
+      </div>
+    }
+  }
+</div>

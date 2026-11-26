@@ -57,6 +57,19 @@ export const routes: Routes = [
       import('./pages/checkout-progress/checkout-progress.page').then((m) => m.CheckoutProgressPage),
   },
   {
+    path: 'orders/:id',
+    title: 'Order · VoltLane',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./pages/order-detail/order-detail.page').then((m) => m.OrderDetailPage),
+  },
+  {
+    path: 'orders',
+    title: 'My orders · VoltLane',
+    canActivate: [authGuard],
+    loadComponent: () => import('./pages/orders/orders.page').then((m) => m.OrdersPage),
+  },
+  {
     path: 'pay/simulated/:orderId',
     title: 'Test payment Â· VoltLane',
     canActivate: [authGuard],

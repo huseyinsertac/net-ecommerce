@@ -9,6 +9,9 @@ export type CheckoutRequest = Schemas['CheckoutRequest'];
 export type ShippingAddress = Schemas['ShippingAddressDto'];
 export type CheckoutStatus = Schemas['CheckoutStatusDto'];
 export type OrderDto = Schemas['OrderDto'];
+export type OrderStatus = Schemas['OrderStatus'];
+export type OrderSummary = Schemas['OrderSummaryDto'];
+export type OrderSummaryPage = Schemas['PagedResultOfOrderSummaryDto'];
 
 /** Thin wrapper over /api/ordering. */
 @Injectable({ providedIn: 'root' })
@@ -35,5 +38,12 @@ export class OrderingApi {
 
   order(orderId: string): Observable<OrderDto> {
     return this.http.get<OrderDto>(`/api/ordering/orders/${encodeURIComponent(orderId)}`);
+  }
+
+  /** The signed-in shopper's orders, newest first. */
+  orders(page: number, pageSize: number): Observable<OrderSummaryPage> {
+    return this.http.get<OrderSummaryPage>('/api/ordering/orders', {
+      params: { page, pageSize },
+    });
   }
 }
