@@ -43,6 +43,7 @@
     <Project Path="tests/Basket.UnitTests/Basket.UnitTests.csproj" />
     <Project Path="tests/Catalog.UnitTests/Catalog.UnitTests.csproj" />
     <Project Path="tests/Identity.UnitTests/Identity.UnitTests.csproj" />
+    <Project Path="tests/Ordering.UnitTests/Ordering.UnitTests.csproj" />
     <Project Path="tests/Shop.Application.Abstractions.UnitTests/Shop.Application.Abstractions.UnitTests.csproj" />
     <Project Path="tests/Shop.ArchitectureTests/Shop.ArchitectureTests.csproj" />
     <Project Path="tests/Shop.Infrastructure.Common.IntegrationTests/Shop.Infrastructure.Common.IntegrationTests.csproj" />
