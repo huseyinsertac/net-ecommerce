@@ -40,6 +40,12 @@ mat-card-subtitle {
   margin-right: 8px;
 }
 
+.hint {
+  margin: 16px 0 0;
+  color: var(--mat-sys-on-surface-variant);
+  font: var(--mat-sys-body-small);
+}
+
 .error {
   margin: 12px 0 0;
   color: var(--mat-sys-error);

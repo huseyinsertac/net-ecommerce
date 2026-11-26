@@ -1,0 +1,26 @@
+<div class="page">
+  <div class="card" role="status" aria-live="polite">
+    @switch (view()) {
+      @case ('reserving') {
+        <mat-spinner diameter="48" aria-hidden="true" />
+        <h1>Reserving your items…</h1>
+        <p>This only takes a moment. Please don't close this page.</p>
+      }
+      @case ('outOfStock') {
+        <h1>Sorry, an item sold out while we were reserving it.</h1>
+        <p>Nothing was charged. Review your cart and try again.</p>
+        <a mat-flat-button routerLink="/cart">Back to cart</a>
+      }
+      @case ('failed') {
+        <h1>We couldn't start your payment.</h1>
+        <p>Your order was saved, and nothing was charged.</p>
+        <a mat-flat-button [routerLink]="['/orders', id()]">View order</a>
+      }
+      @case ('slow') {
+        <h1>This is taking longer than usual.</h1>
+        <p>Your order is safe. Check again to see where it stands.</p>
+        <button mat-flat-button type="button" (click)="start()">Check again</button>
+      }
+    }
+  </div>
+</div>

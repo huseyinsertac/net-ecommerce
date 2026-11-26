@@ -1,0 +1,90 @@
+:host {
+  display: block;
+  padding: 48px 16px;
+}
+
+.card {
+  max-width: 440px;
+  margin: 0 auto;
+  padding: 32px;
+  border-radius: 16px;
+  background: var(--mat-sys-surface-container-low);
+  border: 1px solid var(--mat-sys-outline-variant);
+}
+
+h1 {
+  margin: 0 0 4px;
+  font: var(--mat-sys-headline-medium);
+  font-weight: 700;
+}
+
+.lede {
+  margin: 0 0 24px;
+  color: var(--mat-sys-on-surface-variant);
+}
+
+dl {
+  display: grid;
+  gap: 8px;
+  margin: 0 0 24px;
+
+  div {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+  }
+
+  dt {
+    color: var(--mat-sys-on-surface-variant);
+  }
+
+  dd {
+    margin: 0;
+    font-weight: 500;
+    overflow-wrap: anywhere;
+  }
+
+  .total {
+    font: var(--mat-sys-title-large);
+  }
+}
+
+.sk {
+  height: 56px;
+  margin-bottom: 24px;
+  border-radius: 12px;
+  background: var(--mat-sys-surface-container);
+}
+
+.form-error {
+  margin: 0 0 16px;
+  padding: 12px 16px;
+  border-radius: 12px;
+  color: var(--mat-sys-on-error-container);
+  background: var(--mat-sys-error-container);
+}
+
+.actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+
+  button {
+    height: 48px;
+  }
+}
+
+.spinner {
+  display: inline-block;
+  margin-right: 8px;
+}
+
+@media (max-width: 599px) {
+  :host {
+    padding: 24px 16px;
+  }
+
+  .card {
+    padding: 24px 20px;
+  }
+}

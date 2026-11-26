@@ -41,6 +41,15 @@ describe('DemoPanelComponent', () => {
     expect(text).not.toContain('nightly');
   });
 
+  it('mentions the Stripe test card', async () => {
+    const f = TestBed.createComponent(DemoPanelComponent);
+    await f.whenStable();
+    const text = ((f.nativeElement as HTMLElement).textContent ?? '').replace(/\s+/g, ' ');
+    expect(text).toContain(
+      "Pay with Stripe's test card 4242 4242 4242 4242, any future date, any CVC.",
+    );
+  });
+
   it('disables both buttons while a request is in flight', async () => {
     auth.startDemoAdmin.mockReturnValue(new Promise(() => undefined));
     const f = TestBed.createComponent(DemoPanelComponent);

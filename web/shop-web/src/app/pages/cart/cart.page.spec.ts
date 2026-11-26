@@ -65,9 +65,18 @@ describe('CartPage', () => {
     expect(el.textContent).toContain('$100.00');
     expect(el.querySelector('.line-total')?.textContent).toContain('$200.00');
     expect(el.querySelector('.summary')?.textContent).toContain('$250.00');
-    expect(el.querySelector('.summary')?.textContent).toContain('Checkout arrives with payments.');
-    expect(el.querySelector<HTMLButtonElement>('.summary button')?.disabled).toBe(true);
+    expect(el.querySelector('.summary')?.textContent).not.toContain('coming soon');
+    const checkout = el.querySelector<HTMLAnchorElement>('.summary a.checkout')!;
+    expect(checkout.getAttribute('href')).toBe('/checkout');
+    expect(checkout.textContent).toContain('Checkout');
     expect(el.querySelector('.needs-attention')).toBeNull();
+  });
+
+  it('Checkout is disabled when the cart has issues', async () => {
+    const { fixture, el } = setup(basketOf(line({ issue: 'insufficientStock', lineTotal: null })));
+    await fixture.whenStable();
+    expect(el.querySelector('.summary a.checkout')).toBeNull();
+    expect(el.querySelector<HTMLButtonElement>('.summary button.checkout')?.disabled).toBe(true);
   });
 
   it('flagged unavailable line shows remove hint and no line total', async () => {

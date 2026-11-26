@@ -1,5 +1,5 @@
 import { Routes } from '@angular/router';
-import { guestGuard } from './core/auth/auth.guard';
+import { authGuard, guestGuard } from './core/auth/auth.guard';
 
 export const routes: Routes = [
   {
@@ -41,6 +41,27 @@ export const routes: Routes = [
     path: 'cart',
     title: 'Cart · VoltLane',
     loadComponent: () => import('./pages/cart/cart.page').then((m) => m.CartPage),
+  },
+  {
+    path: 'checkout',
+    title: 'Checkout · VoltLane',
+    canActivate: [authGuard],
+    loadComponent: () => import('./pages/checkout/checkout.page').then((m) => m.CheckoutPage),
+  },
+  {
+    // Registered as its own segment path so a later `orders/:id` route cannot shadow it.
+    path: 'orders/:id/progress',
+    title: 'Placing your order · VoltLane',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./pages/checkout-progress/checkout-progress.page').then((m) => m.CheckoutProgressPage),
+  },
+  {
+    path: 'pay/simulated/:orderId',
+    title: 'Test payment · VoltLane',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./pages/simulated-pay/simulated-pay.page').then((m) => m.SimulatedPayPage),
   },
   {
     path: '**',
