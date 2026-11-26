@@ -1,4 +1,5 @@
 using Identity.Application.Abstractions;
+using Identity.Domain.Users;
 using Shop.Application.Abstractions.Messaging;
 using Shop.SharedKernel;
 
@@ -18,7 +19,7 @@ internal sealed class LogoutHandler(IUserRepository users, IRefreshTokenFactory 
 {
     private const int MaxAttempts = 3;
 
-    /// <summary>Revokes the presented token's family. Always succeeds: an absent or unknown token is already "logged out".</summary>
+    /// <summary>Revokes the presented token's family. An absent or unknown token is already "logged out"; only a persistent concurrent-update conflict fails.</summary>
     public async Task<Result> Handle(Logout command, CancellationToken ct)
     {
         if (string.IsNullOrWhiteSpace(command.RefreshTokenRaw))
@@ -41,8 +42,13 @@ internal sealed class LogoutHandler(IUserRepository users, IRefreshTokenFactory 
 
                 return Result.Success();
             }
-            catch (ConcurrencyConflictException) when (attempt < MaxAttempts)
+            catch (ConcurrencyConflictException)
             {
+                if (attempt >= MaxAttempts)
+                {
+                    return Result.Failure(IdentityErrors.ConcurrentUpdate());
+                }
+
                 // A concurrent refresh may have added a token to this family; reload so the revoke covers it.
             }
         }

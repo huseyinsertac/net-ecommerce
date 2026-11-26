@@ -71,8 +71,13 @@ internal sealed class LoginHandler(
                 await users.SaveChangesAsync(ct);
                 return AuthSession.Build(user, tokens, raw, refresh, now);
             }
-            catch (ConcurrencyConflictException) when (attempt < MaxAttempts)
+            catch (ConcurrencyConflictException)
             {
+                if (attempt >= MaxAttempts)
+                {
+                    return IdentityErrors.ConcurrentUpdate();
+                }
+
                 // A parallel sign-in or refresh touched this user first; reload the fresh state and issue again.
                 user = await users.GetByIdAsync(user.Id, ct);
                 if (user is null)

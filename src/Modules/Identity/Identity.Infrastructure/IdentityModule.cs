@@ -2,6 +2,7 @@ using Identity.Application.Abstractions;
 using Identity.Infrastructure.Endpoints;
 using Identity.Infrastructure.Persistence;
 using Identity.Infrastructure.Security;
+using Identity.Infrastructure.Seeding;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
@@ -24,6 +25,7 @@ public sealed class IdentityModule : IModule
         services.AddSingleton<ITokenIssuer, JwtTokenIssuer>();
         services.AddSingleton<IRefreshTokenFactory, RefreshTokenFactory>();
         services.AddSingleton<IRefreshTokenPolicy, ConfiguredRefreshTokenPolicy>();
+        services.AddScoped<IModuleSeeder, IdentitySeeder>();
         services.AddShopAuthentication(configuration);
         services.AddApplicationHandlers(typeof(Identity.Application.AssemblyReference).Assembly);
     }

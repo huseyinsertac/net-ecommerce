@@ -37,8 +37,13 @@ internal sealed class RefreshHandler(
             {
                 return await RotateAsync(presentedHash, ct);
             }
-            catch (ConcurrencyConflictException) when (attempt < MaxAttempts)
+            catch (ConcurrencyConflictException)
             {
+                if (attempt >= MaxAttempts)
+                {
+                    return IdentityErrors.ConcurrentUpdate();
+                }
+
                 // Every token mutation bumps User.SessionVersion, so a concurrent rotation, logout or theft revocation of
                 // the same user makes our save conflict. The repository discarded its stale state; reload and decide again:
                 // a just-rotated token is then handled by the single reuse grace, a revoked family fails.

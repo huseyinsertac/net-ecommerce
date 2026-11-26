@@ -1,6 +1,8 @@
 using Identity.Application.Auth;
+using Identity.Application.Demo;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.AspNetCore.Routing;
 using Shop.Application.Abstractions.Identity;
 using Shop.Application.Abstractions.Messaging;
@@ -17,6 +19,7 @@ internal static class IdentityEndpoints
     public static void Map(RouteGroupBuilder group)
     {
         group.MapPost("/register", RegisterAsync)
+            .RequireRateLimiting(RateLimitPolicies.AuthStrict)
             .WithName("RegisterUser")
             .WithTags(Tag)
             .WithSummary("Creates an account and signs it in. The refresh token is set as an HttpOnly cookie.")
@@ -25,6 +28,7 @@ internal static class IdentityEndpoints
             .ProducesProblem(StatusCodes.Status409Conflict);
 
         group.MapPost("/login", LoginAsync)
+            .RequireRateLimiting(RateLimitPolicies.AuthStrict)
             .WithName("LoginUser")
             .WithTags(Tag)
             .WithSummary("Signs in with email and password.")
@@ -33,6 +37,7 @@ internal static class IdentityEndpoints
             .ProducesProblem(StatusCodes.Status401Unauthorized);
 
         group.MapPost("/refresh", RefreshAsync)
+            .RequireRateLimiting(RateLimitPolicies.AuthStrict)
             .WithName("RefreshSession")
             .WithTags(Tag)
             .WithSummary("Rotates the refresh cookie and returns a new access token. Replaying a rotated token revokes its family.")
@@ -43,7 +48,25 @@ internal static class IdentityEndpoints
             .WithName("LogoutUser")
             .WithTags(Tag)
             .WithSummary("Revokes the refresh token family and clears the cookie. Always succeeds.")
-            .Produces(StatusCodes.Status204NoContent);
+            .Produces(StatusCodes.Status204NoContent)
+            .ProducesProblem(StatusCodes.Status409Conflict);
+
+        group.MapPost("/demo/customer", DemoCustomerAsync)
+            .RequireRateLimiting(RateLimitPolicies.DemoCustomer)
+            .WithName("StartDemoCustomer")
+            .WithTags(Tag)
+            .WithSummary("Creates a throwaway demo customer and signs it in (rate limited per client IP).")
+            .Produces<AuthResponse>(StatusCodes.Status201Created)
+            .ProducesProblem(StatusCodes.Status429TooManyRequests);
+
+        group.MapPost("/demo/admin", DemoAdminAsync)
+            .RequireRateLimiting(RateLimitPolicies.DemoCustomer)
+            .WithName("StartDemoAdmin")
+            .WithTags(Tag)
+            .WithSummary("Signs in the shared demo admin. 503 when the admin has not been seeded.")
+            .Produces<AuthResponse>()
+            .ProducesProblem(StatusCodes.Status503ServiceUnavailable)
+            .ProducesProblem(StatusCodes.Status429TooManyRequests);
 
         group.MapGet("/me", MeAsync)
             .RequireAuthorization()
@@ -64,6 +87,12 @@ internal static class IdentityEndpoints
         return Respond(result, response, StatusCodes.Status201Created);
     }
 
+    private static async Task<IResult> DemoCustomerAsync(IDispatcher dispatcher, HttpResponse response, CancellationToken ct) =>
+        Respond(await dispatcher.Send(new StartDemoCustomer(), ct), response, StatusCodes.Status201Created);
+
+    private static async Task<IResult> DemoAdminAsync(IDispatcher dispatcher, HttpResponse response, CancellationToken ct) =>
+        Respond(await dispatcher.Send(new StartDemoAdmin(), ct), response, StatusCodes.Status200OK);
+
     private static async Task<IResult> LoginAsync(LoginRequest body, IDispatcher dispatcher, HttpResponse response, CancellationToken ct)
     {
         var result = await dispatcher.Send(new Login(body.Email, body.Password), ct);
@@ -73,8 +102,9 @@ internal static class IdentityEndpoints
     private static async Task<IResult> RefreshAsync(HttpRequest request, HttpResponse response, IDispatcher dispatcher, CancellationToken ct)
     {
         var result = await dispatcher.Send(new Refresh(RefreshCookie.Read(request)), ct);
-        if (result.IsFailure)
+        if (result.IsFailure && result.Error.Type == ErrorType.Unauthorized)
         {
+            // A transient conflict keeps the (still valid) cookie so the client can simply retry.
             RefreshCookie.Clear(response);
         }
 
@@ -83,7 +113,12 @@ internal static class IdentityEndpoints
 
     private static async Task<IResult> LogoutAsync(HttpRequest request, HttpResponse response, IDispatcher dispatcher, CancellationToken ct)
     {
-        await dispatcher.Send(new Logout(RefreshCookie.Read(request)), ct);
+        var result = await dispatcher.Send(new Logout(RefreshCookie.Read(request)), ct);
+        if (result.IsFailure)
+        {
+            return result.Error.ToProblem();
+        }
+
         RefreshCookie.Clear(response);
         return TypedResults.NoContent();
     }

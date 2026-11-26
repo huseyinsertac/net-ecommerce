@@ -33,6 +33,8 @@ public class ShopApiFactory : WebApplicationFactory<Program>, IAsyncLifetime
         builder.UseSetting("ConnectionStrings:Shop", _postgres.GetConnectionString());
         builder.UseSetting("Database:SeedOnStartup", SeedOnStartup ? "true" : "false");
         builder.UseSetting("Jwt:SigningKey", TestSigningKey);
+        builder.UseSetting("RateLimiting:DemoCustomerPerMinute", "1000");
+        builder.UseSetting("RateLimiting:AuthPerMinute", "1000");
         builder.ConfigureServices(services => services.AddSingleton<IStartupFilter, ThrowingEndpointStartupFilter>());
     }
 

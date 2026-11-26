@@ -1,6 +1,6 @@
 namespace Shop.SharedKernel;
 
-public enum ErrorType { Validation, NotFound, Conflict, Unauthorized, Forbidden, Failure }
+public enum ErrorType { Validation, NotFound, Conflict, Unauthorized, Forbidden, Failure, Unavailable }
 
 public record Error(string Code, string Message, ErrorType Type)
 {
@@ -11,5 +11,6 @@ public record Error(string Code, string Message, ErrorType Type)
     public static Error Conflict(string code, string message) => new(code, message, ErrorType.Conflict);
     public static Error Unauthorized(string code, string message) => new(code, message, ErrorType.Unauthorized);
     public static Error Forbidden(string code, string message) => new(code, message, ErrorType.Forbidden);
+    public static Error Unavailable(string code, string message) => new(code, message, ErrorType.Unavailable);
     public static Error Failure(string code, string message) => new(code, message, ErrorType.Failure);
 }

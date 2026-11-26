@@ -41,6 +41,7 @@ builder.Services.Configure<ForwardedHeadersOptions>(options =>
 });
 
 builder.Services.AddProblemDetails();
+builder.Services.AddShopRateLimiting();
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddOpenApi(OpenApiConfiguration.Configure);
 
@@ -70,6 +71,9 @@ app.UseForwardedHeaders();
 app.UseSerilogRequestLogging();
 app.UseExceptionHandler();
 app.UseStatusCodePages();
+
+// After the implicit UseRouting (so endpoint policies are visible) and before the endpoints run.
+app.UseRateLimiter();
 
 // Authentication itself (JWT bearer + the Admin policy) is registered by the Identity module.
 app.UseAuthentication();

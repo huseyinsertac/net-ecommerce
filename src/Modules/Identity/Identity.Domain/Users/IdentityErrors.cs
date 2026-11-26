@@ -22,6 +22,12 @@ public static class IdentityErrors
     public static Error UserNotFound() =>
         Error.Unauthorized("identity.user_not_found", "The signed-in user no longer exists.");
 
+    public static Error ConcurrentUpdate() =>
+        Error.Conflict("identity.concurrent_update", "Please try again.");
+
+    public static Error DemoUnavailable() =>
+        Error.Unavailable("identity.demo_unavailable", "The demo account is not available right now.");
+
     public static Error WeakPassword() =>
         Error.Validation("identity.weak_password",
             "Password must be at least 8 characters and contain a letter and a digit.");
