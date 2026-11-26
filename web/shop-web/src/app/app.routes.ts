@@ -58,14 +58,14 @@ export const routes: Routes = [
   },
   {
     path: 'orders/:id',
-    title: 'Order · VoltLane',
+    title: 'Order Â· VoltLane',
     canActivate: [authGuard],
     loadComponent: () =>
       import('./pages/order-detail/order-detail.page').then((m) => m.OrderDetailPage),
   },
   {
     path: 'orders',
-    title: 'My orders · VoltLane',
+    title: 'My orders Â· VoltLane',
     canActivate: [authGuard],
     loadComponent: () => import('./pages/orders/orders.page').then((m) => m.OrdersPage),
   },
