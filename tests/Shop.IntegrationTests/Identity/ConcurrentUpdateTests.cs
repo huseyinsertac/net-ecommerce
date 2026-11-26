@@ -21,6 +21,7 @@ public sealed class ConcurrentUpdateTests(ShopApiFactory factory)
     private sealed class AlwaysConflictingRepository(IUserRepository inner) : IUserRepository
     {
         public Task<User?> GetByIdAsync(Guid id, CancellationToken ct) => inner.GetByIdAsync(id, ct);
+        public Task<User?> GetByIdWithoutTokensAsync(Guid id, CancellationToken ct) => inner.GetByIdWithoutTokensAsync(id, ct);
         public Task<User?> GetByNormalizedEmailAsync(string normalized, CancellationToken ct) => inner.GetByNormalizedEmailAsync(normalized, ct);
         public Task<User?> GetByRefreshTokenHashAsync(string tokenHash, CancellationToken ct) => inner.GetByRefreshTokenHashAsync(tokenHash, ct);
         public void Add(User user) => inner.Add(user);

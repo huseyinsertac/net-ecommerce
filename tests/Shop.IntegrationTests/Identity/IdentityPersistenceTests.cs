@@ -120,6 +120,100 @@ public sealed class IdentityPersistenceTests(ShopApiFactory factory)
     }
 
     [Fact]
+    public async Task GetByRefreshTokenHash_LoadsOnlyThePresentedTokensFamily_AndRotationSavesWithinIt()
+    {
+        var user = User.CreateDemoAdmin(UniqueEmail("shared"), NowUtc);
+        var a1 = user.IssueRefreshToken("a1-" + Guid.NewGuid().ToString("N"), NowUtc, TimeSpan.FromDays(7));
+        var b1 = user.IssueRefreshToken("b1-" + Guid.NewGuid().ToString("N"), NowUtc, TimeSpan.FromDays(7));
+        var c1 = user.IssueRefreshToken("c1-" + Guid.NewGuid().ToString("N"), NowUtc, TimeSpan.FromDays(7));
+        var a2 = user.Rotate(a1.TokenHash, "a2-" + Guid.NewGuid().ToString("N"), NowUtc.AddMinutes(1), TimeSpan.FromDays(7)).Value;
+
+        await using (var scope = Services.CreateAsyncScope())
+        {
+            var repo = scope.ServiceProvider.GetRequiredService<IUserRepository>();
+            repo.Add(user);
+            await repo.SaveChangesAsync(Ct);
+        }
+
+        var a3Hash = "a3-" + Guid.NewGuid().ToString("N");
+        await using (var scope = Services.CreateAsyncScope())
+        {
+            var repo = scope.ServiceProvider.GetRequiredService<IUserRepository>();
+            var loaded = (await repo.GetByRefreshTokenHashAsync(a1.TokenHash, Ct)).ShouldNotBeNull();
+
+            loaded.RefreshTokens.Select(t => t.Id).ShouldBe([a1.Id, a2.Id], ignoreOrder: true);
+
+            // Replaying the rotated a1 after the grace kills family A only; then rotating a2 fails.
+            loaded.Rotate(a1.TokenHash, a3Hash, NowUtc.AddHours(1).AddMinutes(-1), TimeSpan.FromDays(7)).IsFailure.ShouldBeTrue();
+            await repo.SaveChangesAsync(Ct);
+        }
+
+        await using (var scope = Services.CreateAsyncScope())
+        {
+            var repo = scope.ServiceProvider.GetRequiredService<IUserRepository>();
+            var all = (await repo.GetByIdAsync(user.Id, Ct)).ShouldNotBeNull();
+            all.RefreshTokens.Count.ShouldBe(4);
+            all.RefreshTokens.Where(t => t.FamilyId == a1.FamilyId).ShouldAllBe(t => t.RevokedAtUtc != null);
+            all.RefreshTokens.Single(t => t.Id == b1.Id).RevokedAtUtc.ShouldBeNull();
+            all.RefreshTokens.Single(t => t.Id == c1.Id).RevokedAtUtc.ShouldBeNull();
+        }
+
+        // Two hours on, rotating b1 prunes nothing outside family B (family A's revoked rows were not loaded).
+        await using (var scope = Services.CreateAsyncScope())
+        {
+            var repo = scope.ServiceProvider.GetRequiredService<IUserRepository>();
+            var loaded = (await repo.GetByRefreshTokenHashAsync(b1.TokenHash, Ct)).ShouldNotBeNull();
+            loaded.RefreshTokens.Select(t => t.Id).ShouldBe([b1.Id]);
+            loaded.Rotate(b1.TokenHash, "b2-" + Guid.NewGuid().ToString("N"), NowUtc.AddHours(2), TimeSpan.FromDays(7))
+                .IsSuccess.ShouldBeTrue();
+            await repo.SaveChangesAsync(Ct);
+        }
+
+        (await ScalarAsync<long>("SELECT count(*) FROM identity.refresh_tokens WHERE user_id = @id", ("id", user.Id)))
+            .ShouldBe(5);
+
+        // A full load (sign-in) prunes family A, revoked more than an hour ago.
+        await using (var scope = Services.CreateAsyncScope())
+        {
+            var repo = scope.ServiceProvider.GetRequiredService<IUserRepository>();
+            var all = (await repo.GetByIdAsync(user.Id, Ct)).ShouldNotBeNull();
+            all.IssueRefreshToken("d1-" + Guid.NewGuid().ToString("N"), NowUtc.AddHours(3), TimeSpan.FromDays(7));
+            await repo.SaveChangesAsync(Ct);
+        }
+
+        (await ScalarAsync<long>(
+                "SELECT count(*) FROM identity.refresh_tokens WHERE user_id = @id AND family_id = @family",
+                ("id", user.Id), ("family", a1.FamilyId)))
+            .ShouldBe(0);
+    }
+
+    [Fact]
+    public async Task GetByIdWithoutTokens_LoadsNoRefreshTokens_AndTracksNothing()
+    {
+        var user = User.CreateDemoCustomer(UniqueEmail(), NowUtc);
+        user.IssueRefreshToken("hash-" + Guid.NewGuid().ToString("N"), NowUtc, TimeSpan.FromDays(7));
+
+        await using (var scope = Services.CreateAsyncScope())
+        {
+            var repo = scope.ServiceProvider.GetRequiredService<IUserRepository>();
+            repo.Add(user);
+            await repo.SaveChangesAsync(Ct);
+        }
+
+        await using (var scope = Services.CreateAsyncScope())
+        {
+            var repo = scope.ServiceProvider.GetRequiredService<IUserRepository>();
+            var loaded = (await repo.GetByIdWithoutTokensAsync(user.Id, Ct)).ShouldNotBeNull();
+
+            loaded.Email.ShouldBe(user.Email);
+            loaded.Roles.ShouldBe([Roles.Customer]);
+            loaded.RefreshTokens.ShouldBeEmpty();
+            scope.ServiceProvider.GetRequiredService<IdentityDbContext>().ChangeTracker.Entries().ShouldBeEmpty();
+            (await repo.GetByIdWithoutTokensAsync(Guid.NewGuid(), Ct)).ShouldBeNull();
+        }
+    }
+
+    [Fact]
     public async Task DuplicateNormalizedEmail_ViolatesUniqueIndex_SurfacesAsDuplicateEmailException()
     {
         var suffix = Guid.NewGuid().ToString("N");

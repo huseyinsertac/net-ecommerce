@@ -252,4 +252,56 @@ public class UserTests
 
         user.RefreshTokens.Select(t => t.TokenHash).ShouldBe(["new"]);
     }
+    [Fact]
+    public void IssueRefreshToken_PrunesTokensRevokedMoreThanAnHourAgo()
+    {
+        var user = NewUser();
+        user.IssueRefreshToken("a", Now, Lifetime);
+        user.Rotate("a", "b", Now.AddMinutes(1), Lifetime); // "a" revoked at +1 min
+
+        user.IssueRefreshToken("c", Now.AddMinutes(62), Lifetime);
+
+        user.RefreshTokens.Select(t => t.TokenHash).ShouldBe(["b", "c"]);
+    }
+
+    [Fact]
+    public void IssueRefreshToken_KeepsTokensRevokedWithinTheLastHour()
+    {
+        var user = NewUser();
+        user.IssueRefreshToken("a", Now, Lifetime);
+        user.Rotate("a", "b", Now, Lifetime);
+
+        user.IssueRefreshToken("c", Now.AddMinutes(59), Lifetime);
+
+        user.RefreshTokens.Select(t => t.TokenHash).ShouldBe(["a", "b", "c"]);
+    }
+
+    [Fact]
+    public void IssueRefreshToken_PrunesARevokedFamilyAfterAnHour_ButKeepsActiveTokens()
+    {
+        var user = NewUser();
+        var killed = user.IssueRefreshToken("killed", Now, Lifetime);
+        user.IssueRefreshToken("other", Now, Lifetime);
+        user.RevokeFamily(killed.FamilyId, Now);
+
+        user.IssueRefreshToken("new", Now.AddHours(2), Lifetime);
+
+        user.RefreshTokens.Select(t => t.TokenHash).ShouldBe(["other", "new"]);
+    }
+
+    [Fact]
+    public void Rotate_ReplayOfAPrunedToken_FailsWithoutRevokingTheFamily()
+    {
+        var user = NewUser();
+        user.IssueRefreshToken("a", Now, Lifetime);
+        user.Rotate("a", "b", Now, Lifetime);
+        var current = user.Rotate("b", "c", Now.AddHours(2), Lifetime).Value; // prunes "a"
+
+        var replay = user.Rotate("a", "d", Now.AddHours(2), Lifetime);
+
+        replay.IsFailure.ShouldBeTrue();
+        replay.Error.Code.ShouldBe("identity.invalid_refresh_token");
+        current.IsActive(Now.AddHours(2)).ShouldBeTrue(); // accepted trade-off: a late replay is a plain 401, not a family kill
+        user.RefreshTokens.Select(t => t.TokenHash).ShouldBe(["b", "c"]);
+    }
 }

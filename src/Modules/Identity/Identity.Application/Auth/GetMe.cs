@@ -11,7 +11,7 @@ internal sealed class GetMeHandler(IUserRepository users) : IQueryHandler<GetMe,
 {
     public async Task<Result<UserDto>> Handle(GetMe query, CancellationToken ct)
     {
-        var user = await users.GetByIdAsync(query.UserId, ct);
+        var user = await users.GetByIdWithoutTokensAsync(query.UserId, ct);
         return user is null ? IdentityErrors.UserNotFound() : UserDto.From(user);
     }
 }

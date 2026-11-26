@@ -17,8 +17,27 @@ internal sealed class UserRepository(IdentityDbContext db) : IUserRepository
     public Task<User?> GetByNormalizedEmailAsync(string normalized, CancellationToken ct) =>
         Users.SingleOrDefaultAsync(u => u.Email.Normalized == normalized, ct);
 
-    public Task<User?> GetByRefreshTokenHashAsync(string tokenHash, CancellationToken ct) =>
-        Users.SingleOrDefaultAsync(u => u.RefreshTokens.Any(t => t.TokenHash == tokenHash), ct);
+    public Task<User?> GetByIdWithoutTokensAsync(Guid id, CancellationToken ct) =>
+        db.Users.AsNoTracking().SingleOrDefaultAsync(u => u.Id == id, ct);
+
+    public async Task<User?> GetByRefreshTokenHashAsync(string tokenHash, CancellationToken ct)
+    {
+        var presented = await db.Set<RefreshToken>()
+            .AsNoTracking()
+            .Where(t => t.TokenHash == tokenHash)
+            .Select(t => new { t.UserId, t.FamilyId })
+            .SingleOrDefaultAsync(ct);
+        if (presented is null)
+        {
+            return null;
+        }
+
+        // Only the presented token's family: rotation, the reuse grace and RevokeFamily never look outside it, and a
+        // shared account (the demo admin) may have many other families.
+        return await db.Users
+            .Include(u => u.RefreshTokens.Where(t => t.FamilyId == presented.FamilyId))
+            .SingleOrDefaultAsync(u => u.Id == presented.UserId, ct);
+    }
 
     public void Add(User user) => db.Users.Add(user);
 

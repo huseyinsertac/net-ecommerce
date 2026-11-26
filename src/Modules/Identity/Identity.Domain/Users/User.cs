@@ -8,6 +8,13 @@ public sealed class User : AggregateRoot<Guid>
     private static readonly TimeSpan PruneAfterExpiry = TimeSpan.FromDays(1);
 
     /// <summary>
+    /// A revoked token is kept this long, then pruned. Far longer than <see cref="ReuseGrace"/>, so the grace check and
+    /// reuse detection still see every recently rotated token. A replay of a token older than this finds no row and is a
+    /// plain invalid-token failure instead of a family kill (accepted; see ADR-0007).
+    /// </summary>
+    public static readonly TimeSpan PruneAfterRevocation = TimeSpan.FromHours(1);
+
+    /// <summary>
     /// How long after a rotation the old token may still be presented without it counting as theft, so that two browser
     /// tabs refreshing together do not log each other out.
     /// </summary>
@@ -55,7 +62,8 @@ public sealed class User : AggregateRoot<Guid>
     public RefreshToken IssueRefreshToken(string tokenHash, DateTime nowUtc, TimeSpan lifetime, Guid? familyId = null)
     {
         SessionVersion++;
-        _refreshTokens.RemoveAll(t => t.ExpiresAtUtc < nowUtc - PruneAfterExpiry);
+        _refreshTokens.RemoveAll(t => t.ExpiresAtUtc < nowUtc - PruneAfterExpiry
+                                      || t.RevokedAtUtc < nowUtc - PruneAfterRevocation);
 
         var token = new RefreshToken(Id, tokenHash, familyId ?? Guid.CreateVersion7(), nowUtc, lifetime);
         _refreshTokens.Add(token);
