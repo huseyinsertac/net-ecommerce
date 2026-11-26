@@ -1,10 +1,12 @@
 using Basket.Application.Baskets;
 using System.Text.Json.Serialization;
 using Basket.Domain.Baskets;
+using Identity.Contracts;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.DependencyInjection;
 using Shop.Application.Abstractions.Identity;
 using Shop.Application.Abstractions.Messaging;
 using Shop.Infrastructure.Common.Http;
@@ -14,7 +16,8 @@ namespace Basket.Infrastructure.Endpoints;
 /// <summary>
 /// The shopper's basket, anonymous (the <c>vl_basket</c> cookie) or signed in (the bearer token). Every read joins live
 /// catalog prices and stock. A bearer that is present but invalid or expired gets 401 rather than silently falling back
-/// to the anonymous basket, so the client refreshes and retries.
+/// to the anonymous basket, so the client refreshes and retries. The shared demo admin (many visitors at once) gets a
+/// read-only basket: writes answer 403 and a merge leaves both baskets untouched.
 /// </summary>
 internal static class BasketEndpoints
 {
@@ -35,9 +38,12 @@ internal static class BasketEndpoints
             .WithName("SetBasketItemQuantity")
             .WithTags(Tag)
             .WithSummary("Sets a line's quantity (0 removes it). The first anonymous write issues the vl_basket cookie.")
+            .AddEndpointFilter(RejectDemoAdminAsync)
+            .RequireRateLimiting(RateLimitPolicies.BasketWrite)
             .Produces<BasketDto>()
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesProblem(StatusCodes.Status401Unauthorized)
+            .ProducesProblem(StatusCodes.Status403Forbidden)
             .ProducesProblem(StatusCodes.Status404NotFound)
             .ProducesProblem(StatusCodes.Status409Conflict);
 
@@ -45,23 +51,30 @@ internal static class BasketEndpoints
             .WithName("RemoveBasketItem")
             .WithTags(Tag)
             .WithSummary("Removes a line. Removing a line that is not there succeeds.")
+            .AddEndpointFilter(RejectDemoAdminAsync)
+            .RequireRateLimiting(RateLimitPolicies.BasketWrite)
             .Produces<BasketDto>()
             .ProducesProblem(StatusCodes.Status401Unauthorized)
+            .ProducesProblem(StatusCodes.Status403Forbidden)
             .ProducesProblem(StatusCodes.Status409Conflict);
 
         group.MapDelete("/", ClearAsync)
             .WithName("ClearBasket")
             .WithTags(Tag)
             .WithSummary("Empties the basket.")
+            .AddEndpointFilter(RejectDemoAdminAsync)
+            .RequireRateLimiting(RateLimitPolicies.BasketWrite)
             .Produces(StatusCodes.Status204NoContent)
             .ProducesProblem(StatusCodes.Status401Unauthorized)
+            .ProducesProblem(StatusCodes.Status403Forbidden)
             .ProducesProblem(StatusCodes.Status409Conflict);
 
         group.MapPost("/merge", MergeAsync)
             .RequireAuthorization()
+            .RequireRateLimiting(RateLimitPolicies.BasketWrite)
             .WithName("MergeBasket")
             .WithTags(Tag)
-            .WithSummary("After sign-in: merges the vl_basket cookie's basket into the user's, deletes it and expires the cookie. Repeating it changes nothing.")
+            .WithSummary("After sign-in: merges the vl_basket cookie's basket into the user's, deletes it and expires the cookie. Repeating it changes nothing. For the shared demo admin nothing is merged and the cookie is kept.")
             .Produces<BasketDto>()
             .ProducesProblem(StatusCodes.Status401Unauthorized)
             .ProducesProblem(StatusCodes.Status409Conflict);
@@ -128,18 +141,33 @@ internal static class BasketEndpoints
             return TypedResults.Unauthorized();
         }
 
-        var result = await dispatcher.Send(new MergeBaskets(userId, BasketCookie.ReadAnonymousId(http.Request)), ct);
+        // The shared demo admin: the visitor's anonymous basket stays theirs (and the cookie stays), and the admin's
+        // basket comes back unchanged. Without an anonymous id the merge is a plain read of the user's basket.
+        var demoAdmin = IsDemoAdmin(currentUser);
+        var anonymousId = demoAdmin ? null : BasketCookie.ReadAnonymousId(http.Request);
+
+        var result = await dispatcher.Send(new MergeBaskets(userId, anonymousId), ct);
         if (result.IsFailure)
         {
             return result.Error.ToProblem(); // the cookie stays, so the client can simply retry
         }
 
-        if (BasketCookie.IsPresent(http.Request))
+        if (!demoAdmin && BasketCookie.IsPresent(http.Request))
         {
             BasketCookie.Clear(http.Response);
         }
 
         return TypedResults.Ok(result.Value);
+    }
+
+    private static bool IsDemoAdmin(ICurrentUser currentUser) =>
+        currentUser.IsDemo && currentUser.IsInRole(IdentityRoles.Admin);
+
+    /// <summary>Basket writes are refused for the shared demo admin, whom many visitors sign in as at the same time.</summary>
+    private static async ValueTask<object?> RejectDemoAdminAsync(EndpointFilterInvocationContext context, EndpointFilterDelegate next)
+    {
+        var currentUser = context.HttpContext.RequestServices.GetRequiredService<ICurrentUser>();
+        return IsDemoAdmin(currentUser) ? BasketErrors.DemoAdminReadOnly().ToProblem() : await next(context);
     }
 
     /// <summary>

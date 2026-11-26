@@ -15,6 +15,9 @@ namespace Identity.Infrastructure;
 
 public sealed class IdentityModule : IModule
 {
+    /// <summary>The refresh cookie's name, for the host's refresh rate limit (which only counts calls that carry it).</summary>
+    public const string RefreshCookieName = RefreshCookie.Name;
+
     public string Name => "identity";
 
     public void Register(IServiceCollection services, IConfiguration configuration)

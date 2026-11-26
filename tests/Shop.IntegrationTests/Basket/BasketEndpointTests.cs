@@ -7,6 +7,8 @@ using System.Text.Json;
 using Basket.Application.Baskets;
 using Catalog.Domain.Products;
 using Catalog.Infrastructure.Persistence;
+using Identity.Application.Abstractions;
+using Identity.Domain.Users;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.JsonWebTokens;
@@ -496,6 +498,72 @@ public sealed class BasketEndpointTests(ShopApiFactory factory)
         all.StatusCode.ShouldBe(HttpStatusCode.NoContent);
         SetCookie(item).ShouldBeNull();
         SetCookie(all).ShouldBeNull();
+    }
+
+    [Fact]
+    public async Task DemoAdmin_Writes_403ReadOnly_NothingStored()
+    {
+        var data = await PublishedDatasetAsync();
+        using var admin = Signed(User.CreateDemoAdmin(UniqueEmail(), DateTime.UtcNow));
+
+        var put = await PutAsync(admin, Silver(data), 1);
+        var removeLine = await admin.SendAsync(Request(HttpMethod.Delete, $"/api/basket/items/{Silver(data)}"), Ct);
+        var clear = await admin.SendAsync(Request(HttpMethod.Delete, "/api/basket"), Ct);
+
+        foreach (var response in new[] { put, removeLine, clear })
+        {
+            var problem = await ProblemAsync(response, HttpStatusCode.Forbidden);
+            problem.GetProperty("type").GetString().ShouldBe("basket.demo_admin_readonly");
+            problem.GetProperty("title").GetString()
+                .ShouldBe("The shared demo admin can't use the cart. Try the demo customer instead.");
+            SetCookie(response).ShouldBeNull();
+        }
+
+        (await BasketAsync(await GetAsync(admin))).Lines.ShouldBeEmpty();
+    }
+
+    [Fact]
+    public async Task DemoAdmin_Merge_MovesNothing_KeepsTheVisitorsAnonymousBasketAndCookie()
+    {
+        var data = await PublishedDatasetAsync();
+        using var visitor = factory.CreateClient();
+        var cookie = await NewAnonymousBasketAsync(visitor, Silver(data), 2);
+        using var admin = Signed(User.CreateDemoAdmin(UniqueEmail(), DateTime.UtcNow));
+
+        var merge = await MergeAsync(admin, cookie);
+
+        (await BasketAsync(merge)).Lines.ShouldBeEmpty();
+        SetCookie(merge).ShouldBeNull(); // the cookie is not expired
+        (await BasketAsync(await GetAsync(admin))).Lines.ShouldBeEmpty();
+        (await BasketAsync(await GetAsync(visitor, cookie))).Lines.ShouldHaveSingleItem().Quantity.ShouldBe(2);
+    }
+
+    [Fact]
+    public async Task DemoCustomer_AndNonDemoAdmin_CanStillWriteAndMerge()
+    {
+        var data = await PublishedDatasetAsync();
+        using var demoCustomer = Signed(User.CreateDemoCustomer(UniqueEmail(), DateTime.UtcNow));
+        var realAdmin = User.CreateDemoAdmin(UniqueEmail(), DateTime.UtcNow);
+        typeof(User).GetProperty(nameof(User.IsDemo))!.SetValue(realAdmin, false); // an Admin that is not the demo account
+        using var admin = Signed(realAdmin);
+
+        (await BasketAsync(await PutAsync(demoCustomer, Silver(data), 1))).Lines.ShouldHaveSingleItem();
+        (await BasketAsync(await PutAsync(admin, Headset(data), 1))).Lines.ShouldHaveSingleItem();
+
+        using var visitor = factory.CreateClient();
+        var cookie = await NewAnonymousBasketAsync(visitor, Black(data), 1);
+        (await BasketAsync(await MergeAsync(demoCustomer, cookie))).Lines.Count.ShouldBe(2);
+    }
+
+    private static Email UniqueEmail() => Email.Create($"basket-{Guid.NewGuid():N}@x.test").Value;
+
+    /// <summary>A client carrying a real access token for <paramref name="user"/>, issued by the host's own issuer.</summary>
+    private HttpClient Signed(User user)
+    {
+        var token = Services.GetRequiredService<ITokenIssuer>().Issue(user, DateTime.UtcNow).Value;
+        var client = factory.CreateClient();
+        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+        return client;
     }
 
     /// <summary>A correctly signed token for the test host that expired an hour ago.</summary>

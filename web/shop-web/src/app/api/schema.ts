@@ -152,7 +152,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** After sign-in: merges the vl_basket cookie's basket into the user's, deletes it and expires the cookie. Repeating it changes nothing. */
+        /** After sign-in: merges the vl_basket cookie's basket into the user's, deletes it and expires the cookie. Repeating it changes nothing. For the shared demo admin nothing is merged and the cookie is kept. */
         post: operations["MergeBasket"];
         delete?: never;
         options?: never;
@@ -203,7 +203,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Rotates the refresh cookie and returns a new access token. Replaying a rotated token revokes its family. */
+        /** Rotates the refresh cookie and returns a new access token. 204 when no refresh cookie was sent (no session); 401 when it is invalid, expired or reused. Replaying a rotated token revokes its family. */
         post: operations["RefreshSession"];
         delete?: never;
         options?: never;
@@ -653,7 +653,10 @@ export interface operations {
     ClearBasket: {
         parameters: {
             query?: never;
-            header?: never;
+            header: {
+                /** @description Must be "voltlane". Without it the API answers 400 request.missing_csrf_header. */
+                "X-Requested-With": string;
+            };
             path?: never;
             cookie?: never;
         };
@@ -675,6 +678,15 @@ export interface operations {
                     "application/problem+json": components["schemas"]["ProblemDetails"];
                 };
             };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
             /** @description Conflict */
             409: {
                 headers: {
@@ -689,7 +701,10 @@ export interface operations {
     SetBasketItemQuantity: {
         parameters: {
             query?: never;
-            header?: never;
+            header: {
+                /** @description Must be "voltlane". Without it the API answers 400 request.missing_csrf_header. */
+                "X-Requested-With": string;
+            };
             path: {
                 variantId: string;
             };
@@ -728,6 +743,15 @@ export interface operations {
                     "application/problem+json": components["schemas"]["ProblemDetails"];
                 };
             };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
             /** @description Not Found */
             404: {
                 headers: {
@@ -751,7 +775,10 @@ export interface operations {
     RemoveBasketItem: {
         parameters: {
             query?: never;
-            header?: never;
+            header: {
+                /** @description Must be "voltlane". Without it the API answers 400 request.missing_csrf_header. */
+                "X-Requested-With": string;
+            };
             path: {
                 variantId: string;
             };
@@ -777,6 +804,15 @@ export interface operations {
                     "application/problem+json": components["schemas"]["ProblemDetails"];
                 };
             };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
             /** @description Conflict */
             409: {
                 headers: {
@@ -791,7 +827,10 @@ export interface operations {
     MergeBasket: {
         parameters: {
             query?: never;
-            header?: never;
+            header: {
+                /** @description Must be "voltlane". Without it the API answers 400 request.missing_csrf_header. */
+                "X-Requested-With": string;
+            };
             path?: never;
             cookie?: never;
         };
@@ -829,7 +868,10 @@ export interface operations {
     RegisterUser: {
         parameters: {
             query?: never;
-            header?: never;
+            header: {
+                /** @description Must be "voltlane". Without it the API answers 400 request.missing_csrf_header. */
+                "X-Requested-With": string;
+            };
             path?: never;
             cookie?: never;
         };
@@ -871,7 +913,10 @@ export interface operations {
     LoginUser: {
         parameters: {
             query?: never;
-            header?: never;
+            header: {
+                /** @description Must be "voltlane". Without it the API answers 400 request.missing_csrf_header. */
+                "X-Requested-With": string;
+            };
             path?: never;
             cookie?: never;
         };
@@ -913,7 +958,10 @@ export interface operations {
     RefreshSession: {
         parameters: {
             query?: never;
-            header?: never;
+            header: {
+                /** @description Must be "voltlane". Without it the API answers 400 request.missing_csrf_header. */
+                "X-Requested-With": string;
+            };
             path?: never;
             cookie?: never;
         };
@@ -927,6 +975,13 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["AuthResponse"];
                 };
+            };
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
             /** @description Unauthorized */
             401: {
@@ -942,7 +997,10 @@ export interface operations {
     LogoutUser: {
         parameters: {
             query?: never;
-            header?: never;
+            header: {
+                /** @description Must be "voltlane". Without it the API answers 400 request.missing_csrf_header. */
+                "X-Requested-With": string;
+            };
             path?: never;
             cookie?: never;
         };
@@ -969,7 +1027,10 @@ export interface operations {
     StartDemoCustomer: {
         parameters: {
             query?: never;
-            header?: never;
+            header: {
+                /** @description Must be "voltlane". Without it the API answers 400 request.missing_csrf_header. */
+                "X-Requested-With": string;
+            };
             path?: never;
             cookie?: never;
         };
@@ -998,7 +1059,10 @@ export interface operations {
     StartDemoAdmin: {
         parameters: {
             query?: never;
-            header?: never;
+            header: {
+                /** @description Must be "voltlane". Without it the API answers 400 request.missing_csrf_header. */
+                "X-Requested-With": string;
+            };
             path?: never;
             cookie?: never;
         };

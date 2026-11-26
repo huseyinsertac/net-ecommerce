@@ -119,6 +119,13 @@ public sealed class JwtSetupTests(ShopApiFactory factory)
     }
 
     [Fact]
+    public void ContractRoleNames_MatchTheDomainRoles()
+    {
+        global::Identity.Contracts.IdentityRoles.Admin.ShouldBe(Roles.Admin);
+        global::Identity.Contracts.IdentityRoles.Customer.ShouldBe(Roles.Customer);
+    }
+
+    [Fact]
     public void CurrentUser_ReadsSubAndRoleClaims()
     {
         var userId = Guid.NewGuid();
@@ -132,17 +139,27 @@ public sealed class JwtSetupTests(ShopApiFactory factory)
             current.IsAuthenticated.ShouldBeFalse();
             current.UserId.ShouldBeNull();
             current.IsInRole(Roles.Customer).ShouldBeFalse();
+            current.IsDemo.ShouldBeFalse();
 
             accessor.HttpContext = new DefaultHttpContext
             {
                 User = new ClaimsPrincipal(new ClaimsIdentity(
-                    [new Claim("sub", userId.ToString()), new Claim("role", Roles.Customer)],
+                    [new Claim("sub", userId.ToString()), new Claim("role", Roles.Customer), new Claim("demo", "false")],
                     authenticationType: "Bearer", nameType: "name", roleType: "role")),
             };
             current.IsAuthenticated.ShouldBeTrue();
             current.UserId.ShouldBe(userId);
             current.IsInRole(Roles.Customer).ShouldBeTrue();
             current.IsInRole(Roles.Admin).ShouldBeFalse();
+            current.IsDemo.ShouldBeFalse();
+
+            accessor.HttpContext = new DefaultHttpContext
+            {
+                User = new ClaimsPrincipal(new ClaimsIdentity(
+                    [new Claim("sub", userId.ToString()), new Claim("demo", "true")],
+                    authenticationType: "Bearer", nameType: "name", roleType: "role")),
+            };
+            current.IsDemo.ShouldBeTrue();
         }
         finally
         {

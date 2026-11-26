@@ -3,6 +3,7 @@
   <ItemGroup>
     <ProjectReference Include="../Basket.Application/Basket.Application.csproj" />
     <ProjectReference Include="../../../BuildingBlocks/Shop.Infrastructure.Common/Shop.Infrastructure.Common.csproj" />
+    <ProjectReference Include="../../Identity/Identity.Contracts/Identity.Contracts.csproj" />
   </ItemGroup>
 
 </Project>

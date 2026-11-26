@@ -1,15 +1,17 @@
 using System.Globalization;
 using System.Threading.RateLimiting;
 using Microsoft.AspNetCore.Mvc;
+using Identity.Infrastructure;
 using Microsoft.AspNetCore.RateLimiting;
 using Shop.Infrastructure.Common.Http;
 
 namespace Shop.Api;
 
 /// <summary>
-/// Per-client-IP fixed-window limits on the anonymous account endpoints. Limits come from configuration
-/// (<c>RateLimiting:DemoCustomerPerMinute</c>, <c>RateLimiting:AuthPerMinute</c>) so tests can lower or raise them.
-/// The client address is <c>RemoteIpAddress</c>, which the forwarded-headers middleware (first in the pipeline)
+/// Per-client-IP fixed-window limits on the account endpoints and basket writes. Limits come from configuration so tests
+/// can lower or raise them: <c>RateLimiting:DemoCustomerPerMinute</c> (5), <c>RateLimiting:AuthPerMinute</c> (20),
+/// <c>RateLimiting:RefreshPerMinute</c> (120; only calls that carry the refresh cookie count) and
+/// <c>RateLimiting:BasketWritesPerMinute</c> (60). The client address is <c>RemoteIpAddress</c>, which the forwarded-headers middleware (first in the pipeline)
 /// has already replaced with the real client IP from <c>X-Forwarded-For</c>.
 /// </summary>
 internal static class RateLimitingConfiguration
@@ -17,6 +19,7 @@ internal static class RateLimitingConfiguration
     private const int DefaultDemoCustomerPerMinute = 5;
     private const int DefaultAuthPerMinute = 20;
     private const int DefaultRefreshPerMinute = 120;
+    private const int DefaultBasketWritesPerMinute = 60;
 
     public static IServiceCollection AddShopRateLimiting(this IServiceCollection services)
     {
@@ -48,8 +51,14 @@ internal static class RateLimitingConfiguration
                 PerIp(context, RateLimitPolicies.DemoCustomer, "RateLimiting:DemoCustomerPerMinute", DefaultDemoCustomerPerMinute));
             options.AddPolicy(RateLimitPolicies.AuthStrict, context =>
                 PerIp(context, RateLimitPolicies.AuthStrict, "RateLimiting:AuthPerMinute", DefaultAuthPerMinute));
+            // A call without the refresh cookie is answered 204 straight away (no session to restore), so every anonymous
+            // page load does not eat into the budget of signed-in users behind the same IP.
             options.AddPolicy(RateLimitPolicies.AuthRefresh, context =>
-                PerIp(context, RateLimitPolicies.AuthRefresh, "RateLimiting:RefreshPerMinute", DefaultRefreshPerMinute));
+                context.Request.Cookies.ContainsKey(IdentityModule.RefreshCookieName)
+                    ? PerIp(context, RateLimitPolicies.AuthRefresh, "RateLimiting:RefreshPerMinute", DefaultRefreshPerMinute)
+                    : RateLimitPartition.GetNoLimiter($"{RateLimitPolicies.AuthRefresh}:no-cookie"));
+            options.AddPolicy(RateLimitPolicies.BasketWrite, context =>
+                PerIp(context, RateLimitPolicies.BasketWrite, "RateLimiting:BasketWritesPerMinute", DefaultBasketWritesPerMinute));
         });
 
         return services;

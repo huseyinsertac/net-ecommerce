@@ -9,4 +9,7 @@ public interface ICurrentUser
     Guid? UserId { get; }
 
     bool IsInRole(string role);
+
+    /// <summary>True when the access token carries <c>demo</c> = <c>"true"</c> (a demo customer or the shared demo admin).</summary>
+    bool IsDemo { get; }
 }

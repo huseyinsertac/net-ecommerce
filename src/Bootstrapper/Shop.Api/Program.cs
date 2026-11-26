@@ -72,6 +72,9 @@ app.UseSerilogRequestLogging();
 app.UseExceptionHandler();
 app.UseStatusCodePages();
 
+// Before rate limiting, so a forged cross-site request is refused without spending anyone's budget.
+app.UseCsrfHeaderCheck();
+
 // After the implicit UseRouting (so endpoint policies are visible) and before the endpoints run.
 app.UseRateLimiter();
 

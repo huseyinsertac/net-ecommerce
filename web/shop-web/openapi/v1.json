@@ -314,12 +314,34 @@
         ],
         "summary": "Empties the basket.",
         "operationId": "ClearBasket",
+        "parameters": [
+          {
+            "name": "X-Requested-With",
+            "in": "header",
+            "description": "Must be \u0022voltlane\u0022. Without it the API answers 400 request.missing_csrf_header.",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "voltlane"
+            }
+          }
+        ],
         "responses": {
           "204": {
             "description": "No Content"
           },
           "401": {
             "description": "Unauthorized",
+            "content": {
+              "application/problem\u002Bjson": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
             "content": {
               "application/problem\u002Bjson": {
                 "schema": {
@@ -357,6 +379,16 @@
               "type": "string",
               "format": "uuid"
             }
+          },
+          {
+            "name": "X-Requested-With",
+            "in": "header",
+            "description": "Must be \u0022voltlane\u0022. Without it the API answers 400 request.missing_csrf_header.",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "voltlane"
+            }
           }
         ],
         "requestBody": {
@@ -392,6 +424,16 @@
           },
           "401": {
             "description": "Unauthorized",
+            "content": {
+              "application/problem\u002Bjson": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
             "content": {
               "application/problem\u002Bjson": {
                 "schema": {
@@ -437,6 +479,16 @@
               "type": "string",
               "format": "uuid"
             }
+          },
+          {
+            "name": "X-Requested-With",
+            "in": "header",
+            "description": "Must be \u0022voltlane\u0022. Without it the API answers 400 request.missing_csrf_header.",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "voltlane"
+            }
           }
         ],
         "responses": {
@@ -452,6 +504,16 @@
           },
           "401": {
             "description": "Unauthorized",
+            "content": {
+              "application/problem\u002Bjson": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
             "content": {
               "application/problem\u002Bjson": {
                 "schema": {
@@ -478,8 +540,20 @@
         "tags": [
           "Basket"
         ],
-        "summary": "After sign-in: merges the vl_basket cookie\u0027s basket into the user\u0027s, deletes it and expires the cookie. Repeating it changes nothing.",
+        "summary": "After sign-in: merges the vl_basket cookie\u0027s basket into the user\u0027s, deletes it and expires the cookie. Repeating it changes nothing. For the shared demo admin nothing is merged and the cookie is kept.",
         "operationId": "MergeBasket",
+        "parameters": [
+          {
+            "name": "X-Requested-With",
+            "in": "header",
+            "description": "Must be \u0022voltlane\u0022. Without it the API answers 400 request.missing_csrf_header.",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "voltlane"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK",
@@ -526,6 +600,18 @@
         ],
         "summary": "Creates an account and signs it in. The refresh token is set as an HttpOnly cookie.",
         "operationId": "RegisterUser",
+        "parameters": [
+          {
+            "name": "X-Requested-With",
+            "in": "header",
+            "description": "Must be \u0022voltlane\u0022. Without it the API answers 400 request.missing_csrf_header.",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "voltlane"
+            }
+          }
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -577,6 +663,18 @@
         ],
         "summary": "Signs in with email and password.",
         "operationId": "LoginUser",
+        "parameters": [
+          {
+            "name": "X-Requested-With",
+            "in": "header",
+            "description": "Must be \u0022voltlane\u0022. Without it the API answers 400 request.missing_csrf_header.",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "voltlane"
+            }
+          }
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -626,8 +724,20 @@
         "tags": [
           "Identity"
         ],
-        "summary": "Rotates the refresh cookie and returns a new access token. Replaying a rotated token revokes its family.",
+        "summary": "Rotates the refresh cookie and returns a new access token. 204 when no refresh cookie was sent (no session); 401 when it is invalid, expired or reused. Replaying a rotated token revokes its family.",
         "operationId": "RefreshSession",
+        "parameters": [
+          {
+            "name": "X-Requested-With",
+            "in": "header",
+            "description": "Must be \u0022voltlane\u0022. Without it the API answers 400 request.missing_csrf_header.",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "voltlane"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK",
@@ -638,6 +748,9 @@
                 }
               }
             }
+          },
+          "204": {
+            "description": "No Content"
           },
           "401": {
             "description": "Unauthorized",
@@ -659,6 +772,18 @@
         ],
         "summary": "Revokes the refresh token family and always clears the cookie. Answers 409 when the revoke lost a concurrency race and should be retried.",
         "operationId": "LogoutUser",
+        "parameters": [
+          {
+            "name": "X-Requested-With",
+            "in": "header",
+            "description": "Must be \u0022voltlane\u0022. Without it the API answers 400 request.missing_csrf_header.",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "voltlane"
+            }
+          }
+        ],
         "responses": {
           "204": {
             "description": "No Content"
@@ -683,6 +808,18 @@
         ],
         "summary": "Creates a throwaway demo customer and signs it in (rate limited per client IP).",
         "operationId": "StartDemoCustomer",
+        "parameters": [
+          {
+            "name": "X-Requested-With",
+            "in": "header",
+            "description": "Must be \u0022voltlane\u0022. Without it the API answers 400 request.missing_csrf_header.",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "voltlane"
+            }
+          }
+        ],
         "responses": {
           "201": {
             "description": "Created",
@@ -714,6 +851,18 @@
         ],
         "summary": "Signs in the shared demo admin. 503 when the admin has not been seeded.",
         "operationId": "StartDemoAdmin",
+        "parameters": [
+          {
+            "name": "X-Requested-With",
+            "in": "header",
+            "description": "Must be \u0022voltlane\u0022. Without it the API answers 400 request.missing_csrf_header.",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "voltlane"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK",

@@ -18,6 +18,11 @@ public static class BasketErrors
     public static Error InsufficientStock(int available) =>
         Error.Conflict("basket.insufficient_stock", available <= 0 ? "Out of stock." : $"Only {available} left.");
 
+    /// <summary>The shared demo admin is signed in by many visitors at once, so its basket is read-only. Shown verbatim.</summary>
+    public static Error DemoAdminReadOnly() =>
+        Error.Forbidden("basket.demo_admin_readonly",
+            "The shared demo admin can't use the cart. Try the demo customer instead.");
+
     public static Error ConcurrentUpdate() =>
         Error.Conflict("basket.concurrent_update", "The basket was changed by another request. Please try again.");
 }

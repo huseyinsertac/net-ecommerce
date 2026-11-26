@@ -177,12 +177,23 @@ public sealed class AuthEndpointTests(ShopApiFactory factory)
     }
 
     [Fact]
-    public async Task RefreshWithoutCookie_401_NoServerError()
+    public async Task RefreshWithoutCookie_204NoContent_NoCookieTouched()
     {
         var response = await PostWithRefreshAsync(factory.CreateClient(), "/api/identity/refresh", null);
 
-        response.StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
-        (await JsonAsync(response)).GetProperty("type").GetString().ShouldBe("identity.invalid_refresh_token");
+        response.StatusCode.ShouldBe(HttpStatusCode.NoContent);
+        (await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken)).ShouldBeEmpty();
+        RefreshSetCookie(response).ShouldBeNull();
+    }
+
+    [Fact]
+    public async Task RefreshWithEmptyCookie_204_ButGarbageCookie_401()
+    {
+        (await PostWithRefreshAsync(factory.CreateClient(), "/api/identity/refresh", "")).StatusCode
+            .ShouldBe(HttpStatusCode.NoContent);
+        var garbage = await PostWithRefreshAsync(factory.CreateClient(), "/api/identity/refresh", "garbage");
+        garbage.StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
+        (await JsonAsync(garbage)).GetProperty("type").GetString().ShouldBe("identity.invalid_refresh_token");
     }
 
     [Fact]

@@ -40,8 +40,9 @@ internal static class IdentityEndpoints
             .RequireRateLimiting(RateLimitPolicies.AuthRefresh)
             .WithName("RefreshSession")
             .WithTags(Tag)
-            .WithSummary("Rotates the refresh cookie and returns a new access token. Replaying a rotated token revokes its family.")
+            .WithSummary("Rotates the refresh cookie and returns a new access token. 204 when no refresh cookie was sent (no session); 401 when it is invalid, expired or reused. Replaying a rotated token revokes its family.")
             .Produces<AuthResponse>()
+            .Produces(StatusCodes.Status204NoContent)
             .ProducesProblem(StatusCodes.Status401Unauthorized);
 
         group.MapPost("/logout", LogoutAsync)
@@ -101,7 +102,13 @@ internal static class IdentityEndpoints
 
     private static async Task<IResult> RefreshAsync(HttpRequest request, HttpResponse response, IDispatcher dispatcher, CancellationToken ct)
     {
-        var result = await dispatcher.Send(new Refresh(RefreshCookie.Read(request)), ct);
+        // No cookie is "no session", not a bad one: answer quietly so anonymous visitors see no 401.
+        if (RefreshCookie.Read(request) is not { } raw)
+        {
+            return TypedResults.NoContent();
+        }
+
+        var result = await dispatcher.Send(new Refresh(raw), ct);
         if (result.IsFailure && result.Error.Type == ErrorType.Unauthorized)
         {
             // A transient conflict keeps the (still valid) cookie so the client can simply retry.

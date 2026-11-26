@@ -36,8 +36,23 @@ public class ShopApiFactory : WebApplicationFactory<Program>, IAsyncLifetime
         builder.UseSetting("RateLimiting:DemoCustomerPerMinute", "1000");
         builder.UseSetting("RateLimiting:AuthPerMinute", "1000");
         builder.UseSetting("RateLimiting:RefreshPerMinute", "1000");
+        builder.UseSetting("RateLimiting:BasketWritesPerMinute", "1000");
         builder.ConfigureServices(services => services.AddSingleton<IStartupFilter, ThrowingEndpointStartupFilter>());
     }
+
+    /// <summary>
+    /// Every client from this factory (and from <c>WithWebHostBuilder</c> copies, which reuse this hook) sends the CSRF
+    /// header the API requires on non-GET <c>/api/</c> requests, as the SPA does. A test that needs a request without it
+    /// removes it from <see cref="HttpClient.DefaultRequestHeaders"/>.
+    /// </summary>
+    protected override void ConfigureClient(HttpClient client)
+    {
+        base.ConfigureClient(client);
+        client.DefaultRequestHeaders.Add(CsrfHeaderName, CsrfHeaderValue);
+    }
+
+    public const string CsrfHeaderName = "X-Requested-With";
+    public const string CsrfHeaderValue = "voltlane";
 
     /// <summary>
     /// Test-only: appends a middleware AFTER the app's own pipeline, so a request to /test/throw falls through the
