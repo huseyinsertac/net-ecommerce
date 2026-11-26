@@ -68,7 +68,15 @@ internal sealed class RegisterHandler(
         var refresh = user.Value.IssueRefreshToken(hash, now, refreshPolicy.Lifetime);
 
         users.Add(user.Value);
-        await users.SaveChangesAsync(ct);
+        try
+        {
+            await users.SaveChangesAsync(ct);
+        }
+        catch (DuplicateEmailException)
+        {
+            // Lost a race with a concurrent registration of the same email.
+            return IdentityErrors.EmailTaken();
+        }
 
         return AuthSession.Build(user.Value, tokens, raw, refresh, now);
     }

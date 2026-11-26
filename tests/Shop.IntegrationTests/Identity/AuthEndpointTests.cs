@@ -106,40 +106,39 @@ public sealed class AuthEndpointTests(ShopApiFactory factory)
     }
 
     [Fact]
-    public async Task Refresh_RotatesCookie_OldCookieThenRejected()
+    public async Task Register_TwoConcurrentWithSameEmail_OneCreated_OneConflict_NeverServerError()
     {
-        var client = factory.CreateClient();
-        var register = await RegisterAsync(client, NewEmail());
-        var first = RefreshValue(register)!;
+        var email = NewEmail();
+        var clients = Enumerable.Range(0, 4).Select(_ => factory.CreateClient()).ToArray();
 
-        var refreshed = await PostWithRefreshAsync(client, "/api/identity/refresh", first);
+        var responses = await Task.WhenAll(clients.Select(c => RegisterAsync(c, email)));
 
-        refreshed.StatusCode.ShouldBe(HttpStatusCode.OK);
-        var second = RefreshValue(refreshed)!;
-        second.ShouldNotBeNullOrEmpty();
-        second.ShouldNotBe(first);
-        (await AccessTokenAsync(refreshed)).ShouldNotBeNullOrWhiteSpace();
-
-        var old = await PostWithRefreshAsync(client, "/api/identity/refresh", first);
-        old.StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
-        (await JsonAsync(old)).GetProperty("type").GetString().ShouldBe("identity.invalid_refresh_token");
+        responses.Count(r => r.StatusCode == HttpStatusCode.Created).ShouldBe(1);
+        responses.Count(r => r.StatusCode == HttpStatusCode.Conflict).ShouldBe(3);
+        foreach (var conflict in responses.Where(r => r.StatusCode == HttpStatusCode.Conflict))
+        {
+            (await JsonAsync(conflict)).GetProperty("type").GetString().ShouldBe("identity.email_taken");
+        }
     }
 
     [Fact]
-    public async Task Refresh_ReplayOfRotatedToken_RevokesFamily_NewTokenAlsoDead()
+    public async Task Refresh_TwoConcurrentWithSameCookie_BothSucceed_FamilyNotRevoked()
     {
         var client = factory.CreateClient();
         var first = RefreshValue(await RegisterAsync(client, NewEmail()))!;
-        var second = RefreshValue(await PostWithRefreshAsync(client, "/api/identity/refresh", first))!;
 
-        // The attacker replays the already-rotated token ...
-        var replay = await PostWithRefreshAsync(client, "/api/identity/refresh", first);
-        replay.StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
+        var both = await Task.WhenAll(
+            PostWithRefreshAsync(factory.CreateClient(), "/api/identity/refresh", first),
+            PostWithRefreshAsync(factory.CreateClient(), "/api/identity/refresh", first));
 
-        // ... and the victim's newest token dies with it.
-        var victim = await PostWithRefreshAsync(client, "/api/identity/refresh", second);
-        victim.StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
-        (await JsonAsync(victim)).GetProperty("type").GetString().ShouldBe("identity.invalid_refresh_token");
+        both.ShouldAllBe(r => r.StatusCode == HttpStatusCode.OK);
+        var a = RefreshValue(both[0])!;
+        var b = RefreshValue(both[1])!;
+        a.ShouldNotBe(b);
+
+        // The family is alive: either returned cookie still refreshes.
+        (await PostWithRefreshAsync(client, "/api/identity/refresh", a)).StatusCode.ShouldBe(HttpStatusCode.OK);
+        (await PostWithRefreshAsync(client, "/api/identity/refresh", b)).StatusCode.ShouldBe(HttpStatusCode.OK);
     }
 
     [Fact]

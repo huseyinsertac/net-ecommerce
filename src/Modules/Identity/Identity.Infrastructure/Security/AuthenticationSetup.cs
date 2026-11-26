@@ -30,8 +30,8 @@ public static class AuthenticationSetup
                 "In production supply it through the Jwt__SigningKey environment variable.")
             .Validate(o => !string.IsNullOrWhiteSpace(o.Issuer) && !string.IsNullOrWhiteSpace(o.Audience),
                 "Jwt:Issuer and Jwt:Audience must be set.")
-            .Validate(o => o.AccessTokenMinutes > 0 && o.RefreshTokenDays > 0,
-                "Jwt:AccessTokenMinutes and Jwt:RefreshTokenDays must be positive.")
+            .Validate(o => o.AccessTokenMinutes > 0 && o.RefreshTokenDays > 0 && o.RefreshReuseGraceSeconds >= 0,
+                "Jwt:AccessTokenMinutes and Jwt:RefreshTokenDays must be positive, Jwt:RefreshReuseGraceSeconds non-negative.")
             .ValidateOnStart();
 
         services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer();

@@ -120,7 +120,7 @@ public sealed class IdentityPersistenceTests(ShopApiFactory factory)
     }
 
     [Fact]
-    public async Task DuplicateNormalizedEmail_ViolatesUniqueIndex()
+    public async Task DuplicateNormalizedEmail_ViolatesUniqueIndex_SurfacesAsDuplicateEmailException()
     {
         var suffix = Guid.NewGuid().ToString("N");
         var upper = User.CreateDemoCustomer(Email.Create($"A{suffix}@x.test").Value, NowUtc);
@@ -138,8 +138,8 @@ public sealed class IdentityPersistenceTests(ShopApiFactory factory)
             var repo = scope.ServiceProvider.GetRequiredService<IUserRepository>();
             repo.Add(lower);
 
-            var ex = await Should.ThrowAsync<DbUpdateException>(() => repo.SaveChangesAsync(Ct));
-            var pg = ex.InnerException.ShouldBeOfType<PostgresException>();
+            var ex = await Should.ThrowAsync<DuplicateEmailException>(() => repo.SaveChangesAsync(Ct));
+            var pg = ex.InnerException.ShouldBeOfType<DbUpdateException>().InnerException.ShouldBeOfType<PostgresException>();
             pg.SqlState.ShouldBe(PostgresErrorCodes.UniqueViolation);
             pg.ConstraintName.ShouldBe("ix_users_email_normalized");
         }

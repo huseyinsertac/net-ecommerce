@@ -18,4 +18,7 @@ public sealed class JwtOptions
     public int AccessTokenMinutes { get; set; } = 15;
 
     public int RefreshTokenDays { get; set; } = 7;
+
+    /// <summary>Seconds after a rotation during which the old refresh token is still accepted once more (concurrent tabs). 0 disables it.</summary>
+    public int RefreshReuseGraceSeconds { get; set; } = 30;
 }

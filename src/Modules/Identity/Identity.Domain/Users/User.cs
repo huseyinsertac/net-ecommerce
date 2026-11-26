@@ -7,6 +7,12 @@ public sealed class User : AggregateRoot<Guid>
     private const int MaxDisplayNameLength = 80;
     private static readonly TimeSpan PruneAfterExpiry = TimeSpan.FromDays(1);
 
+    /// <summary>
+    /// How long after a rotation the old token may still be presented without it counting as theft, so that two browser
+    /// tabs refreshing together do not log each other out.
+    /// </summary>
+    public static readonly TimeSpan ReuseGrace = TimeSpan.FromSeconds(30);
+
     private List<string> _roles = [];
     private List<RefreshToken> _refreshTokens = [];
 
@@ -49,7 +55,8 @@ public sealed class User : AggregateRoot<Guid>
         return token;
     }
 
-    public Result<RefreshToken> Rotate(string presentedHash, string newHash, DateTime nowUtc, TimeSpan lifetime)
+    public Result<RefreshToken> Rotate(string presentedHash, string newHash, DateTime nowUtc, TimeSpan lifetime,
+        TimeSpan? reuseGrace = null)
     {
         var existing = _refreshTokens.FirstOrDefault(t => t.TokenHash == presentedHash);
         if (existing is null)
@@ -59,6 +66,11 @@ public sealed class User : AggregateRoot<Guid>
 
         if (existing.RevokedAtUtc is not null)
         {
+            if (IsBenignConcurrentReuse(existing, nowUtc, reuseGrace ?? ReuseGrace))
+            {
+                return IssueRefreshToken(newHash, nowUtc, lifetime, existing.FamilyId);
+            }
+
             RevokeFamily(existing.FamilyId, nowUtc);
             return IdentityErrors.InvalidRefreshToken();
         }
@@ -72,6 +84,15 @@ public sealed class User : AggregateRoot<Guid>
         existing.Revoke(nowUtc, replacement.Id);
         return replacement;
     }
+
+    // Rotated (has a replacement), only just now, not expired, and the family was not killed by a logout or an earlier
+    // reuse detection (a killed family has a revoked token with no replacement).
+    private bool IsBenignConcurrentReuse(RefreshToken existing, DateTime nowUtc, TimeSpan grace) =>
+        grace > TimeSpan.Zero
+        && existing.ReplacedById is not null
+        && nowUtc - existing.RevokedAtUtc!.Value <= grace
+        && nowUtc < existing.ExpiresAtUtc
+        && !_refreshTokens.Any(t => t.FamilyId == existing.FamilyId && t.RevokedAtUtc is not null && t.ReplacedById is null);
 
     public void RevokeFamily(Guid familyId, DateTime nowUtc)
     {
