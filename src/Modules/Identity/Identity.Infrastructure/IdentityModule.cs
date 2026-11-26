@@ -1,4 +1,5 @@
 using Identity.Application.Abstractions;
+using Identity.Infrastructure.Endpoints;
 using Identity.Infrastructure.Persistence;
 using Identity.Infrastructure.Security;
 using Microsoft.AspNetCore.Builder;
@@ -22,12 +23,13 @@ public sealed class IdentityModule : IModule
         services.AddSingleton<IPasswordHasher, AspNetPasswordHasher>();
         services.AddSingleton<ITokenIssuer, JwtTokenIssuer>();
         services.AddSingleton<IRefreshTokenFactory, RefreshTokenFactory>();
+        services.AddSingleton<IRefreshTokenPolicy, ConfiguredRefreshTokenPolicy>();
         services.AddShopAuthentication(configuration);
         services.AddApplicationHandlers(typeof(Identity.Application.AssemblyReference).Assembly);
     }
 
     public void MapEndpoints(IEndpointRouteBuilder app)
     {
-        app.MapGroup($"/api/{Name}");
+        IdentityEndpoints.Map(app.MapGroup($"/api/{Name}"));
     }
 }
