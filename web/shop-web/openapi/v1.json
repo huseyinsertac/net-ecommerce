@@ -812,6 +812,86 @@
         ]
       }
     },
+    "/api/payments/simulated/{orderId}": {
+      "post": {
+        "tags": [
+          "Payments"
+        ],
+        "summary": "Reports the outcome chosen on the simulated payment page (test mode without Stripe). A payment that has already ended is left unchanged.",
+        "operationId": "SimulatePayment",
+        "parameters": [
+          {
+            "name": "orderId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "X-Requested-With",
+            "in": "header",
+            "description": "Must be \u0022voltlane\u0022. Without it the API answers 400 request.missing_csrf_header.",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "voltlane"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SimulatedPaymentRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem\u002Bjson": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem\u002Bjson": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem\u002Bjson": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
     "/api/identity/register": {
       "post": {
         "tags": [
@@ -2000,6 +2080,18 @@
           }
         }
       },
+      "SimulatedPaymentRequest": {
+        "required": [
+          "succeed"
+        ],
+        "type": "object",
+        "properties": {
+          "succeed": {
+            "type": "boolean",
+            "description": "True for \u0022Pay\u0022, false for \u0022Decline\u0022."
+          }
+        }
+      },
       "SpecFacetDto": {
         "required": [
           "key",
@@ -2203,6 +2295,9 @@
     },
     {
       "name": "Ordering"
+    },
+    {
+      "name": "Payments"
     },
     {
       "name": "Identity"
