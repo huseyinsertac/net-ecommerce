@@ -143,6 +143,67 @@ describe('BasketService', () => {
     expect(svc.count()).toBe(0);
   });
 
+  it('a failed merge reloads the basket', async () => {
+    signedIn.next(user);
+    await macrotask();
+    http.expectOne('/api/basket/merge').flush({}, { status: 500, statusText: 'x' });
+    await macrotask();
+    await macrotask();
+    http.expectOne('/api/basket').flush(basketOf());
+  });
+
+  describe('add', () => {
+    it('reads the quantity when it runs, after a queued merge lands', async () => {
+      const merge = svc.mergeAfterSignIn();
+      const added = svc.add('v1', 1);
+      await macrotask();
+      http.expectOne('/api/basket/merge').flush(basketOf(line({ quantity: 4, lineTotal: 400 })));
+      await merge;
+      await macrotask();
+      const put = http.expectOne('/api/basket/items/v1');
+      expect(put.request.body).toEqual({ quantity: 5 });
+      put.flush(basketOf(line({ quantity: 5, lineTotal: 500 })));
+      expect(await added).toBe(true);
+    });
+
+    it('loads first when the basket is unknown, so it cannot lower a server quantity', async () => {
+      const added = svc.add('v1', 1);
+      await macrotask();
+      http.expectOne('/api/basket').flush(basketOf(line({ quantity: 6, lineTotal: 600 })));
+      await macrotask();
+      const put = http.expectOne('/api/basket/items/v1');
+      expect(put.request.body).toEqual({ quantity: 7 });
+      put.flush(basketOf(line({ quantity: 7, lineTotal: 700 })));
+      await added;
+    });
+
+    it('reloads after a failed load before adding', async () => {
+      const failed = svc.load();
+      await macrotask();
+      http.expectOne('/api/basket').flush({}, { status: 500, statusText: 'x' });
+      await failed;
+      const added = svc.add('v1', 1);
+      await macrotask();
+      http.expectOne('/api/basket').flush(basketOf(line({ quantity: 3, lineTotal: 300 })));
+      await macrotask();
+      const put = http.expectOne('/api/basket/items/v1');
+      expect(put.request.body).toEqual({ quantity: 4 });
+      put.flush(basketOf(line({ quantity: 4, lineTotal: 400 })));
+      await added;
+    });
+
+    it('sends nothing and resolves false at the maximum', async () => {
+      const ok = svc.load();
+      await macrotask();
+      http.expectOne('/api/basket').flush(basketOf(line({ quantity: 10, lineTotal: 1000 })));
+      await ok;
+      const added = svc.add('v1', 1);
+      await macrotask();
+      http.expectNone('/api/basket/items/v1');
+      expect(await added).toBe(false);
+    });
+  });
+
   it('clear empties the basket', async () => {
     const p = svc.clear();
     await macrotask();

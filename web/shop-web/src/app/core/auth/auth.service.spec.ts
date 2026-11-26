@@ -132,4 +132,15 @@ describe('AuthService', () => {
     expect(auth.user()?.id).toBe('u2');
     expect(auth.accessToken()).toBe('t-new');
   });
+
+  it('a failed login does not discard an in-flight refresh', async () => {
+    const refresh = auth.refresh();
+    const pending = http.expectOne('/api/identity/refresh');
+    const failed = auth.login('a@x.io', 'bad').catch(() => 'failed');
+    http.expectOne('/api/identity/login').flush({}, { status: 401, statusText: 'Unauthorized' });
+    expect(await failed).toBe('failed');
+    pending.flush(res('t-restored', 'u1'));
+    expect(await refresh).toBe(true);
+    expect(auth.user()?.id).toBe('u1');
+  });
 });

@@ -55,6 +55,8 @@ describe('HeaderComponent', () => {
     await fixture.whenStable();
     expect(el.querySelector('.mat-badge-hidden')).toBeNull();
     expect(el.querySelector('.mat-badge-content')?.textContent?.trim()).toBe('3');
+    // Small badges render as a dot with no number.
+    expect(el.querySelector('.mat-badge-small')).toBeNull();
     expect(link.getAttribute('aria-label')).toBe('Cart, 3 items');
   });
 

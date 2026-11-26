@@ -39,7 +39,7 @@ function fakeBasket(lines: Basket['lines'] = []) {
   return {
     basket: signal<Basket | null>({ lines, itemCount: 0, subtotal: 0, hasIssues: false }),
     count: () => 0,
-    setQuantity: vi.fn().mockResolvedValue(undefined),
+    add: vi.fn().mockResolvedValue(true),
   };
 }
 
@@ -178,7 +178,7 @@ describe('ProductDetailPage', () => {
       },
     ];
 
-    it('Add to cart enabled for in-stock variant and calls setQuantity(current+1)', async () => {
+    it('Add to cart enabled for in-stock variant and calls add(variant, 1)', async () => {
       const { el, harness, basket } = await setup(
         '/p/aurora-x?variant=BLU-128',
         detail,
@@ -189,7 +189,7 @@ describe('ProductDetailPage', () => {
       expect(addButton(el).disabled).toBe(false);
       expect(addButton(el).textContent).toContain('Add to cart');
       addButton(el).click();
-      expect(basket.setQuantity).toHaveBeenCalledWith('3', 3);
+      expect(basket.add).toHaveBeenCalledWith('3', 1);
       await harness.fixture.whenStable();
       expect(open).toHaveBeenCalledWith('Added to cart', 'View cart', expect.anything());
     });
@@ -197,19 +197,19 @@ describe('ProductDetailPage', () => {
     it('adds 1 when the variant is not in the cart yet', async () => {
       const { el, basket } = await setup('/p/aurora-x?variant=BLU-128');
       addButton(el).click();
-      expect(basket.setQuantity).toHaveBeenCalledWith('3', 1);
+      expect(basket.add).toHaveBeenCalledWith('3', 1);
     });
 
     it('is disabled while the request is in flight, so a double click sends once', async () => {
       let release!: () => void;
       const basket = fakeBasket();
-      basket.setQuantity.mockImplementation(() => new Promise<void>((r) => (release = r)));
+      basket.add.mockImplementation(() => new Promise<void>((r) => (release = r)));
       const { el, harness } = await setup('/p/aurora-x?variant=BLU-128', detail, 200, basket);
       addButton(el).click();
       harness.detectChanges();
       expect(addButton(el).disabled).toBe(true);
       addButton(el).click();
-      expect(basket.setQuantity).toHaveBeenCalledTimes(1);
+      expect(basket.add).toHaveBeenCalledTimes(1);
       release();
       await harness.fixture.whenStable();
       harness.detectChanges();
@@ -224,7 +224,7 @@ describe('ProductDetailPage', () => {
 
     it('shows the server message when stock runs short', async () => {
       const basket = fakeBasket();
-      basket.setQuantity.mockRejectedValue(
+      basket.add.mockRejectedValue(
         new HttpErrorResponse({ status: 409, error: { title: 'Only 3 left.' }, statusText: 'x' }),
       );
       const { el, harness } = await setup('/p/aurora-x?variant=BLK-256', detail, 200, basket);

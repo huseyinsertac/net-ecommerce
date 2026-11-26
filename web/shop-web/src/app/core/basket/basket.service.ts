@@ -45,7 +45,13 @@ export class BasketService {
   constructor() {
     // Sign-in (or a session restored by reload): fold the anonymous cart into the user's cart.
     // The server makes merging idempotent, so firing on a restore is harmless.
-    this.auth.signedIn.subscribe(() => void this.mergeAfterSignIn().catch(() => undefined));
+    this.auth.signedIn.subscribe(
+      () =>
+        void this.mergeAfterSignIn().catch(() => {
+          // Merge failed: do not keep showing the anonymous cart as if it were the user's.
+          void this.load();
+        }),
+    );
 
     // Sign-out: the user's cart is no longer ours to show; reload so it becomes the anonymous cart.
     let wasSignedIn = false;
@@ -71,6 +77,27 @@ export class BasketService {
   /** Sets a line's quantity (0 removes it). Rejects with the HttpErrorResponse on failure. */
   setQuantity(variantId: string, quantity: number): Promise<void> {
     return this.mutate(this.api.setQuantity(variantId, quantity));
+  }
+
+  /**
+   * Adds `delta` to a line, capped at the per-line maximum. The current quantity is read when the
+   * task runs (after any queued merge or load has landed), and an unknown basket is fetched first,
+   * so the PUT can never lower a quantity the server already holds. Resolves false when the line
+   * was already at the maximum and nothing was sent.
+   */
+  add(variantId: string, delta: number): Promise<boolean> {
+    let added = false;
+    return this.enqueue(async () => {
+      if (this._basket() === null || this._loadFailed()) {
+        this._basket.set(await firstValueFrom(this.api.get()));
+        this._loadFailed.set(false);
+      }
+      const current = this._basket()?.lines.find((l) => l.variantId === variantId)?.quantity ?? 0;
+      if (current >= MAX_LINE_QUANTITY) return;
+      const next = Math.min(MAX_LINE_QUANTITY, current + delta);
+      this._basket.set(await firstValueFrom(this.api.setQuantity(variantId, next)));
+      added = true;
+    }).then(() => added);
   }
 
   remove(variantId: string): Promise<void> {

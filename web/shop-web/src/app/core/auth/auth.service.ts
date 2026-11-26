@@ -20,7 +20,7 @@ export class AuthService {
   private readonly _signedIn = new Subject<CurrentUser>();
   private token: string | null = null;
   private inflight: Promise<boolean> | null = null;
-  /** Bumped by every explicit sign-in and sign-out; a refresh started under an older value is stale. */
+  /** Bumped by every successful explicit sign-in and by sign-out; a refresh started under an older value is stale. */
   private generation = 0;
 
   readonly user: Signal<CurrentUser | null> = this._user.asReadonly();
@@ -40,23 +40,19 @@ export class AuthService {
   }
 
   async login(email: string, password: string): Promise<void> {
-    this.generation++;
-    this.apply(await firstValueFrom(this.api.login(email, password)));
+    this.applySignIn(await firstValueFrom(this.api.login(email, password)));
   }
 
   async register(email: string, password: string, displayName: string): Promise<void> {
-    this.generation++;
-    this.apply(await firstValueFrom(this.api.register(email, password, displayName)));
+    this.applySignIn(await firstValueFrom(this.api.register(email, password, displayName)));
   }
 
   async startDemoCustomer(): Promise<void> {
-    this.generation++;
-    this.apply(await firstValueFrom(this.api.demoCustomer()));
+    this.applySignIn(await firstValueFrom(this.api.demoCustomer()));
   }
 
   async startDemoAdmin(): Promise<void> {
-    this.generation++;
-    this.apply(await firstValueFrom(this.api.demoAdmin()));
+    this.applySignIn(await firstValueFrom(this.api.demoAdmin()));
   }
 
   /** Clears local state even if the request fails (the server clears the cookie regardless). */
@@ -116,6 +112,12 @@ export class AuthService {
       }
       return false;
     }
+  }
+
+  /** An explicit sign-in succeeded: any refresh still in flight now describes an older session. */
+  private applySignIn(res: AuthResponse): void {
+    this.generation++;
+    this.apply(res);
   }
 
   private apply(res: AuthResponse): void {

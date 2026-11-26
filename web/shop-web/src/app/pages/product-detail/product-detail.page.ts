@@ -124,16 +124,12 @@ export class ProductDetailPage {
     if (!v || v.available <= 0 || this.adding()) return;
     this.adding.set(true);
     try {
-      // Absolute quantities need the real current quantity, so wait for the first load if needed.
-      if (this.basket.basket() === null) await this.basket.load();
-      const current = this.basket.basket()?.lines.find((l) => l.variantId === v.id)?.quantity ?? 0;
-      if (current >= MAX_LINE_QUANTITY) {
+      if (!(await this.basket.add(v.id, 1))) {
         this.snackBar.open(`You can add up to ${MAX_LINE_QUANTITY} of each item.`, 'Dismiss', {
           duration: 5000,
         });
         return;
       }
-      await this.basket.setQuantity(v.id, current + 1);
       this.snackBar
         .open('Added to cart', 'View cart', { duration: 5000 })
         .onAction()

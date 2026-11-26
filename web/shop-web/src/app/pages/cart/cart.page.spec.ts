@@ -86,6 +86,10 @@ describe('CartPage', () => {
     await fixture.whenStable();
     expect(el.textContent).toContain('No longer available — remove it');
     expect(el.querySelector('.line-total')).toBeNull();
+    const warning = el.querySelector<HTMLElement>('.line > .warning')!;
+    expect(warning).not.toBeNull();
+    expect(warning.classList.contains('empty')).toBe(false);
+    expect(getComputedStyle(warning).gridArea.replace(/\s/g, '')).toBe('warn');
     expect(el.querySelector('.needs-attention')?.textContent).toContain(
       'Some items need attention.',
     );
