@@ -6,7 +6,14 @@ using Shop.SharedKernel;
 
 namespace Identity.Application.Auth;
 
-public sealed record Login(string Email, string Password) : ICommand<AuthResult>;
+public sealed record Login(string Email, string Password) : ICommand<AuthResult>
+{
+    private bool PrintMembers(System.Text.StringBuilder builder)
+    {
+        builder.Append("Email = ").Append(Email).Append(", Password = ***");
+        return true;
+    }
+}
 
 internal sealed class LoginValidator : AbstractValidator<Login>
 {
@@ -25,6 +32,8 @@ internal sealed class LoginHandler(
     IRefreshTokenPolicy refreshPolicy,
     TimeProvider clock) : ICommandHandler<Login, AuthResult>
 {
+    private const int MaxAttempts = 3;
+
     // A valid hash of a random password, computed once. Verifying against it costs the same as a real check, so unknown
     // emails, demo users and password-less users take as long to reject as a wrong password.
     private static string? _dummyHash;
@@ -53,10 +62,24 @@ internal sealed class LoginHandler(
         }
 
         var now = clock.GetUtcNow().UtcDateTime;
-        var (raw, hash) = refreshFactory.Create();
-        var refresh = user.IssueRefreshToken(hash, now, refreshPolicy.Lifetime);
-        await users.SaveChangesAsync(ct);
-
-        return AuthSession.Build(user, tokens, raw, refresh, now);
+        for (var attempt = 1; ; attempt++)
+        {
+            var (raw, hash) = refreshFactory.Create();
+            var refresh = user.IssueRefreshToken(hash, now, refreshPolicy.Lifetime);
+            try
+            {
+                await users.SaveChangesAsync(ct);
+                return AuthSession.Build(user, tokens, raw, refresh, now);
+            }
+            catch (ConcurrencyConflictException) when (attempt < MaxAttempts)
+            {
+                // A parallel sign-in or refresh touched this user first; reload the fresh state and issue again.
+                user = await users.GetByIdAsync(user.Id, ct);
+                if (user is null)
+                {
+                    return IdentityErrors.InvalidCredentials();
+                }
+            }
+        }
     }
 }

@@ -41,6 +41,10 @@ namespace Identity.Infrastructure.Persistence.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("family_id");
 
+                    b.Property<DateTime?>("GraceUsedAtUtc")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("grace_used_at_utc");
+
                     b.Property<Guid?>("ReplacedById")
                         .HasColumnType("uuid")
                         .HasColumnName("replaced_by_id");
@@ -110,6 +114,10 @@ namespace Identity.Infrastructure.Persistence.Migrations
                         .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("xid")
                         .HasColumnName("xmin");
+
+                    b.Property<int>("SessionVersion")
+                        .HasColumnType("integer")
+                        .HasColumnName("session_version");
 
                     b.HasKey("Id")
                         .HasName("pk_users");

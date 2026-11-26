@@ -24,7 +24,12 @@ public sealed class RefreshToken : Entity<Guid>
     public DateTime? RevokedAtUtc { get; private set; }
     public Guid? ReplacedById { get; private set; }
 
+    /// <summary>Set when the once-only reuse grace reissue was spent on this (already rotated) token.</summary>
+    public DateTime? GraceUsedAtUtc { get; private set; }
+
     public bool IsActive(DateTime nowUtc) => RevokedAtUtc is null && nowUtc < ExpiresAtUtc;
+
+    internal void MarkGraceUsed(DateTime nowUtc) => GraceUsedAtUtc ??= nowUtc;
 
     internal void Revoke(DateTime nowUtc, Guid? replacedById = null)
     {

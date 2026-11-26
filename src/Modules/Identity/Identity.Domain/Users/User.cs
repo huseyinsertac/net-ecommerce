@@ -26,6 +26,12 @@ public sealed class User : AggregateRoot<Guid>
     public DateTime CreatedAtUtc { get; private set; }
     public IReadOnlyList<RefreshToken> RefreshTokens => _refreshTokens;
 
+    /// <summary>
+    /// Bumped by every refresh-token mutation. Token rows have no concurrency token of their own, so this makes any two
+    /// concurrent token writes on the same user conflict on the user row (xmin) instead of silently interleaving.
+    /// </summary>
+    public int SessionVersion { get; private set; }
+
     public bool CanLogInWithPassword => PasswordHash is not null && !IsDemo;
 
     public static Result<User> Register(Email email, string displayName, string passwordHash, DateTime nowUtc)
@@ -48,6 +54,7 @@ public sealed class User : AggregateRoot<Guid>
 
     public RefreshToken IssueRefreshToken(string tokenHash, DateTime nowUtc, TimeSpan lifetime, Guid? familyId = null)
     {
+        SessionVersion++;
         _refreshTokens.RemoveAll(t => t.ExpiresAtUtc < nowUtc - PruneAfterExpiry);
 
         var token = new RefreshToken(Id, tokenHash, familyId ?? Guid.CreateVersion7(), nowUtc, lifetime);
@@ -68,6 +75,7 @@ public sealed class User : AggregateRoot<Guid>
         {
             if (IsBenignConcurrentReuse(existing, nowUtc, reuseGrace ?? ReuseGrace))
             {
+                existing.MarkGraceUsed(nowUtc);
                 return IssueRefreshToken(newHash, nowUtc, lifetime, existing.FamilyId);
             }
 
@@ -90,12 +98,14 @@ public sealed class User : AggregateRoot<Guid>
     private bool IsBenignConcurrentReuse(RefreshToken existing, DateTime nowUtc, TimeSpan grace) =>
         grace > TimeSpan.Zero
         && existing.ReplacedById is not null
+        && existing.GraceUsedAtUtc is null
         && nowUtc - existing.RevokedAtUtc!.Value <= grace
         && nowUtc < existing.ExpiresAtUtc
         && !_refreshTokens.Any(t => t.FamilyId == existing.FamilyId && t.RevokedAtUtc is not null && t.ReplacedById is null);
 
     public void RevokeFamily(Guid familyId, DateTime nowUtc)
     {
+        SessionVersion++;
         foreach (var token in _refreshTokens.Where(t => t.FamilyId == familyId))
         {
             token.Revoke(nowUtc);
@@ -104,6 +114,7 @@ public sealed class User : AggregateRoot<Guid>
 
     public void RevokeAll(DateTime nowUtc)
     {
+        SessionVersion++;
         foreach (var token in _refreshTokens)
         {
             token.Revoke(nowUtc);

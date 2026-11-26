@@ -20,7 +20,7 @@ public static class IdentityErrors
         Error.Unauthorized("identity.invalid_refresh_token", "The refresh token is invalid or expired.");
 
     public static Error UserNotFound() =>
-        Error.NotFound("identity.user_not_found", "The user no longer exists.");
+        Error.Unauthorized("identity.user_not_found", "The signed-in user no longer exists.");
 
     public static Error WeakPassword() =>
         Error.Validation("identity.weak_password",

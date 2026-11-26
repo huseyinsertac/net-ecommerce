@@ -5,7 +5,14 @@ using Shop.SharedKernel;
 
 namespace Identity.Application.Auth;
 
-public sealed record Refresh(string? RefreshTokenRaw) : ICommand<AuthResult>;
+public sealed record Refresh(string? RefreshTokenRaw) : ICommand<AuthResult>
+{
+    private bool PrintMembers(System.Text.StringBuilder builder)
+    {
+        builder.Append("RefreshTokenRaw = ").Append(RefreshTokenRaw is null ? "null" : "***");
+        return true;
+    }
+}
 
 internal sealed class RefreshHandler(
     IUserRepository users,
@@ -14,6 +21,8 @@ internal sealed class RefreshHandler(
     IRefreshTokenPolicy refreshPolicy,
     TimeProvider clock) : ICommandHandler<Refresh, AuthResult>
 {
+    private const int MaxAttempts = 3;
+
     public async Task<Result<AuthResult>> Handle(Refresh command, CancellationToken ct)
     {
         if (string.IsNullOrWhiteSpace(command.RefreshTokenRaw))
@@ -22,15 +31,18 @@ internal sealed class RefreshHandler(
         }
 
         var presentedHash = refreshFactory.Hash(command.RefreshTokenRaw);
-        try
+        for (var attempt = 1; ; attempt++)
         {
-            return await RotateAsync(presentedHash, ct);
-        }
-        catch (ConcurrencyConflictException)
-        {
-            // Another tab rotated the same token between our read and write. Reload once: the reuse grace turns the
-            // now-rotated token into a normal, successful refresh.
-            return await RotateAsync(presentedHash, ct);
+            try
+            {
+                return await RotateAsync(presentedHash, ct);
+            }
+            catch (ConcurrencyConflictException) when (attempt < MaxAttempts)
+            {
+                // Every token mutation bumps User.SessionVersion, so a concurrent rotation, logout or theft revocation of
+                // the same user makes our save conflict. The repository discarded its stale state; reload and decide again:
+                // a just-rotated token is then handled by the single reuse grace, a revoked family fails.
+            }
         }
     }
 

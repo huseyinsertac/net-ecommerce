@@ -6,7 +6,14 @@ using Shop.SharedKernel;
 
 namespace Identity.Application.Auth;
 
-public sealed record Register(string Email, string Password, string DisplayName) : ICommand<AuthResult>;
+public sealed record Register(string Email, string Password, string DisplayName) : ICommand<AuthResult>
+{
+    private bool PrintMembers(System.Text.StringBuilder builder)
+    {
+        builder.Append("Email = ").Append(Email).Append(", Password = ***, DisplayName = ").Append(DisplayName);
+        return true;
+    }
+}
 
 internal sealed class RegisterValidator : AbstractValidator<Register>
 {

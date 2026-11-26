@@ -161,6 +161,37 @@ public class UserTests
     }
 
     [Fact]
+    public void Rotate_SecondReplayWithinGrace_RevokesFamily()
+    {
+        var user = NewUser();
+        var first = user.IssueRefreshToken("h1", Now, Lifetime);
+        user.Rotate("h1", "h2", Now.AddMinutes(1), Lifetime);
+
+        var firstReplay = user.Rotate("h1", "h3", Now.AddMinutes(1).AddSeconds(5), Lifetime);
+        var secondReplay = user.Rotate("h1", "h4", Now.AddMinutes(1).AddSeconds(10), Lifetime);
+
+        firstReplay.IsSuccess.ShouldBeTrue();
+        secondReplay.IsFailure.ShouldBeTrue();
+        user.RefreshTokens.Where(t => t.FamilyId == first.FamilyId).ShouldAllBe(t => t.RevokedAtUtc != null);
+    }
+
+    [Fact]
+    public void SessionVersion_BumpsOnEveryTokenMutation()
+    {
+        var user = NewUser();
+        var v0 = user.SessionVersion;
+        var first = user.IssueRefreshToken("h1", Now, Lifetime);
+        var v1 = user.SessionVersion;
+        user.Rotate("h1", "h2", Now.AddMinutes(1), Lifetime);
+        var v2 = user.SessionVersion;
+        user.RevokeFamily(first.FamilyId, Now.AddMinutes(2));
+        var v3 = user.SessionVersion;
+        user.RevokeAll(Now.AddMinutes(3));
+
+        new[] { v0, v1, v2, v3, user.SessionVersion }.ShouldBe([v0, v0 + 1, v0 + 2, v0 + 3, v0 + 4]);
+    }
+
+    [Fact]
     public void Rotate_RotatedTokenWithinGrace_ButFamilyRevokedByLogout_Fails()
     {
         var user = NewUser();
