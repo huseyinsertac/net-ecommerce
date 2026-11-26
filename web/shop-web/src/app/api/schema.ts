@@ -211,6 +211,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/ordering/orders/{id}/checkout-status": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Where one of the caller's checkouts stands. Poll while the state is Pending; ReadyToPay carries the payment URL. */
+        get: operations["GetCheckoutStatus"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/payments/simulated/{orderId}": {
         parameters: {
             query?: never;
@@ -418,6 +435,15 @@ export interface components {
              * @description The total the shopper was shown, in USD. A different live total is refused with price_changed.
              */
             expectedTotal: number;
+        };
+        /** @enum {unknown} */
+        CheckoutState: "Pending" | "OutOfStock" | "ReadyToPay" | "Paid" | "Failed";
+        CheckoutStatusDto: {
+            state: components["schemas"]["CheckoutState"];
+            paymentUrl?: null | string;
+            reason?: null | string;
+            /** Format: date-time */
+            expiresAtUtc?: null | string;
         };
         FacetOptionDto: {
             value: string;
@@ -1150,6 +1176,46 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["OrderDto"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    GetCheckoutStatus: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CheckoutStatusDto"];
                 };
             };
             /** @description Unauthorized */

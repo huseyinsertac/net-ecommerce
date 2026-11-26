@@ -51,6 +51,14 @@ internal static class OrderingEndpoints
             .Produces<OrderDto>()
             .ProducesProblem(StatusCodes.Status401Unauthorized)
             .ProducesProblem(StatusCodes.Status404NotFound);
+
+        group.MapGet("/orders/{id:guid}/checkout-status", GetCheckoutStatusAsync)
+            .WithName("GetCheckoutStatus")
+            .WithTags(Tag)
+            .WithSummary("Where one of the caller's checkouts stands. Poll while the state is Pending; ReadyToPay carries the payment URL.")
+            .Produces<CheckoutStatusDto>()
+            .ProducesProblem(StatusCodes.Status401Unauthorized)
+            .ProducesProblem(StatusCodes.Status404NotFound);
     }
 
     /// <summary>A missing expected total is a 400 binding failure, never a silent 0.</summary>
@@ -113,6 +121,18 @@ internal static class OrderingEndpoints
         }
 
         var result = await dispatcher.Query(new GetOrder(userId, id), ct);
+        return result.IsSuccess ? TypedResults.Ok(result.Value) : result.Error.ToProblem();
+    }
+
+    private static async Task<IResult> GetCheckoutStatusAsync(
+        Guid id, ICurrentUser currentUser, IDispatcher dispatcher, CancellationToken ct)
+    {
+        if (currentUser.UserId is not { } userId || userId == Guid.Empty)
+        {
+            return TypedResults.Unauthorized();
+        }
+
+        var result = await dispatcher.Query(new GetCheckoutStatus(userId, id), ct);
         return result.IsSuccess ? TypedResults.Ok(result.Value) : result.Error.ToProblem();
     }
 }

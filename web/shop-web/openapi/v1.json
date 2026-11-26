@@ -812,6 +812,63 @@
         ]
       }
     },
+    "/api/ordering/orders/{id}/checkout-status": {
+      "get": {
+        "tags": [
+          "Ordering"
+        ],
+        "summary": "Where one of the caller\u0027s checkouts stands. Poll while the state is Pending; ReadyToPay carries the payment URL.",
+        "operationId": "GetCheckoutStatus",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CheckoutStatusDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem\u002Bjson": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem\u002Bjson": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
     "/api/payments/simulated/{orderId}": {
       "post": {
         "tags": [
@@ -1500,6 +1557,45 @@
             "type": "number",
             "description": "The total the shopper was shown, in USD. A different live total is refused with price_changed.",
             "format": "double"
+          }
+        }
+      },
+      "CheckoutState": {
+        "enum": [
+          "Pending",
+          "OutOfStock",
+          "ReadyToPay",
+          "Paid",
+          "Failed"
+        ]
+      },
+      "CheckoutStatusDto": {
+        "required": [
+          "state"
+        ],
+        "type": "object",
+        "properties": {
+          "state": {
+            "$ref": "#/components/schemas/CheckoutState"
+          },
+          "paymentUrl": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "reason": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "expiresAtUtc": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date-time"
           }
         }
       },

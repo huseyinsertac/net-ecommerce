@@ -56,6 +56,34 @@ public sealed record StatusChangeDto(
     DateTime AtUtc,
     string? Note);
 
+/// <summary>Where a checkout stands, as the client polling checkout-status sees it.</summary>
+public enum CheckoutState
+{
+    /// <summary>Still in progress (stock not yet reserved, or the payment outcome not yet applied): keep polling.</summary>
+    Pending,
+
+    /// <summary>The stock could not be reserved; the order is cancelled.</summary>
+    OutOfStock,
+
+    /// <summary>The payment session is open: send the shopper to the payment URL.</summary>
+    ReadyToPay,
+
+    /// <summary>The order is paid (or already further along).</summary>
+    Paid,
+
+    /// <summary>The order was cancelled for another reason, given in the reason field.</summary>
+    Failed,
+}
+
+/// <param name="PaymentUrl">Where the shopper pays; only when <paramref name="State"/> is ReadyToPay.</param>
+/// <param name="Reason">The cancellation reason (PaymentFailed, PaymentExpired or Admin); only when <paramref name="State"/> is Failed.</param>
+/// <param name="ExpiresAtUtc">When the payment session closes; only when <paramref name="State"/> is ReadyToPay.</param>
+public sealed record CheckoutStatusDto(
+    [property: JsonConverter(typeof(JsonStringEnumConverter<CheckoutState>))] CheckoutState State,
+    string? PaymentUrl = null,
+    string? Reason = null,
+    DateTime? ExpiresAtUtc = null);
+
 internal static class OrderMapping
 {
     public static OrderSummaryDto ToSummary(this Order order) => new(

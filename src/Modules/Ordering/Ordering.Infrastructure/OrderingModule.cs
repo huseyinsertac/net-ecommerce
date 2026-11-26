@@ -23,6 +23,7 @@ public sealed class OrderingModule : IModule
         services.AddScoped<IOrderRepository, OrderRepository>();
         services.AddScoped<IOrderPaymentQuery, OrderPaymentQuery>();
         services.AddApplicationHandlers(typeof(Ordering.Application.AssemblyReference).Assembly);
+        services.AddInboxHandlers<OrderingDbContext>(typeof(Ordering.Application.AssemblyReference).Assembly);
     }
 
     public void MapEndpoints(IEndpointRouteBuilder app)

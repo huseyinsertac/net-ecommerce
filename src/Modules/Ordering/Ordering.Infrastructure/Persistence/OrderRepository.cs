@@ -10,6 +10,9 @@ internal sealed class OrderRepository(OrderingDbContext db) : IOrderRepository
 {
     private IQueryable<Order> ReadOnlyOrders => db.Orders.AsNoTracking().Include(o => o.Lines);
 
+    public Task<Order?> GetAsync(Guid orderId, CancellationToken ct) =>
+        db.Orders.Include(o => o.Lines).SingleOrDefaultAsync(o => o.Id == orderId, ct);
+
     public Task<Order?> GetByIdempotencyKeyAsync(Guid customerId, Guid idempotencyKey, CancellationToken ct) =>
         ReadOnlyOrders.SingleOrDefaultAsync(o => o.CustomerId == customerId && o.IdempotencyKey == idempotencyKey, ct);
 

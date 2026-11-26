@@ -6,6 +6,9 @@ namespace Ordering.Application.Abstractions;
 /// <summary>Loads and saves the <see cref="Order"/> aggregate, always with its lines.</summary>
 public interface IOrderRepository
 {
+    /// <summary>The order, tracked so changes to it are saved; null when it does not exist.</summary>
+    Task<Order?> GetAsync(Guid orderId, CancellationToken ct);
+
     /// <summary>The customer's order placed with this idempotency key, if any.</summary>
     Task<Order?> GetByIdempotencyKeyAsync(Guid customerId, Guid idempotencyKey, CancellationToken ct);
 

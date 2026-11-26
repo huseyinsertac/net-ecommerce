@@ -5,6 +5,7 @@
     <ProjectReference Include="../Ordering.Contracts/Ordering.Contracts.csproj" />
     <ProjectReference Include="../../Basket/Basket.Contracts/Basket.Contracts.csproj" />
     <ProjectReference Include="../../Catalog/Catalog.Contracts/Catalog.Contracts.csproj" />
+    <ProjectReference Include="../../Payments/Payments.Contracts/Payments.Contracts.csproj" />
     <ProjectReference Include="../../../BuildingBlocks/Shop.Application.Abstractions/Shop.Application.Abstractions.csproj" />
   </ItemGroup>
 
