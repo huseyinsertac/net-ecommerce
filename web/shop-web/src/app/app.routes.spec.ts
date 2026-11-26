@@ -4,6 +4,8 @@ describe('routes', () => {
   it.each([
     ['', 'VoltLane'],
     ['search', 'Search · VoltLane'],
+    ['login', 'Sign in · VoltLane'],
+    ['register', 'Create account · VoltLane'],
     ['**', 'Page not found · VoltLane'],
   ])('%j has the tab title %j', (path, title) => {
     expect(routes.find((r) => r.path === path)?.title).toBe(title);

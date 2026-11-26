@@ -4,6 +4,10 @@
   <a mat-flat-button routerLink="/search">Shop all products</a>
 </section>
 
+@if (!auth.user()) {
+  <app-demo-panel />
+}
+
 <section class="section">
   <h2>Shop by category</h2>
   @if (categoryList(); as list) {

@@ -1,0 +1,39 @@
+<mat-card class="panel" appearance="outlined">
+  <mat-card-header>
+    <mat-card-title>Try it out — no sign-up needed</mat-card-title>
+    <mat-card-subtitle>
+      Customer accounts are private and temporary. Admin access is shared and reset nightly.
+    </mat-card-subtitle>
+  </mat-card-header>
+  <mat-card-content>
+    <div class="actions">
+      <button
+        mat-flat-button
+        type="button"
+        [disabled]="pending() !== null"
+        (click)="start('customer')"
+      >
+        @if (pending() === 'customer') {
+          <mat-spinner class="spinner" diameter="18" aria-hidden="true" />
+        } @else {
+          <mat-icon fontSet="material-symbols-outlined">shopping_bag</mat-icon>
+        }
+        Try as customer
+      </button>
+      <button
+        mat-stroked-button
+        type="button"
+        [disabled]="pending() !== null"
+        (click)="start('admin')"
+      >
+        @if (pending() === 'admin') {
+          <mat-spinner class="spinner" diameter="18" aria-hidden="true" />
+        } @else {
+          <mat-icon fontSet="material-symbols-outlined">admin_panel_settings</mat-icon>
+        }
+        Try as admin
+      </button>
+    </div>
+    <p class="error" role="alert" aria-live="assertive">{{ error() }}</p>
+  </mat-card-content>
+</mat-card>

@@ -1,0 +1,42 @@
+<div class="card">
+  <h1>Sign in</h1>
+  <p class="lede">Welcome back to VoltLane.</p>
+
+  <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+    <div class="form-error" role="alert" aria-live="assertive">{{ error() }}</div>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Email</mat-label>
+      <input matInput type="email" formControlName="email" autocomplete="email" required />
+      @if (form.controls.email.touched && form.controls.email.invalid) {
+        <mat-error>Enter a valid email address.</mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Password</mat-label>
+      <input
+        matInput
+        type="password"
+        formControlName="password"
+        autocomplete="current-password"
+        required
+      />
+      @if (form.controls.password.touched && form.controls.password.invalid) {
+        <mat-error>Enter your password.</mat-error>
+      }
+    </mat-form-field>
+
+    <button mat-flat-button class="submit" type="submit" [disabled]="busy()">
+      @if (busy()) {
+        <mat-spinner class="spinner" diameter="18" aria-hidden="true" />
+      }
+      Sign in
+    </button>
+  </form>
+
+  <p class="alt">New here? <a routerLink="/register">Create an account</a></p>
+  <p class="note">
+    Just looking around? <a routerLink="/">Try a one-click demo account</a> on the home page.
+  </p>
+</div>

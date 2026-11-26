@@ -1,7 +1,10 @@
-import { Component } from '@angular/core';
+import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
+import { Component, signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { Router, provideRouter } from '@angular/router';
 import { BRAND } from '../../brand';
+import { AuthService, CurrentUser } from '../../core/auth/auth.service';
 import { HeaderComponent } from './header.component';
 
 @Component({ template: '' })
@@ -12,6 +15,8 @@ describe('HeaderComponent', () => {
     TestBed.configureTestingModule({
       imports: [HeaderComponent],
       providers: [
+        provideHttpClient(),
+        provideHttpClientTesting(),
         provideRouter([
           { path: 'search', component: Dummy },
           { path: '', component: Dummy },
@@ -108,5 +113,31 @@ describe('HeaderComponent', () => {
     toggle.click();
     await fixture.whenStable();
     expect(form.classList.contains('open')).toBe(false);
+  });
+
+  describe('account area', () => {
+    const user = signal<CurrentUser | null>(null);
+
+    beforeEach(() => {
+      user.set(null);
+      TestBed.overrideProvider(AuthService, {
+        useValue: { user, isAdmin: () => false, logout: vi.fn() },
+      });
+    });
+
+    it('shows Sign in when signed out, display name initial when signed in', async () => {
+      const fixture = TestBed.createComponent(HeaderComponent);
+      await fixture.whenStable();
+      const el = fixture.nativeElement as HTMLElement;
+      expect(el.querySelector('a[href="/login"]')?.textContent).toContain('Sign in');
+      expect(el.querySelector('.account-button')).toBeNull();
+
+      user.set({ id: '1', email: 'a@x.io', displayName: 'ada', roles: [], isDemo: false });
+      await fixture.whenStable();
+      expect(el.querySelector('a[href="/login"]')).toBeNull();
+      const avatar = el.querySelector<HTMLButtonElement>('.account-button')!;
+      expect(avatar.textContent?.trim()).toBe('A');
+      expect(avatar.getAttribute('aria-label')).toContain('ada');
+    });
   });
 });

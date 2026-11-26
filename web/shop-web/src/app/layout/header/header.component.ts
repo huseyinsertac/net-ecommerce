@@ -19,6 +19,7 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import { NavigationEnd, Router, RouterLink } from '@angular/router';
 import { filter, map, startWith } from 'rxjs';
 import { BRAND } from '../../brand';
+import { AuthService } from '../../core/auth/auth.service';
 
 @Component({
   selector: 'app-header',
@@ -39,6 +40,7 @@ import { BRAND } from '../../brand';
 export class HeaderComponent {
   protected readonly brand = BRAND;
   protected readonly cartCount = 0;
+  protected readonly auth = inject(AuthService);
   private readonly router = inject(Router);
   /** Phone layout only: whether the search row is expanded. */
   protected readonly searchOpen = signal(false);
@@ -68,6 +70,11 @@ export class HeaderComponent {
         injector: this.injector,
       });
     }
+  }
+
+  protected async signOut(): Promise<void> {
+    await this.auth.logout();
+    await this.router.navigateByUrl('/');
   }
 
   protected search(event: Event, value: string): void {

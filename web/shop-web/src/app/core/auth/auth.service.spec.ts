@@ -1,0 +1,97 @@
+import { provideHttpClient } from '@angular/common/http';
+import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
+import { TestBed } from '@angular/core/testing';
+import { AuthService } from './auth.service';
+
+const res = (token: string, id = 'u1', roles: string[] = ['Customer']) => ({
+  accessToken: token,
+  expiresAtUtc: '2030-01-01T00:00:00Z',
+  user: { id, email: `${id}@x.io`, displayName: 'Ada', roles, isDemo: false },
+});
+
+describe('AuthService', () => {
+  let auth: AuthService;
+  let http: HttpTestingController;
+
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      providers: [provideHttpClient(), provideHttpClientTesting()],
+    });
+    auth = TestBed.inject(AuthService);
+    http = TestBed.inject(HttpTestingController);
+  });
+
+  afterEach(() => http.verify());
+
+  async function loginAs(token = 't1', id = 'u1', roles?: string[]) {
+    const p = auth.login('a@x.io', 'pw');
+    http.expectOne('/api/identity/login').flush(res(token, id, roles));
+    await p;
+  }
+
+  it('login sets user and token', async () => {
+    const p = auth.login('a@x.io', 'pw');
+    const req = http.expectOne('/api/identity/login');
+    expect(req.request.body).toEqual({ email: 'a@x.io', password: 'pw' });
+    req.flush(res('t1'));
+    await p;
+    expect(auth.user()?.displayName).toBe('Ada');
+    expect(auth.accessToken()).toBe('t1');
+    expect(auth.isAdmin()).toBe(false);
+  });
+
+  it('isAdmin is true for the Admin role', async () => {
+    await loginAs('t1', 'u1', ['Admin']);
+    expect(auth.isAdmin()).toBe(true);
+  });
+
+  it('logout clears user even if request fails', async () => {
+    await loginAs();
+    const p = auth.logout();
+    http.expectOne('/api/identity/logout').flush(null, { status: 409, statusText: 'Conflict' });
+    await p;
+    expect(auth.user()).toBeNull();
+    expect(auth.accessToken()).toBeNull();
+  });
+
+  it('signedIn emits on sign-in but not on a token-only refresh of the same user', async () => {
+    const seen: string[] = [];
+    auth.signedIn.subscribe((u) => seen.push(u.id));
+    await loginAs('t1', 'u1');
+    const p = auth.refresh();
+    http.expectOne('/api/identity/refresh').flush(res('t2', 'u1'));
+    await p;
+    expect(auth.accessToken()).toBe('t2');
+    expect(seen).toEqual(['u1']);
+  });
+
+  it('refresh is single-flight', async () => {
+    const a = auth.refresh();
+    const b = auth.refresh();
+    http.expectOne('/api/identity/refresh').flush(res('t9'));
+    expect(await Promise.all([a, b])).toEqual([true, true]);
+  });
+
+  it('refresh 401 clears the session; 429 keeps it', async () => {
+    await loginAs();
+    let p = auth.refresh();
+    http
+      .expectOne('/api/identity/refresh')
+      .flush({ type: 'rate_limited' }, { status: 429, statusText: 'Too Many' });
+    expect(await p).toBe(false);
+    expect(auth.user()).not.toBeNull();
+    p = auth.refresh();
+    http.expectOne('/api/identity/refresh').flush({}, { status: 401, statusText: 'Unauthorized' });
+    expect(await p).toBe(false);
+    expect(auth.user()).toBeNull();
+  });
+
+  it('initialize becomes ready even when the refresh fails', async () => {
+    const p = auth.initialize();
+    expect(auth.ready()).toBe(false);
+    http.expectOne('/api/identity/refresh').flush({}, { status: 401, statusText: 'Unauthorized' });
+    await p;
+    expect(auth.ready()).toBe(true);
+    expect(auth.user()).toBeNull();
+  });
+});

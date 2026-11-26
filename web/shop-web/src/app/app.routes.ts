@@ -8,6 +8,16 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/home/home.component').then((m) => m.HomeComponent),
   },
   {
+    path: 'login',
+    title: 'Sign in · VoltLane',
+    loadComponent: () => import('./pages/login/login.page').then((m) => m.LoginPage),
+  },
+  {
+    path: 'register',
+    title: 'Create account · VoltLane',
+    loadComponent: () => import('./pages/register/register.page').then((m) => m.RegisterPage),
+  },
+  {
     path: 'c/:slug',
     loadComponent: () =>
       import('./pages/product-list/product-list.page').then((m) => m.ProductListPage),
