@@ -11,8 +11,20 @@ public sealed class OutboxProcessorTests(PostgresFixture postgres)
 {
     private static CancellationToken Ct => TestContext.Current.CancellationToken;
 
-    private Task<ServiceProvider> BuildWithRecordingHandler() =>
-        TestHost.BuildAsync(postgres, s => s.AddScoped<IIntegrationEventHandler<TestEvent>, RecordingHandler>(), Ct);
+    private Task<ServiceProvider> BuildWithRecordingHandler(TestClock? clock = null, Action<OutboxOptions>? configure = null) =>
+        TestHost.BuildAsync(postgres, s =>
+        {
+            s.AddScoped<IIntegrationEventHandler<TestEvent>, RecordingHandler>();
+            if (clock is not null)
+            {
+                s.AddSingleton<TimeProvider>(clock);
+            }
+
+            if (configure is not null)
+            {
+                s.Configure(configure);
+            }
+        }, Ct);
 
     [Fact]
     public async Task ProcessBatch_PublishesPendingMessage_AndMarksProcessed()
@@ -49,21 +61,23 @@ public sealed class OutboxProcessorTests(PostgresFixture postgres)
     [Fact]
     public async Task ProcessBatch_AfterMaxAttempts_StopsRetrying()
     {
-        await using var sp = await BuildWithRecordingHandler();
+        var clock = new TestClock();
+        await using var sp = await BuildWithRecordingHandler(clock);
         var probe = sp.GetRequiredService<HandlerProbe>();
         probe.AlwaysThrow = true;
         await TestHost.EnqueueAsync(sp, 1, Ct);
         var processor = TestHost.CreateProcessor(sp);
 
-        for (var i = 0; i < 6; i++)
+        for (var i = 0; i < 11; i++)
         {
             await processor.ProcessBatchAsync(Ct);
+            clock.Advance(TimeSpan.FromMinutes(5));
         }
 
         probe.Calls.Count.ShouldBe(new OutboxOptions().MaxAttempts);
-        probe.Calls.Count.ShouldBe(5);
+        probe.Calls.Count.ShouldBe(10);
         var row = (await TestHost.OutboxAsync(sp, Ct)).ShouldHaveSingleItem();
-        row.Attempts.ShouldBe(5);
+        row.Attempts.ShouldBe(10);
         row.ProcessedOnUtc.ShouldBeNull();
         (await processor.ProcessBatchAsync(Ct)).ShouldBe(0);
     }
@@ -130,5 +144,97 @@ public sealed class OutboxProcessorTests(PostgresFixture postgres)
         delivered.ShouldBe(events.Select(e => e.Id), ignoreOrder: true);
         probe.MaxInFlight.ShouldBeGreaterThan(1, "both processors should have been delivering at the same time");
         (await TestHost.OutboxAsync(sp, Ct)).ShouldAllBe(r => r.ProcessedOnUtc != null);
+    }
+
+    [Fact]
+    public async Task Failed_message_is_not_retried_before_its_backoff_elapses()
+    {
+        var clock = new TestClock();
+        await using var sp = await BuildWithRecordingHandler(clock);
+        var probe = sp.GetRequiredService<HandlerProbe>();
+        probe.AlwaysThrow = true;
+        await TestHost.EnqueueAsync(sp, 1, Ct);
+        var processor = TestHost.CreateProcessor(sp);
+
+        (await processor.ProcessBatchAsync(Ct)).ShouldBe(1);
+        probe.AlwaysThrow = false;
+
+        (await processor.ProcessBatchAsync(Ct)).ShouldBe(0);
+        clock.Advance(TimeSpan.FromSeconds(1));
+        (await processor.ProcessBatchAsync(Ct)).ShouldBe(1);
+
+        var row = (await TestHost.OutboxAsync(sp, Ct)).ShouldHaveSingleItem();
+        row.Attempts.ShouldBe(1);
+        row.ProcessedOnUtc.ShouldNotBeNull();
+    }
+
+    [Fact]
+    public async Task Backoff_doubles_and_is_capped()
+    {
+        var clock = new TestClock();
+        await using var sp = await BuildWithRecordingHandler(clock);
+        sp.GetRequiredService<HandlerProbe>().AlwaysThrow = true;
+        await TestHost.EnqueueAsync(sp, 1, Ct);
+        var processor = TestHost.CreateProcessor(sp);
+
+        var lastFailureAt = clock.GetUtcNow().UtcDateTime;
+        for (var i = 0; i < 3; i++)
+        {
+            lastFailureAt = clock.GetUtcNow().UtcDateTime;
+            await processor.ProcessBatchAsync(Ct);
+            clock.Advance(TimeSpan.FromMinutes(1));
+        }
+
+        // Delays were 1 s, 2 s, 4 s.
+        var row = (await TestHost.OutboxAsync(sp, Ct)).ShouldHaveSingleItem();
+        row.Attempts.ShouldBe(3);
+        (row.NextAttemptOnUtc!.Value - lastFailureAt).ShouldBe(TimeSpan.FromSeconds(4));
+    }
+
+    [Fact]
+    public async Task Backoff_is_capped_at_RetryMaxDelay()
+    {
+        var clock = new TestClock();
+        await using var sp = await BuildWithRecordingHandler(clock, o => o.RetryMaxDelay = TimeSpan.FromSeconds(3));
+        sp.GetRequiredService<HandlerProbe>().AlwaysThrow = true;
+        await TestHost.EnqueueAsync(sp, 1, Ct);
+        var processor = TestHost.CreateProcessor(sp);
+
+        var lastFailureAt = clock.GetUtcNow().UtcDateTime;
+        for (var i = 0; i < 3; i++)
+        {
+            lastFailureAt = clock.GetUtcNow().UtcDateTime;
+            await processor.ProcessBatchAsync(Ct);
+            clock.Advance(TimeSpan.FromMinutes(1));
+        }
+
+        var row = (await TestHost.OutboxAsync(sp, Ct)).ShouldHaveSingleItem();
+        (row.NextAttemptOnUtc!.Value - lastFailureAt).ShouldBe(TimeSpan.FromSeconds(3));
+    }
+
+    [Fact]
+    public async Task Message_parks_after_MaxAttempts()
+    {
+        var clock = new TestClock();
+        await using var sp = await BuildWithRecordingHandler(clock, o => o.MaxAttempts = 3);
+        var probe = sp.GetRequiredService<HandlerProbe>();
+        probe.AlwaysThrow = true;
+        await TestHost.EnqueueAsync(sp, 1, Ct);
+        var processor = TestHost.CreateProcessor(sp);
+
+        for (var i = 0; i < 3; i++)
+        {
+            (await processor.ProcessBatchAsync(Ct)).ShouldBe(1);
+            clock.Advance(TimeSpan.FromHours(1));
+        }
+
+        (await processor.ProcessBatchAsync(Ct)).ShouldBe(0);
+        clock.Advance(TimeSpan.FromDays(1));
+        (await processor.ProcessBatchAsync(Ct)).ShouldBe(0);
+        probe.Calls.Count.ShouldBe(3);
+        var row = (await TestHost.OutboxAsync(sp, Ct)).ShouldHaveSingleItem();
+        row.Attempts.ShouldBe(3);
+        row.Error.ShouldNotBeNull().ShouldContain("handler exploded");
+        row.ProcessedOnUtc.ShouldBeNull();
     }
 }

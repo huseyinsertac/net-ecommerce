@@ -263,6 +263,10 @@ namespace Catalog.Infrastructure.Persistence.Migrations
                         .HasColumnType("text")
                         .HasColumnName("error");
 
+                    b.Property<DateTime?>("NextAttemptOnUtc")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("next_attempt_on_utc");
+
                     b.Property<DateTime>("OccurredOnUtc")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("occurred_on_utc");
@@ -280,8 +284,8 @@ namespace Catalog.Infrastructure.Persistence.Migrations
                     b.HasKey("Id")
                         .HasName("pk_outbox_messages");
 
-                    b.HasIndex("OccurredOnUtc")
-                        .HasDatabaseName("ix_outbox_messages_occurred_on_utc")
+                    b.HasIndex("NextAttemptOnUtc", "OccurredOnUtc")
+                        .HasDatabaseName("ix_outbox_messages_next_attempt_on_utc_occurred_on_utc")
                         .HasFilter("processed_on_utc IS NULL");
 
                     b.ToTable("outbox_messages", "catalog");

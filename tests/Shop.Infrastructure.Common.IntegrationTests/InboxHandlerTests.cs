@@ -34,7 +34,9 @@ public sealed class InboxHandlerTests(PostgresFixture postgres)
     [Fact]
     public async Task OneOfTwoHandlersFails_RetryDoesNotReinvokeSucceededHandler()
     {
+        var clock = new TestClock();
         await using var sp = await TestHost.BuildAsync(postgres, s => s
+            .AddSingleton<TimeProvider>(clock)
             .AddInboxHandler<TestEvent, HandlerA, TestModuleDbContext>()
             .AddInboxHandler<TestEvent, HandlerB, TestModuleDbContext>(), Ct);
         var probe = sp.GetRequiredService<HandlerProbe>();
@@ -43,6 +45,7 @@ public sealed class InboxHandlerTests(PostgresFixture postgres)
         var processor = TestHost.CreateProcessor(sp);
 
         await processor.ProcessBatchAsync(Ct);
+        clock.Advance(TimeSpan.FromSeconds(1));
         await processor.ProcessBatchAsync(Ct);
 
         probe.CountFor(nameof(HandlerA)).ShouldBe(1);
