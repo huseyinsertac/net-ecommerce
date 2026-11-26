@@ -2,18 +2,21 @@ import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@a
 import { MatButtonModule } from '@angular/material/button';
 import { RouterLink } from '@angular/router';
 import { BRAND } from '../../brand';
+import { AuthService } from '../../core/auth/auth.service';
 import { CatalogApi } from '../../api/catalog-api.service';
+import { DemoPanelComponent } from './demo-panel/demo-panel.component';
 import { ProductCardComponent } from '../../shared/product-card/product-card.component';
 
 @Component({
   selector: 'app-home',
-  imports: [MatButtonModule, RouterLink, ProductCardComponent],
+  imports: [MatButtonModule, RouterLink, DemoPanelComponent, ProductCardComponent],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class HomeComponent {
   private readonly api = inject(CatalogApi);
+  protected readonly auth = inject(AuthService);
 
   protected readonly brand = BRAND;
   protected readonly skeletons = Array.from({ length: 8 }, (_, i) => i);

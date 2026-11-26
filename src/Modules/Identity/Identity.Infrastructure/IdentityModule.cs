@@ -1,4 +1,8 @@
+using Identity.Application.Abstractions;
+using Identity.Infrastructure.Endpoints;
 using Identity.Infrastructure.Persistence;
+using Identity.Infrastructure.Security;
+using Identity.Infrastructure.Seeding;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
@@ -11,16 +15,26 @@ namespace Identity.Infrastructure;
 
 public sealed class IdentityModule : IModule
 {
+    /// <summary>The refresh cookie's name, for the host's refresh rate limit (which only counts calls that carry it).</summary>
+    public const string RefreshCookieName = RefreshCookie.Name;
+
     public string Name => "identity";
 
     public void Register(IServiceCollection services, IConfiguration configuration)
     {
         services.AddModuleDbContext<IdentityDbContext>(configuration);
+        services.AddScoped<IUserRepository, UserRepository>();
+        services.AddSingleton<IPasswordHasher, AspNetPasswordHasher>();
+        services.AddSingleton<ITokenIssuer, JwtTokenIssuer>();
+        services.AddSingleton<IRefreshTokenFactory, RefreshTokenFactory>();
+        services.AddSingleton<IRefreshTokenPolicy, ConfiguredRefreshTokenPolicy>();
+        services.AddScoped<IModuleSeeder, IdentitySeeder>();
+        services.AddShopAuthentication(configuration);
         services.AddApplicationHandlers(typeof(Identity.Application.AssemblyReference).Assembly);
     }
 
     public void MapEndpoints(IEndpointRouteBuilder app)
     {
-        app.MapGroup($"/api/{Name}");
+        IdentityEndpoints.Map(app.MapGroup($"/api/{Name}"));
     }
 }

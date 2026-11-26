@@ -7,6 +7,8 @@ using Serilog.Formatting.Compact;
 using Shop.Api;
 using Shop.Api.ErrorHandling;
 using Shop.Application.Abstractions;
+using Shop.Application.Abstractions.Identity;
+using Shop.Infrastructure.Common.Http;
 using Shop.Infrastructure.Common.Modules;
 using Shop.Infrastructure.Common.Persistence;
 
@@ -39,8 +41,12 @@ builder.Services.Configure<ForwardedHeadersOptions>(options =>
 });
 
 builder.Services.AddProblemDetails();
+builder.Services.AddShopRateLimiting();
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddOpenApi(OpenApiConfiguration.Configure);
+
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<ICurrentUser, CurrentUser>();
 
 builder.Services.AddDispatcher();
 builder.Services.AddEventing(
@@ -65,6 +71,16 @@ app.UseForwardedHeaders();
 app.UseSerilogRequestLogging();
 app.UseExceptionHandler();
 app.UseStatusCodePages();
+
+// Before rate limiting, so a forged cross-site request is refused without spending anyone's budget.
+app.UseCsrfHeaderCheck();
+
+// After the implicit UseRouting (so endpoint policies are visible) and before the endpoints run.
+app.UseRateLimiter();
+
+// Authentication itself (JWT bearer + the Admin policy) is registered by the Identity module.
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.MapOpenApi();
 app.MapScalarApiReference();

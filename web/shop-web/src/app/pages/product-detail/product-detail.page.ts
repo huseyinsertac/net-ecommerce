@@ -1,11 +1,24 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { ChangeDetectionStrategy, Component, computed, effect, inject } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  effect,
+  inject,
+  signal,
+} from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { Title } from '@angular/platform-browser';
 import { MatButtonModule } from '@angular/material/button';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { combineLatest, map } from 'rxjs';
 import { CatalogApi, ProductDetail } from '../../api/catalog-api.service';
+import {
+  BasketService,
+  MAX_LINE_QUANTITY,
+  basketErrorMessage,
+} from '../../core/basket/basket.service';
 import { MoneyPipe } from '../../core/money.pipe';
 import { NotFoundComponent } from '../../shared/not-found/not-found.component';
 import { StockBadgeComponent } from '../../shared/stock-badge/stock-badge.component';
@@ -39,6 +52,8 @@ export class ProductDetailPage {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly titleService = inject(Title);
+  private readonly basket = inject(BasketService);
+  private readonly snackBar = inject(MatSnackBar);
 
   private readonly params = toSignal(
     combineLatest([this.route.paramMap, this.route.queryParamMap]).pipe(
@@ -69,6 +84,10 @@ export class ProductDetailPage {
   protected readonly selection = computed<Selection>(() => this.variant()?.options ?? {});
   protected readonly hasPicker = computed(() => (this.detail()?.options.length ?? 0) > 0);
 
+  /** True while an add is in flight: the button is disabled so a double click cannot send twice. */
+  protected readonly adding = signal(false);
+  protected readonly inStock = computed(() => (this.variant()?.available ?? 0) > 0);
+
   constructor() {
     effect(() => {
       const d = this.detail();
@@ -97,5 +116,29 @@ export class ProductDetailPage {
       queryParamsHandling: 'merge',
       replaceUrl: true,
     });
+  }
+
+  /** Adds one of the selected variant: the cart quantity plus 1, capped at the per-line maximum. */
+  protected async addToCart(): Promise<void> {
+    const v = this.variant();
+    if (!v || v.available <= 0 || this.adding()) return;
+    this.adding.set(true);
+    try {
+      if (!(await this.basket.add(v.id, 1))) {
+        this.snackBar.open(`You can add up to ${MAX_LINE_QUANTITY} of each item.`, 'Dismiss', {
+          duration: 5000,
+        });
+        return;
+      }
+      this.snackBar
+        .open('Added to cart', 'View cart', { duration: 5000 })
+        .onAction()
+        .subscribe(() => void this.router.navigateByUrl('/cart'));
+    } catch (err) {
+      const message = basketErrorMessage(err);
+      if (message) this.snackBar.open(message, 'Dismiss', { duration: 6000 });
+    } finally {
+      this.adding.set(false);
+    }
   }
 }

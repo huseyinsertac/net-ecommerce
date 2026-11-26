@@ -1,0 +1,147 @@
+<div class="page">
+  <h1>Cart</h1>
+
+  @switch (view()) {
+    @case ('loading') {
+      <div class="layout" aria-busy="true" aria-label="Loading your cart">
+        <div class="skeleton-lines">
+          @for (row of skeletonRows; track row) {
+            <div class="sk sk-row"></div>
+          }
+        </div>
+        <div class="sk sk-summary"></div>
+      </div>
+    }
+    @case ('error') {
+      <div class="empty">
+        <h2>We couldn't load your cart</h2>
+        <p>Please try again in a moment.</p>
+        <button mat-flat-button type="button" class="retry" (click)="retry()">Retry</button>
+      </div>
+    }
+    @case ('empty') {
+      <div class="empty">
+        <mat-icon class="empty-icon" fontSet="material-symbols-outlined">shopping_cart</mat-icon>
+        <h2>Your cart is empty</h2>
+        <p>Items you add will show up here.</p>
+        <a mat-flat-button routerLink="/">Start shopping</a>
+      </div>
+    }
+    @case ('lines') {
+      @let basket = cart.basket()!;
+      <div class="layout">
+        <ul class="lines" aria-label="Items in your cart">
+          <li class="lines-head" aria-hidden="true">
+            <span class="h-product">Product</span>
+            <span class="h-unit">Price</span>
+            <span class="h-qty">Quantity</span>
+            <span class="h-total">Total</span>
+          </li>
+          @for (line of basket.lines; track line.variantId) {
+            <li class="line" [class.flagged]="line.issue">
+              @if (line.productSlug && line.thumbnailUrl) {
+                <a class="thumb" [routerLink]="['/p', line.productSlug]" [attr.aria-label]="name(line)">
+                  <img [src]="line.thumbnailUrl" alt="" width="88" height="88" loading="lazy" />
+                </a>
+              } @else {
+                <span class="thumb placeholder" aria-hidden="true">
+                  <mat-icon fontSet="material-symbols-outlined">image_not_supported</mat-icon>
+                </span>
+              }
+
+              <div class="info">
+                @if (line.brand) {
+                  <span class="brand">{{ line.brand }}</span>
+                }
+                @if (line.productSlug && line.issue !== 'unavailable') {
+                  <a class="name" [routerLink]="['/p', line.productSlug]">{{ name(line) }}</a>
+                } @else {
+                  <span class="name">{{ name(line) }}</span>
+                }
+                @if (line.optionsLabel) {
+                  <span class="options">{{ line.optionsLabel }}</span>
+                }
+              </div>
+
+              @if (line.unitPrice !== null) {
+                <span class="unit">{{ line.unitPrice | money }}</span>
+              }
+
+              <div class="qty">
+                @if (line.issue !== 'unavailable') {
+                  <div class="stepper" role="group" [attr.aria-label]="'Quantity of ' + name(line)">
+                    <button
+                      mat-icon-button
+                      type="button"
+                      [attr.aria-label]="'Decrease quantity of ' + name(line)"
+                      [disabled]="shown(line) <= 1 || max(line) < 1"
+                      (click)="step(line, -1)"
+                    >
+                      <mat-icon fontSet="material-symbols-outlined">remove</mat-icon>
+                    </button>
+                    <span class="qty-value" aria-live="polite">{{ shown(line) }}</span>
+                    <button
+                      mat-icon-button
+                      type="button"
+                      [attr.aria-label]="'Increase quantity of ' + name(line)"
+                      [disabled]="shown(line) >= max(line)"
+                      (click)="step(line, 1)"
+                    >
+                      <mat-icon fontSet="material-symbols-outlined">add</mat-icon>
+                    </button>
+                  </div>
+                }
+                <button
+                  mat-icon-button
+                  type="button"
+                  class="delete"
+                  [attr.aria-label]="'Remove ' + name(line) + ' from cart'"
+                  (click)="remove(line)"
+                >
+                  <mat-icon fontSet="material-symbols-outlined">delete</mat-icon>
+                </button>
+              </div>
+
+              @if (line.lineTotal !== null && !line.issue) {
+                <span class="line-total">{{ line.lineTotal | money }}</span>
+              }
+
+              @if (line.issue === 'unavailable') {
+                <p class="warning">
+                  <mat-icon fontSet="material-symbols-outlined">error</mat-icon>
+                  No longer available — remove it
+                </p>
+              } @else if (line.issue === 'insufficientStock') {
+                <p class="warning">
+                  <mat-icon fontSet="material-symbols-outlined">warning</mat-icon>
+                  @if (line.available > 0) {
+                    Only {{ line.available }} left — lower the quantity
+                  } @else {
+                    Out of stock — remove it
+                  }
+                </p>
+              }
+            </li>
+          }
+        </ul>
+
+        <aside class="summary" aria-label="Order summary">
+          <h2>Summary</h2>
+          <div class="row">
+            <span>Subtotal ({{ basket.itemCount }} {{ basket.itemCount === 1 ? 'item' : 'items' }})</span>
+            <strong>{{ basket.subtotal | money }}</strong>
+          </div>
+          @if (basket.hasIssues) {
+            <p class="needs-attention" role="status">
+              <mat-icon fontSet="material-symbols-outlined">warning</mat-icon>
+              Some items need attention.
+            </p>
+          }
+          <button mat-flat-button type="button" disabled>Checkout — coming soon</button>
+          <p class="caption">Checkout arrives with payments.</p>
+          <a mat-button routerLink="/">Continue shopping</a>
+        </aside>
+      </div>
+    }
+  }
+</div>

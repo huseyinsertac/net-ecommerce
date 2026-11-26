@@ -100,6 +100,71 @@ public sealed class HostTests(ShopApiFactory factory)
         url.ShouldNotBeNull().ShouldStartWith("https://shop.example.com");
     }
 
+    [Theory]
+    [InlineData("POST", "/api/identity/refresh")]
+    [InlineData("POST", "/api/identity/logout")]
+    [InlineData("POST", "/api/identity/demo/customer")]
+    [InlineData("POST", "/api/identity/demo/admin")]
+    [InlineData("POST", "/api/identity/login")]
+    [InlineData("POST", "/api/identity/register")]
+    [InlineData("POST", "/api/basket/merge")]
+    [InlineData("PUT", "/api/basket/items/0190b2b4-0000-7000-8000-000000000001")]
+    [InlineData("DELETE", "/api/basket/items/0190b2b4-0000-7000-8000-000000000001")]
+    [InlineData("DELETE", "/api/basket")]
+    public async Task NonGetApiRequest_WithoutCsrfHeader_400MissingCsrfHeader(string method, string path)
+    {
+        using var client = WithoutCsrfHeader();
+        using var request = new HttpRequestMessage(new HttpMethod(method), path)
+        {
+            Content = JsonContent.Create(new { quantity = 1, email = "a@b.test", password = "x", displayName = "x" }),
+        };
+
+        var response = await client.SendAsync(request, Ct);
+
+        response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
+        response.Content.Headers.ContentType!.MediaType.ShouldBe("application/problem+json");
+        using var json = JsonDocument.Parse(await response.Content.ReadAsStringAsync(Ct));
+        json.RootElement.GetProperty("type").GetString().ShouldBe("request.missing_csrf_header");
+        response.Headers.Contains("Set-Cookie").ShouldBeFalse();
+    }
+
+    [Fact]
+    public async Task Post_WithWrongCsrfHeaderValue_400()
+    {
+        using var client = WithoutCsrfHeader();
+        client.DefaultRequestHeaders.Add(ShopApiFactory.CsrfHeaderName, "XMLHttpRequest");
+
+        var response = await client.PostAsync("/api/identity/demo/customer", null, Ct);
+
+        response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
+    }
+
+    [Fact]
+    public async Task Get_WithoutCsrfHeader_StillWorks()
+    {
+        using var client = WithoutCsrfHeader();
+
+        (await client.GetAsync("/api/basket", Ct)).StatusCode.ShouldBe(HttpStatusCode.OK);
+        (await client.GetAsync("/api/system/info", Ct)).StatusCode.ShouldBe(HttpStatusCode.OK);
+    }
+
+    [Fact]
+    public async Task Post_WithCsrfHeader_ReachesTheEndpoint()
+    {
+        using var client = factory.CreateClient(); // the factory adds the header
+
+        var response = await client.PostAsync("/api/identity/logout", null, Ct);
+
+        response.StatusCode.ShouldBe(HttpStatusCode.NoContent);
+    }
+
+    private HttpClient WithoutCsrfHeader()
+    {
+        var client = factory.CreateClient();
+        client.DefaultRequestHeaders.Remove(ShopApiFactory.CsrfHeaderName);
+        return client;
+    }
+
     [Fact]
     public async Task Scalar_IsServed()
     {

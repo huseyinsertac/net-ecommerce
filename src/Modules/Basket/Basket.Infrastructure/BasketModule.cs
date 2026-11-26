@@ -1,3 +1,5 @@
+using Basket.Application.Abstractions;
+using Basket.Infrastructure.Endpoints;
 using Basket.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Routing;
@@ -16,11 +18,12 @@ public sealed class BasketModule : IModule
     public void Register(IServiceCollection services, IConfiguration configuration)
     {
         services.AddModuleDbContext<BasketDbContext>(configuration);
+        services.AddScoped<IBasketRepository, BasketRepository>();
         services.AddApplicationHandlers(typeof(Basket.Application.AssemblyReference).Assembly);
     }
 
     public void MapEndpoints(IEndpointRouteBuilder app)
     {
-        app.MapGroup($"/api/{Name}");
+        BasketEndpoints.Map(app.MapGroup($"/api/{Name}"));
     }
 }

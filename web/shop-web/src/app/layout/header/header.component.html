@@ -47,13 +47,52 @@
 
   <a mat-button class="nav-link" routerLink="/">Shop</a>
 
-  <button mat-icon-button aria-label="Cart">
+  @if (auth.user(); as user) {
+    <button
+      mat-icon-button
+      type="button"
+      class="account-button"
+      [attr.aria-label]="'Account menu for ' + user.displayName"
+      [matMenuTriggerFor]="accountMenu"
+    >
+      <span class="avatar" aria-hidden="true">{{ user.displayName.charAt(0).toUpperCase() }}</span>
+    </button>
+    <mat-menu #accountMenu="matMenu" xPosition="before">
+      <div class="account-info">
+        <span class="account-name">{{ user.displayName }}</span>
+        <span class="account-email">{{ user.email }}</span>
+        @if (user.isDemo || auth.isAdmin()) {
+          <span class="chips">
+            @if (user.isDemo) {
+              <span class="chip">Demo account</span>
+            }
+            @if (auth.isAdmin()) {
+              <span class="chip chip-admin">Admin</span>
+            }
+          </span>
+        }
+      </div>
+      <button mat-menu-item type="button" (click)="signOut()">
+        <mat-icon fontSet="material-symbols-outlined">logout</mat-icon>
+        Sign out
+      </button>
+    </mat-menu>
+  } @else {
+    <a mat-button class="sign-in" routerLink="/login">Sign in</a>
+  }
+
+  <a
+    mat-icon-button
+    class="cart-link"
+    routerLink="/cart"
+    [attr.aria-label]="cartLabel()"
+  >
     <mat-icon
       fontSet="material-symbols-outlined"
-      [matBadge]="cartCount"
-      matBadgeSize="small"
-      [matBadgeHidden]="cartCount === 0"
+      [matBadge]="cart.count()"
+      [matBadgeHidden]="cart.count() === 0"
+      aria-hidden="false"
       >shopping_cart</mat-icon
     >
-  </button>
+  </a>
 </mat-toolbar>
