@@ -9,4 +9,15 @@ public static class BasketErrors
 
     public static Error TooManyLines(int max) =>
         Error.Conflict("basket.too_many_lines", $"A basket can hold at most {max} different items.");
+
+    /// <summary>Unknown variant, or its product is not Active.</summary>
+    public static Error VariantUnavailable() =>
+        Error.NotFound("basket.variant_unavailable", "This item is not available.");
+
+    /// <summary>The title is shown to shoppers verbatim.</summary>
+    public static Error InsufficientStock(int available) =>
+        Error.Conflict("basket.insufficient_stock", available <= 0 ? "Out of stock." : $"Only {available} left.");
+
+    public static Error ConcurrentUpdate() =>
+        Error.Conflict("basket.concurrent_update", "The basket was changed by another request. Please try again.");
 }

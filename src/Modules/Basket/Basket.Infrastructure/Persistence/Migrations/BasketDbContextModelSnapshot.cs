@@ -23,6 +23,63 @@ namespace Basket.Infrastructure.Persistence.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("Basket.Domain.Baskets.Basket", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<uint>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("xid")
+                        .HasColumnName("xmin");
+
+                    b.Property<DateTime>("UpdatedAtUtc")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at_utc");
+
+                    b.HasKey("Id")
+                        .HasName("pk_baskets");
+
+                    b.ToTable("baskets", "basket", t =>
+                        {
+                            t.HasCheckConstraint("ck_baskets_exactly_one_owner", "(user_id IS NULL) <> (anonymous_id IS NULL)");
+                        });
+                });
+
+            modelBuilder.Entity("Basket.Domain.Baskets.BasketLine", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<DateTime>("AddedAtUtc")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("added_at_utc");
+
+                    b.Property<Guid>("BasketId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("basket_id");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("integer")
+                        .HasColumnName("quantity");
+
+                    b.Property<Guid>("VariantId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("variant_id");
+
+                    b.HasKey("Id")
+                        .HasName("pk_basket_lines");
+
+                    b.HasIndex("BasketId", "VariantId")
+                        .IsUnique()
+                        .HasDatabaseName("ix_basket_lines_basket_id_variant_id");
+
+                    b.ToTable("basket_lines", "basket");
+                });
+
             modelBuilder.Entity("Shop.Infrastructure.Common.Inbox.InboxMessage", b =>
                 {
                     b.Property<Guid>("MessageId")
@@ -85,6 +142,60 @@ namespace Basket.Infrastructure.Persistence.Migrations
                         .HasFilter("processed_on_utc IS NULL");
 
                     b.ToTable("outbox_messages", "basket");
+                });
+
+            modelBuilder.Entity("Basket.Domain.Baskets.Basket", b =>
+                {
+                    b.OwnsOne("Basket.Domain.Baskets.BasketOwner", "Owner", b1 =>
+                        {
+                            b1.Property<Guid>("BasketId")
+                                .HasColumnType("uuid")
+                                .HasColumnName("id");
+
+                            b1.Property<Guid?>("AnonymousId")
+                                .HasColumnType("uuid")
+                                .HasColumnName("anonymous_id");
+
+                            b1.Property<Guid?>("UserId")
+                                .HasColumnType("uuid")
+                                .HasColumnName("user_id");
+
+                            b1.HasKey("BasketId");
+
+                            b1.HasIndex("AnonymousId")
+                                .IsUnique()
+                                .HasDatabaseName("ix_baskets_anonymous_id")
+                                .HasFilter("anonymous_id IS NOT NULL");
+
+                            b1.HasIndex("UserId")
+                                .IsUnique()
+                                .HasDatabaseName("ix_baskets_user_id")
+                                .HasFilter("user_id IS NOT NULL");
+
+                            b1.ToTable("baskets", "basket");
+
+                            b1.WithOwner()
+                                .HasForeignKey("BasketId")
+                                .HasConstraintName("fk_baskets_baskets_id");
+                        });
+
+                    b.Navigation("Owner")
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Basket.Domain.Baskets.BasketLine", b =>
+                {
+                    b.HasOne("Basket.Domain.Baskets.Basket", null)
+                        .WithMany("Lines")
+                        .HasForeignKey("BasketId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_basket_lines_baskets_basket_id");
+                });
+
+            modelBuilder.Entity("Basket.Domain.Baskets.Basket", b =>
+                {
+                    b.Navigation("Lines");
                 });
 #pragma warning restore 612, 618
         }
