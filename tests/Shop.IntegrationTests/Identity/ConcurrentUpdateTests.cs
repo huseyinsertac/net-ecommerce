@@ -69,12 +69,15 @@ public sealed class ConcurrentUpdateTests(ShopApiFactory factory)
     }
 
     [Fact]
-    public async Task Logout_ConflictsOnEverySave_409ConcurrentUpdate()
+    public async Task Logout_ConflictsOnEverySave_409_ButCookieCleared()
     {
         using var normal = factory.CreateClient();
         var refresh = RefreshValue(await RegisterAsync(normal, NewEmail()))!;
 
         using var client = ConflictingClient();
-        await AssertConcurrentAsync(await PostWithRefreshAsync(client, "/api/identity/logout", refresh));
+        var response = await PostWithRefreshAsync(client, "/api/identity/logout", refresh);
+
+        await AssertConcurrentAsync(response);
+        RefreshValue(response).ShouldBe(string.Empty); // cookie cleared even though the server-side revoke did not commit
     }
 }

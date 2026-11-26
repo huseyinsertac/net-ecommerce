@@ -6,6 +6,9 @@ public static class RateLimitPolicies
     /// <summary>Anonymous creation of throwaway demo customers (account spam).</summary>
     public const string DemoCustomer = "demo-customer";
 
-    /// <summary>Register, login and refresh share one budget per client IP (credential stuffing).</summary>
+    /// <summary>Register and login share one budget per client IP (credential stuffing).</summary>
     public const string AuthStrict = "auth-strict";
+
+    /// <summary>Refresh has its own, larger per-IP budget: legitimate SPAs refresh often, and several users may share an IP.</summary>
+    public const string AuthRefresh = "auth-refresh";
 }

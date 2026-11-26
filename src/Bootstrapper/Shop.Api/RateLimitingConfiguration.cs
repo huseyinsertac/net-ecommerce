@@ -16,6 +16,7 @@ internal static class RateLimitingConfiguration
 {
     private const int DefaultDemoCustomerPerMinute = 5;
     private const int DefaultAuthPerMinute = 20;
+    private const int DefaultRefreshPerMinute = 120;
 
     public static IServiceCollection AddShopRateLimiting(this IServiceCollection services)
     {
@@ -47,6 +48,8 @@ internal static class RateLimitingConfiguration
                 PerIp(context, RateLimitPolicies.DemoCustomer, "RateLimiting:DemoCustomerPerMinute", DefaultDemoCustomerPerMinute));
             options.AddPolicy(RateLimitPolicies.AuthStrict, context =>
                 PerIp(context, RateLimitPolicies.AuthStrict, "RateLimiting:AuthPerMinute", DefaultAuthPerMinute));
+            options.AddPolicy(RateLimitPolicies.AuthRefresh, context =>
+                PerIp(context, RateLimitPolicies.AuthRefresh, "RateLimiting:RefreshPerMinute", DefaultRefreshPerMinute));
         });
 
         return services;

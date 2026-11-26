@@ -416,7 +416,7 @@
         "tags": [
           "Identity"
         ],
-        "summary": "Revokes the refresh token family and clears the cookie. Always succeeds.",
+        "summary": "Revokes the refresh token family and always clears the cookie. Answers 409 when the revoke lost a concurrency race and should be retried.",
         "operationId": "LogoutUser",
         "responses": {
           "204": {

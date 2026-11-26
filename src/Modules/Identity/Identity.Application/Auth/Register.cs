@@ -50,6 +50,12 @@ internal sealed class RegisterHandler(
             return email.Error;
         }
 
+        // The demo domain is reserved for seeded and generated demo accounts. Same answer as an existing user, no explanation.
+        if (email.Value.Value.EndsWith("@" + DemoAccounts.EmailDomain, StringComparison.OrdinalIgnoreCase))
+        {
+            return IdentityErrors.EmailTaken();
+        }
+
         if (!PasswordRules.IsStrongEnough(command.Password))
         {
             return IdentityErrors.WeakPassword();

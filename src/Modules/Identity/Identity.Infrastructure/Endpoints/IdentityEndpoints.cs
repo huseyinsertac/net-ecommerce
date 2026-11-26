@@ -37,7 +37,7 @@ internal static class IdentityEndpoints
             .ProducesProblem(StatusCodes.Status401Unauthorized);
 
         group.MapPost("/refresh", RefreshAsync)
-            .RequireRateLimiting(RateLimitPolicies.AuthStrict)
+            .RequireRateLimiting(RateLimitPolicies.AuthRefresh)
             .WithName("RefreshSession")
             .WithTags(Tag)
             .WithSummary("Rotates the refresh cookie and returns a new access token. Replaying a rotated token revokes its family.")
@@ -47,7 +47,7 @@ internal static class IdentityEndpoints
         group.MapPost("/logout", LogoutAsync)
             .WithName("LogoutUser")
             .WithTags(Tag)
-            .WithSummary("Revokes the refresh token family and clears the cookie. Always succeeds.")
+            .WithSummary("Revokes the refresh token family and always clears the cookie. Answers 409 when the revoke lost a concurrency race and should be retried.")
             .Produces(StatusCodes.Status204NoContent)
             .ProducesProblem(StatusCodes.Status409Conflict);
 
@@ -114,13 +114,10 @@ internal static class IdentityEndpoints
     private static async Task<IResult> LogoutAsync(HttpRequest request, HttpResponse response, IDispatcher dispatcher, CancellationToken ct)
     {
         var result = await dispatcher.Send(new Logout(RefreshCookie.Read(request)), ct);
-        if (result.IsFailure)
-        {
-            return result.Error.ToProblem();
-        }
 
+        // Cleared even on a lost race: the cookie is the only handle on this session, so the browser is signed out either way.
         RefreshCookie.Clear(response);
-        return TypedResults.NoContent();
+        return result.IsFailure ? result.Error.ToProblem() : TypedResults.NoContent();
     }
 
     private static async Task<IResult> MeAsync(ICurrentUser currentUser, IDispatcher dispatcher, CancellationToken ct)

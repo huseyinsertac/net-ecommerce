@@ -167,7 +167,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Revokes the refresh token family and clears the cookie. Always succeeds. */
+        /** Revokes the refresh token family and always clears the cookie. Answers 409 when the revoke lost a concurrency race and should be retried. */
         post: operations["LogoutUser"];
         delete?: never;
         options?: never;

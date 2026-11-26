@@ -133,3 +133,26 @@ public sealed class DemoRateLimitTests(DemoRateLimitedApiFactory factory) : ICla
         (await UserCountAsync()).ShouldBe(before);
     }
 }
+
+public sealed class ReservedDemoDomainTests(DemoSeededApiFactory factory) : IClassFixture<DemoSeededApiFactory>
+{
+    private static CancellationToken Ct => TestContext.Current.CancellationToken;
+
+    [Theory]
+    [InlineData("admin@demo.voltlane.test")]
+    [InlineData("Someone@DEMO.Voltlane.TEST")]
+    public async Task Register_DemoDomain_409EmailTaken_SeededAdminUnaffected(string email)
+    {
+        using var client = factory.CreateClient();
+
+        var response = await RegisterAsync(client, email);
+
+        response.StatusCode.ShouldBe(HttpStatusCode.Conflict);
+        JsonDocument.Parse(await response.Content.ReadAsStringAsync(Ct)).RootElement.GetProperty("type").GetString()
+            .ShouldBe("identity.email_taken");
+        RefreshSetCookie(response).ShouldBeNull();
+
+        var admin = await client.PostAsync("/api/identity/demo/admin", null, Ct);
+        admin.StatusCode.ShouldBe(HttpStatusCode.OK);
+    }
+}
