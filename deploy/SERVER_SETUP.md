@@ -85,8 +85,7 @@ install -m 600 -o deploy -g deploy /dev/null /opt/voltlane/.env
 cat > /opt/voltlane/.env <<ENV
 POSTGRES_USER=voltlane
 POSTGRES_PASSWORD=$(openssl rand -base64 24 | tr -d '/+=')
-JWT_SIGNING_KEY=$(openssl rand -base64 48 | tr -d '
-')
+JWT_SIGNING_KEY=$(openssl rand -base64 48)
 SITE_ADDRESS=${DOMAIN}
 GHCR_OWNER=${OWNER}
 IMAGE_TAG=latest
@@ -105,8 +104,7 @@ before the next deploy. This appends it only if absent, never prints it, and kee
 private:
 
 ```bash
-grep -q '^JWT_SIGNING_KEY=' /opt/voltlane/.env || echo "JWT_SIGNING_KEY=$(openssl rand -base64 48 | tr -d '
-')" >> /opt/voltlane/.env
+grep -q '^JWT_SIGNING_KEY=' /opt/voltlane/.env || { [ -n "$(tail -c1 /opt/voltlane/.env)" ] && echo >> /opt/voltlane/.env; echo "JWT_SIGNING_KEY=$(openssl rand -base64 48)" >> /opt/voltlane/.env; }
 chown deploy:deploy /opt/voltlane/.env
 chmod 600 /opt/voltlane/.env
 grep -c '^JWT_SIGNING_KEY=' /opt/voltlane/.env    # expect: 1

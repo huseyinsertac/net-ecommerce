@@ -27,7 +27,7 @@ services:
     environment:
       ASPNETCORE_ENVIRONMENT: Production
       ConnectionStrings__Shop: Host=postgres;Port=5432;Database=voltlane;Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}
-      Jwt__SigningKey: ${JWT_SIGNING_KEY:?JWT_SIGNING_KEY is required}
+      Jwt__SigningKey: ${JWT_SIGNING_KEY:?JWT_SIGNING_KEY is required (see deploy/SERVER_SETUP.md)}
     depends_on:
       postgres:
         condition: service_healthy
