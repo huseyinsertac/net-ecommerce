@@ -1,4 +1,5 @@
 using Basket.Application.Baskets;
+using System.Text.Json.Serialization;
 using Basket.Domain.Baskets;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Builder;
@@ -66,7 +67,8 @@ internal static class BasketEndpoints
             .ProducesProblem(StatusCodes.Status409Conflict);
     }
 
-    private sealed record SetQuantityRequest(int Quantity);
+    /// <summary>A missing quantity is a 400 binding failure, never a silent 0 (which would remove the line).</summary>
+    private sealed record SetQuantityRequest([property: JsonRequired] int Quantity);
 
     private static async Task<IResult> GetAsync(HttpContext http, ICurrentUser currentUser, IDispatcher dispatcher, CancellationToken ct)
     {
@@ -121,7 +123,7 @@ internal static class BasketEndpoints
 
     private static async Task<IResult> MergeAsync(HttpContext http, ICurrentUser currentUser, IDispatcher dispatcher, CancellationToken ct)
     {
-        if (currentUser.UserId is not { } userId)
+        if (currentUser.UserId is not { } userId || userId == Guid.Empty)
         {
             return TypedResults.Unauthorized();
         }

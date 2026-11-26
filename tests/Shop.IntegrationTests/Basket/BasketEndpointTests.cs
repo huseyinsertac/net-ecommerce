@@ -240,6 +240,21 @@ public sealed class BasketEndpointTests(ShopApiFactory factory)
     }
 
     [Fact]
+    public async Task Put_MissingQuantity_400_LineUntouched()
+    {
+        var data = await PublishedDatasetAsync();
+        using var client = factory.CreateClient();
+        var cookie = await NewAnonymousBasketAsync(client, Silver(data), 2);
+
+        var response = await client.SendAsync(
+            Request(HttpMethod.Put, $"/api/basket/items/{Silver(data)}", cookie, new { }), Ct);
+
+        await ProblemAsync(response, HttpStatusCode.BadRequest);
+        var line = (await BasketAsync(await GetAsync(client, cookie))).Lines.ShouldHaveSingleItem();
+        line.Quantity.ShouldBe(2);
+    }
+
+    [Fact]
     public async Task Get_AfterVariantGoesOutOfStockAndPriceChanges_FlagsLine_UsesLivePrice_NoError()
     {
         var data = await PublishedDatasetAsync();
