@@ -2,15 +2,6 @@ using Shop.SharedKernel;
 
 namespace Catalog.Domain.Reservations;
 
-public enum ReservationStatus
-{
-    Reserved,
-    Committed,
-    Released,
-}
-
-public sealed record ReservationLine(Guid ProductId, Guid VariantId, int Quantity);
-
 /// <summary>The stock held for one order (<c>Id</c> is the order id): Reserved, then Committed or Released exactly once.</summary>
 public sealed class StockReservation : AggregateRoot<Guid>
 {
