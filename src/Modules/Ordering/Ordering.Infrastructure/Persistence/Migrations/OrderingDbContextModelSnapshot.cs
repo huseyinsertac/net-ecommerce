@@ -60,6 +60,12 @@ namespace Ordering.Infrastructure.Persistence.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("idempotency_key");
 
+                    b.Property<bool>("IsHistorical")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false)
+                        .HasColumnName("is_historical");
+
                     b.Property<string>("OrderNumber")
                         .IsRequired()
                         .HasMaxLength(20)

@@ -28,6 +28,41 @@ internal sealed class CatalogVariantQuery(CatalogDbContext db) : ICatalogVariant
         WHERE v.id = ANY(@ids)
         """;
 
+    private const string SampleSql = $"""
+        SELECT v.id AS VariantId, p.id AS ProductId, p.slug AS ProductSlug, p.name AS ProductName, p.brand AS Brand,
+               v.sku AS Sku, v.price AS UnitPrice, v.stock_on_hand - v.stock_reserved AS Available,
+               p.image_keys[1] AS ImageKey, (p.status = {SearchSql.Active}) AS IsPurchasable,
+               v.options::text AS OptionsJson, p.option_axes::text AS AxesJson
+        FROM catalog.products p
+        CROSS JOIN LATERAL (
+            SELECT * FROM catalog.product_variants pv WHERE pv.product_id = p.id ORDER BY pv.sku LIMIT 1
+        ) v
+        WHERE p.is_featured AND p.status = {SearchSql.Active}
+        ORDER BY p.name, p.id
+        LIMIT @count
+        """;
+
+    public async Task<IReadOnlyList<VariantSnapshot>> GetSampleAsync(int count, CancellationToken ct)
+    {
+        if (count < 1)
+        {
+            return [];
+        }
+
+        await db.Database.OpenConnectionAsync(ct);
+        try
+        {
+            DbConnection connection = db.Database.GetDbConnection();
+            var rows = await connection.QueryAsync<Row>(new CommandDefinition(
+                SampleSql, new { count }, cancellationToken: ct));
+            return [.. rows.Select(ToSnapshot)];
+        }
+        finally
+        {
+            await db.Database.CloseConnectionAsync();
+        }
+    }
+
     public async Task<IReadOnlyDictionary<Guid, VariantSnapshot>> GetAsync(
         IReadOnlyCollection<Guid> variantIds, CancellationToken ct)
     {

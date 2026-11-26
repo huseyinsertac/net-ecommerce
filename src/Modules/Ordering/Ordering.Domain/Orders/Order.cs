@@ -27,9 +27,34 @@ public sealed class Order : AggregateRoot<Guid>
     public DateTime PlacedAtUtc { get; private set; }
     public IReadOnlyList<StatusChange> History => _history.AsReadOnly();
 
+    /// <summary>Seeded past order (demo accounts): it never went through the live reservation and payment flow.</summary>
+    public bool IsHistorical { get; private set; }
+
     public static Result<Order> Place(
         string orderNumber, Guid customerId, string customerEmail, Guid idempotencyKey,
         ShippingAddress address, IReadOnlyCollection<NewOrderLine> lines, DateTime nowUtc)
+    {
+        var created = Create(orderNumber, customerId, customerEmail, idempotencyKey, address, lines, nowUtc, false);
+        if (created.IsSuccess)
+        {
+            created.Value.Raise(new OrderPlacedDomainEvent(created.Value));
+        }
+
+        return created;
+    }
+
+    /// <summary>
+    /// Like <see cref="Place"/> but flagged <see cref="IsHistorical"/> and raising no domain event, so no OrderPlaced is
+    /// published and no stock is touched. The caller then applies the transitions with backdated times.
+    /// </summary>
+    public static Result<Order> PlaceHistorical(
+        string orderNumber, Guid customerId, string customerEmail, Guid idempotencyKey,
+        ShippingAddress address, IReadOnlyCollection<NewOrderLine> lines, DateTime nowUtc) =>
+        Create(orderNumber, customerId, customerEmail, idempotencyKey, address, lines, nowUtc, true);
+
+    private static Result<Order> Create(
+        string orderNumber, Guid customerId, string customerEmail, Guid idempotencyKey,
+        ShippingAddress address, IReadOnlyCollection<NewOrderLine> lines, DateTime nowUtc, bool historical)
     {
         if (lines.Count is < 1 or > MaxLines
             || lines.Any(l => l.Quantity is < 1 or > MaxQuantityPerLine)
@@ -56,9 +81,9 @@ public sealed class Order : AggregateRoot<Guid>
             Total = Money.Usd(subtotal.Amount - discount.Amount),
             Status = OrderStatus.Placed,
             PlacedAtUtc = nowUtc,
+            IsHistorical = historical,
         };
         order._history.Add(new StatusChange(OrderStatus.Placed, nowUtc, null));
-        order.Raise(new OrderPlacedDomainEvent(order));
         return order;
     }
 

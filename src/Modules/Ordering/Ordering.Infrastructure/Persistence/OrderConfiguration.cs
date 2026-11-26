@@ -36,6 +36,8 @@ internal sealed class OrderConfiguration : IEntityTypeConfiguration<Order>
         b.Property(o => o.Discount).HasConversion(m => m.Amount, a => Money.Usd(a)).HasColumnType("numeric(12,2)");
         b.Property(o => o.Total).HasConversion(m => m.Amount, a => Money.Usd(a)).HasColumnType("numeric(12,2)");
 
+        b.Property(o => o.IsHistorical).HasDefaultValue(false);
+
         b.Property(o => o.Status).HasConversion<string>().HasMaxLength(20);
         b.Property(o => o.CancellationReason).HasConversion<string>().HasMaxLength(20);
 

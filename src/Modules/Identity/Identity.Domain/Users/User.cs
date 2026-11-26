@@ -52,8 +52,12 @@ public sealed class User : AggregateRoot<Guid>
         return Build(email, name, passwordHash, false, [Identity.Domain.Users.Roles.Customer], nowUtc);
     }
 
-    public static User CreateDemoCustomer(Email email, DateTime nowUtc) =>
-        Build(email, "Demo Customer", null, true, [Identity.Domain.Users.Roles.Customer], nowUtc);
+    public static User CreateDemoCustomer(Email email, DateTime nowUtc)
+    {
+        var user = Build(email, "Demo Customer", null, true, [Identity.Domain.Users.Roles.Customer], nowUtc);
+        user.Raise(new DemoCustomerCreatedDomainEvent(user));
+        return user;
+    }
 
     public static User CreateDemoAdmin(Email email, DateTime nowUtc) =>
         Build(email, "Demo Admin", null, true,
