@@ -7,11 +7,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../core/auth/auth.service';
-
-/** Only same-site paths: an absolute or protocol-relative returnUrl would be an open redirect. */
-export function safeReturnUrl(url: string | undefined): string {
-  return url && url.startsWith('/') && !url.startsWith('//') && !url.startsWith('/\\') ? url : '/';
-}
+import { safeReturnUrl } from '../../core/auth/return-url';
 
 @Component({
   selector: 'app-login',

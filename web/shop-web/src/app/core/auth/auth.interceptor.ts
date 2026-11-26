@@ -5,13 +5,19 @@ import { AuthService } from './auth.service';
 
 const NO_BEARER = /^\/api\/identity\/(login|register|refresh|logout|demo\/)/;
 
-function path(url: string): string {
-  return url.replace(/^https?:\/\/[^/]+/, '').split('?')[0];
-}
-
+/** Same-origin only: a relative `/api/` URL, or an absolute one on this page's origin. */
 function wantsBearer(url: string): boolean {
-  const p = path(url);
-  return p.startsWith('/api/') && !NO_BEARER.test(p);
+  let parsed: URL;
+  try {
+    parsed = new URL(url, location.origin);
+  } catch {
+    return false;
+  }
+  return (
+    parsed.origin === location.origin &&
+    parsed.pathname.startsWith('/api/') &&
+    !NO_BEARER.test(parsed.pathname)
+  );
 }
 
 const withToken = <T>(req: HttpRequest<T>, token: string) =>

@@ -5,6 +5,8 @@ import { AuthResponse, CurrentUser, IdentityApi } from '../../api/identity-api.s
 
 export type { CurrentUser } from '../../api/identity-api.service';
 
+const STARTUP_TIMEOUT_MS = 5000;
+
 /**
  * Session state. The access token lives only in memory; a reload restores the session through the
  * HttpOnly refresh cookie (see `initialize`, run by the app initializer).
@@ -77,9 +79,18 @@ export class AuthService {
 
   /** App initializer entry point: one silent refresh, then `ready`. Never rejects. */
   async initialize(): Promise<void> {
+    let timer: ReturnType<typeof setTimeout> | undefined;
     try {
-      await this.refresh();
+      // A hung refresh must not keep the app from rendering: give up after STARTUP_TIMEOUT_MS and
+      // stay signed out. If the request completes later it still applies its result.
+      await Promise.race([
+        this.refresh(),
+        new Promise<boolean>((resolve) => {
+          timer = setTimeout(() => resolve(false), STARTUP_TIMEOUT_MS);
+        }),
+      ]);
     } finally {
+      clearTimeout(timer);
       this._ready.set(true);
     }
   }

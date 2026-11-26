@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { guestGuard } from './core/auth/auth.guard';
 
 export const routes: Routes = [
   {
@@ -10,11 +11,13 @@ export const routes: Routes = [
   {
     path: 'login',
     title: 'Sign in · VoltLane',
+    canActivate: [guestGuard],
     loadComponent: () => import('./pages/login/login.page').then((m) => m.LoginPage),
   },
   {
     path: 'register',
     title: 'Create account · VoltLane',
+    canActivate: [guestGuard],
     loadComponent: () => import('./pages/register/register.page').then((m) => m.RegisterPage),
   },
   {

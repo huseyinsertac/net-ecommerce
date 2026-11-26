@@ -86,6 +86,21 @@ describe('AuthService', () => {
     expect(auth.user()).toBeNull();
   });
 
+  it('initialize resolves after 5s when the refresh never responds', async () => {
+    vi.useFakeTimers();
+    try {
+      const p = auth.initialize();
+      http.expectOne('/api/identity/refresh');
+      expect(auth.ready()).toBe(false);
+      await vi.advanceTimersByTimeAsync(5000);
+      await p;
+      expect(auth.ready()).toBe(true);
+      expect(auth.user()).toBeNull();
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
   it('initialize becomes ready even when the refresh fails', async () => {
     const p = auth.initialize();
     expect(auth.ready()).toBe(false);

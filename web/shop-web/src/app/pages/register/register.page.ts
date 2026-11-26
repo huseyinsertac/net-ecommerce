@@ -1,5 +1,6 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -42,6 +43,15 @@ export class RegisterPage {
     ],
   });
   protected readonly busy = signal(false);
+
+  constructor() {
+    // Editing a field drops its stale server message.
+    for (const f of ['displayName', 'email', 'password'] as const) {
+      this.form.controls[f].valueChanges.pipe(takeUntilDestroyed()).subscribe(() => {
+        if (this.serverErrors()[f]) this.serverErrors.update((errs) => ({ ...errs, [f]: undefined }));
+      });
+    }
+  }
   /** Messages from the server, per field. */
   protected readonly serverErrors = signal<Partial<Record<Field, string>>>({});
   protected readonly error = signal('');

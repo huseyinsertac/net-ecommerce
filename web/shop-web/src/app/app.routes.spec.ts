@@ -1,3 +1,4 @@
+import { guestGuard } from './core/auth/auth.guard';
 import { routes } from './app.routes';
 
 describe('routes', () => {
@@ -9,6 +10,12 @@ describe('routes', () => {
     ['**', 'Page not found · VoltLane'],
   ])('%j has the tab title %j', (path, title) => {
     expect(routes.find((r) => r.path === path)?.title).toBe(title);
+  });
+});
+
+describe('guest routes', () => {
+  it.each(['login', 'register'])('%s is guarded by guestGuard', (path) => {
+    expect(routes.find((r) => r.path === path)?.canActivate).toEqual([guestGuard]);
   });
 });
 

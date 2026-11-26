@@ -1,4 +1,5 @@
 import { HttpErrorResponse } from '@angular/common/http';
+import { ApplicationRef } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { Router, provideRouter } from '@angular/router';
 import { AuthService } from '../../core/auth/auth.service';
@@ -46,6 +47,20 @@ describe('RegisterPage', () => {
     await submit();
     expect(auth.register).toHaveBeenCalledWith('a@x.io', 'secret123', 'Ada');
     expect(nav).toHaveBeenCalledWith('/');
+  });
+
+  it('clears a stale server error when the field is edited', async () => {
+    auth.register.mockRejectedValue(
+      new HttpErrorResponse({ status: 409, error: { type: 'identity.email_taken' } }),
+    );
+    const el = await submit();
+    expect(el.textContent).toContain('already exists');
+    const email = el.querySelector<HTMLInputElement>('input[type="email"]')!;
+    email.value = 'bad';
+    email.dispatchEvent(new Event('input'));
+    await TestBed.inject(ApplicationRef).whenStable();
+    expect(el.textContent).not.toContain('already exists');
+    expect(el.textContent).toContain('Enter a valid email address.');
   });
 
   it('shows email_taken on the email field', async () => {

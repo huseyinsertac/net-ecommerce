@@ -42,6 +42,21 @@ describe('authInterceptor', () => {
     );
   });
 
+  it('adds bearer to an absolute same-origin URL but not a cross-origin one', () => {
+    http.get(`${location.origin}/api/basket`).subscribe();
+    http.get('https://other.example/api/x').subscribe();
+    http.get('//other.example/api/y').subscribe();
+    expect(
+      ctrl.expectOne(`${location.origin}/api/basket`).request.headers.get('Authorization'),
+    ).toBe('Bearer old');
+    expect(ctrl.expectOne('https://other.example/api/x').request.headers.has('Authorization')).toBe(
+      false,
+    );
+    expect(ctrl.expectOne('//other.example/api/y').request.headers.has('Authorization')).toBe(
+      false,
+    );
+  });
+
   it('does not add bearer to /api/identity/refresh', () => {
     http.post('/api/identity/refresh', null).subscribe();
     expect(ctrl.expectOne('/api/identity/refresh').request.headers.has('Authorization')).toBe(
