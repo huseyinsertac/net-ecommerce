@@ -22,8 +22,10 @@ during creation. Note its public IPv4 address (`<SERVER_IP>`).
 Point an `A` record for your domain at `<SERVER_IP>` and wait for it to resolve
 (`dig +short <YOUR_DOMAIN>`).
 
-No domain? Use a free `sslip.io` name that encodes the IP, for example `203-0-113-10.sslip.io` for
-`203.0.113.10`. Let's Encrypt issues certificates for it. Use that name as `<YOUR_DOMAIN>` below.
+No domain? Use a free DuckDNS subdomain (`<name>.duckdns.org`, set its IP to `<SERVER_IP>` at duckdns.org).
+`duckdns.org` is on the Public Suffix List, so other DuckDNS sites count as cross-site for cookies. Avoid
+`sslip.io` names for anything with cookies: `sslip.io` is not on that list, so every other `*.sslip.io` host is
+same-site with yours (see ADR-0007). Use the name as `<YOUR_DOMAIN>` below.
 
 ## 4. Prepare the server
 

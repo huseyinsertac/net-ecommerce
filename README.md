@@ -5,7 +5,7 @@ front end, with a CI/CD pipeline that deploys to a single server.
 
 [![CI](https://github.com/huseyinsertac/net-ecommerce/actions/workflows/ci.yml/badge.svg)](https://github.com/huseyinsertac/net-ecommerce/actions/workflows/ci.yml)
 
-**Live demo:** [204.168.194.99.sslip.io](https://204.168.194.99.sslip.io) · [API reference](https://204.168.194.99.sslip.io/scalar) · [health](https://204.168.194.99.sslip.io/health/ready)
+**Live demo:** [huseyinsertacnetecommerce.duckdns.org](https://huseyinsertacnetecommerce.duckdns.org) · [API reference](https://huseyinsertacnetecommerce.duckdns.org/scalar) · [health](https://huseyinsertacnetecommerce.duckdns.org/health/ready)
 
 ## Demo accounts
 
