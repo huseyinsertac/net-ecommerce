@@ -15,6 +15,11 @@ No credentials are needed. On the home page:
 - **Try as admin** signs into a shared admin account. Admin tools are coming soon (Plan 5), and
   the shared admin cannot use the cart.
 
+Each demo customer starts with three historical orders, so the order history is not empty.
+To try checkout, add something to the cart and place the order. On Stripe's page, pay with the
+test card `4242 4242 4242 4242`, any future expiry date and any CVC. No real money moves: the
+site only accepts Stripe test-mode keys.
+
 Normal registration and sign-in also work. Screenshots: coming soon (Plan 5).
 
 ## Features
@@ -36,8 +41,11 @@ Normal registration and sign-in also work. Screenshots: coming soon (Plan 5).
 - **API hardening:** per-IP rate limits, and a required `X-Requested-With` header on API writes.
 - **Cart:** works for anonymous and signed-in users, with live prices and stock flags, and is
   merged into your account when you sign in.
+- **Checkout and payments:** place an order from the cart, then pay on Stripe's hosted Checkout page
+  (test mode only). Stock is reserved first, the order moves through a status timeline to `Paid`
+  (or is cancelled and the stock released), and the order history lists every order.
 
-Not built yet: checkout and payments (Plan 4).
+Not built yet: admin tools, the nightly demo reset and screenshots (Plan 5), and refunds (Milestone 2).
 
 ### Identity design
 
@@ -80,6 +88,7 @@ flowchart TB
     Identity --> S5[("schema: identity")]
     Basket -.->|"Contracts query: prices"| Catalog
     Ordering -.->|"OrderPlaced"| Catalog
+    Ordering -.->|"OrderPlaced"| Basket
     Catalog -.->|"StockReserved / StockReservationFailed"| Payments
     Catalog -.->|"StockReservationFailed"| Ordering
     Payments -.->|"PaymentSucceeded / Failed / Expired"| Ordering
@@ -87,8 +96,26 @@ flowchart TB
 ```
 
 Dashed arrows are Contracts-only communication (integration events via outbox/inbox, plus one
-Contracts query). The modules' business logic lands in Plans 2-4; the foundation and messaging
-infrastructure exist now.
+Contracts query).
+
+### Checkout flow
+
+Checkout is choreographed with integration events; no module owns the whole flow
+([ADR-0008](docs/adr/0008-payments-stripe-checkout-choreography.md)).
+
+```mermaid
+flowchart LR
+    OP["OrderPlaced"] --> Cat["Catalog reserves stock"]
+    OP --> Bas["Basket removes ordered lines"]
+    Cat -->|"StockReserved"| Pay["Payments opens a payment session"]
+    Cat -->|"StockReservationFailed"| Cancel1["Ordering cancels the order"]
+    Pay -->|"customer pays (Stripe webhook)"| PS["PaymentSucceeded"]
+    Pay -->|"payment fails"| PF["PaymentFailed"]
+    Pay -->|"deadline, Stripe is source of truth"| PE["PaymentExpired"]
+    PS --> Paid["Ordering marks Paid, Catalog commits the reservation"]
+    PF --> Rel["Ordering cancels, Catalog releases stock"]
+    PE --> Rel
+```
 
 Decisions are recorded as ADRs:
 
@@ -99,6 +126,7 @@ Decisions are recorded as ADRs:
 - [0005 Own dispatcher instead of MediatR](docs/adr/0005-own-dispatcher-instead-of-mediatr.md)
 - [0006 Catalog search: Postgres FTS, JSONB specs, SQL read side](docs/adr/0006-catalog-search-postgres-fts-jsonb-sql-read-side.md)
 - [0007 Identity: own user model, JWT and refresh cookie](docs/adr/0007-identity-own-user-model-jwt-refresh-cookie.md)
+- [0008 Payments: Stripe Checkout, webhooks and the fake gateway](docs/adr/0008-payments-stripe-checkout-choreography.md)
 
 ## Run locally
 
@@ -111,6 +139,18 @@ docker compose up -d --build
 ```
 
 Then open http://localhost:8080.
+
+The local stack uses the **simulated payment page** (the Fake provider), so checkout works with no
+Stripe account: you choose whether the payment succeeds or fails. The Fake provider is allowed here
+through `Payments__AllowFakeProviderInProduction`, and `docker-compose.prod.yml` never sets it.
+
+To exercise real Stripe webhooks locally, run the API with `Payments__Provider=Stripe`, a test-mode
+`Stripe__SecretKey` (`sk_test_...`) and the signing secret the CLI prints as `Stripe__WebhookSecret`
+(`whsec_...`) in its environment, then forward events:
+
+```bash
+stripe listen --forward-to localhost:8080/api/payments/stripe/webhook
+```
 
 ## Develop from source
 
@@ -155,7 +195,7 @@ Server setup: [deploy/SERVER_SETUP.md](deploy/SERVER_SETUP.md).
 - [x] **Plan 1:** Foundation and walking skeleton (modules, CI/CD, first deploy)
 - [x] **Plan 2:** Catalog and storefront
 - [x] **Plan 3:** Identity and Basket
-- [ ] **Plan 4:** Ordering and Payments (Stripe test mode)
+- [x] **Plan 4:** Ordering and Payments (Stripe test mode)
 - [ ] **Plan 5:** Admin, nightly demo reset, rate limiting, polish
 
 ## License

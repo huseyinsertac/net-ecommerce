@@ -34,6 +34,11 @@ services:
       # Local dev only. NOT a secret: fixed key so the API starts under compose.
       # Production uses JWT_SIGNING_KEY from the server's .env (docker-compose.prod.yml).
       Jwt__SigningKey: local-dev-only-not-a-secret-voltlane-jwt-signing-key-0123456789
+      # Local stack runs as Production but pays through the simulated Fake provider (no Stripe, no keys).
+      Payments__Provider: Fake
+      Payments__AllowFakeProviderInProduction: "true"
+      # Where payment redirects send the browser back to (Caddy publishes 8080 locally).
+      App__PublicBaseUrl: http://localhost:8080
     depends_on:
       postgres:
         condition: service_healthy

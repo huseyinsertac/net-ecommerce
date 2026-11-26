@@ -28,6 +28,11 @@ services:
       ASPNETCORE_ENVIRONMENT: Production
       ConnectionStrings__Shop: Host=postgres;Port=5432;Database=voltlane;Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}
       Jwt__SigningKey: ${JWT_SIGNING_KEY:?JWT_SIGNING_KEY is required (see deploy/SERVER_SETUP.md)}
+      # Stripe test mode only: the API refuses live keys (sk_live_) in every environment.
+      Payments__Provider: Stripe
+      Stripe__SecretKey: ${STRIPE_SECRET_KEY:?STRIPE_SECRET_KEY is required (see deploy/SERVER_SETUP.md)}
+      Stripe__WebhookSecret: ${STRIPE_WEBHOOK_SECRET:?STRIPE_WEBHOOK_SECRET is required (see deploy/SERVER_SETUP.md)}
+      App__PublicBaseUrl: https://${SITE_ADDRESS}
     depends_on:
       postgres:
         condition: service_healthy
