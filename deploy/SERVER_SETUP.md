@@ -85,6 +85,8 @@ install -m 600 -o deploy -g deploy /dev/null /opt/voltlane/.env
 cat > /opt/voltlane/.env <<ENV
 POSTGRES_USER=voltlane
 POSTGRES_PASSWORD=$(openssl rand -base64 24 | tr -d '/+=')
+JWT_SIGNING_KEY=$(openssl rand -base64 48 | tr -d '
+')
 SITE_ADDRESS=${DOMAIN}
 GHCR_OWNER=${OWNER}
 IMAGE_TAG=latest
@@ -97,6 +99,21 @@ ls -l /opt/voltlane/.env       # expect: -rw------- 1 deploy deploy
 `SITE_ADDRESS` must be the bare domain (no `https://`); Caddy then obtains a Let's Encrypt
 certificate automatically. The deploy workflow overrides `GHCR_OWNER` and `IMAGE_TAG` on every
 run, so those two values only matter for manual `docker compose` use.
+
+**Existing servers** (created before the API required a JWT signing key) must add the key once,
+before the next deploy. This appends it only if absent, never prints it, and keeps the file
+private:
+
+```bash
+grep -q '^JWT_SIGNING_KEY=' /opt/voltlane/.env || echo "JWT_SIGNING_KEY=$(openssl rand -base64 48 | tr -d '
+')" >> /opt/voltlane/.env
+chown deploy:deploy /opt/voltlane/.env
+chmod 600 /opt/voltlane/.env
+grep -c '^JWT_SIGNING_KEY=' /opt/voltlane/.env    # expect: 1
+```
+
+Compose reads `.env` from `/opt/voltlane` automatically, so the deploy workflow needs no change.
+Do not rotate the key casually: it invalidates all issued access tokens.
 
 ## 5. Create the deploy SSH key
 

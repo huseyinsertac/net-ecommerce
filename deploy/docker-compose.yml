@@ -31,6 +31,9 @@ services:
     environment:
       ASPNETCORE_ENVIRONMENT: Production
       ConnectionStrings__Shop: Host=postgres;Port=5432;Database=voltlane;Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}
+      # Local dev only. NOT a secret: fixed key so the API starts under compose.
+      # Production uses JWT_SIGNING_KEY from the server's .env (docker-compose.prod.yml).
+      Jwt__SigningKey: local-dev-only-not-a-secret-voltlane-jwt-signing-key-0123456789
     depends_on:
       postgres:
         condition: service_healthy
