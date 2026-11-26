@@ -21,6 +21,7 @@ public sealed class CatalogModule : IModule
     {
         services.AddModuleDbContext<CatalogDbContext>(configuration);
         services.AddScoped<ICatalogReader, CatalogReader>();
+        services.AddScoped<Catalog.Contracts.Variants.ICatalogVariantQuery, CatalogVariantQuery>();
         services.AddScoped<IModuleSeeder, CatalogSeeder>();
         services.AddApplicationHandlers(typeof(Catalog.Application.AssemblyReference).Assembly);
     }
