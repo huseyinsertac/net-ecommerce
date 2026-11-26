@@ -109,4 +109,27 @@ describe('AuthService', () => {
     expect(auth.ready()).toBe(true);
     expect(auth.user()).toBeNull();
   });
+
+  it('a late refresh success after logout does not sign the user back in', async () => {
+    await loginAs('t1', 'u1');
+    const refresh = auth.refresh();
+    const pending = http.expectOne('/api/identity/refresh');
+    const out = auth.logout();
+    http.expectOne('/api/identity/logout').flush(null, { status: 204, statusText: 'No Content' });
+    await out;
+    pending.flush(res('t-late', 'u1'));
+    await refresh;
+    expect(auth.user()).toBeNull();
+    expect(auth.accessToken()).toBeNull();
+  });
+
+  it('a late refresh 401 after a new login does not sign the user out', async () => {
+    const refresh = auth.refresh();
+    const pending = http.expectOne('/api/identity/refresh');
+    await loginAs('t-new', 'u2');
+    pending.flush({}, { status: 401, statusText: 'Unauthorized' });
+    await refresh;
+    expect(auth.user()?.id).toBe('u2');
+    expect(auth.accessToken()).toBe('t-new');
+  });
 });

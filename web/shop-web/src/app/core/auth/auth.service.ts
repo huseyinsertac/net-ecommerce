@@ -20,6 +20,8 @@ export class AuthService {
   private readonly _signedIn = new Subject<CurrentUser>();
   private token: string | null = null;
   private inflight: Promise<boolean> | null = null;
+  /** Bumped by every explicit sign-in and sign-out; a refresh started under an older value is stale. */
+  private generation = 0;
 
   readonly user: Signal<CurrentUser | null> = this._user.asReadonly();
   readonly isAdmin = computed(() => this._user()?.roles.includes('Admin') ?? false);
@@ -38,23 +40,28 @@ export class AuthService {
   }
 
   async login(email: string, password: string): Promise<void> {
+    this.generation++;
     this.apply(await firstValueFrom(this.api.login(email, password)));
   }
 
   async register(email: string, password: string, displayName: string): Promise<void> {
+    this.generation++;
     this.apply(await firstValueFrom(this.api.register(email, password, displayName)));
   }
 
   async startDemoCustomer(): Promise<void> {
+    this.generation++;
     this.apply(await firstValueFrom(this.api.demoCustomer()));
   }
 
   async startDemoAdmin(): Promise<void> {
+    this.generation++;
     this.apply(await firstValueFrom(this.api.demoAdmin()));
   }
 
   /** Clears local state even if the request fails (the server clears the cookie regardless). */
   async logout(): Promise<void> {
+    this.generation++;
     try {
       await firstValueFrom(this.api.logout());
     } catch {
@@ -96,11 +103,17 @@ export class AuthService {
   }
 
   private async doRefresh(): Promise<boolean> {
+    const started = this.generation;
     try {
-      this.apply(await firstValueFrom(this.api.refresh()));
+      const res = await firstValueFrom(this.api.refresh());
+      // A sign-in or sign-out happened meanwhile: this result describes a dead session.
+      if (started !== this.generation) return false;
+      this.apply(res);
       return true;
     } catch (err) {
-      if (err instanceof HttpErrorResponse && err.status === 401) this.clear();
+      if (started === this.generation && err instanceof HttpErrorResponse && err.status === 401) {
+        this.clear();
+      }
       return false;
     }
   }
