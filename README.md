@@ -7,7 +7,15 @@ front end, with a CI/CD pipeline that deploys to a single server.
 
 **Live demo:** [204.168.194.99.sslip.io](https://204.168.194.99.sslip.io) · [API reference](https://204.168.194.99.sslip.io/scalar) · [health](https://204.168.194.99.sslip.io/health/ready)
 
-Demo credentials and screenshots: coming soon (Plan 3/5).
+## Demo accounts
+
+No credentials are needed. On the home page:
+
+- **Try as customer** creates a private, temporary account just for you.
+- **Try as admin** signs into a shared admin account. Admin tools are coming soon (Plan 5), and
+  the shared admin cannot use the cart.
+
+Normal registration and sign-in also work. Screenshots: coming soon (Plan 5).
 
 ## Features
 
@@ -21,8 +29,21 @@ Demo credentials and screenshots: coming soon (Plan 3/5).
   [CREDITS.md](web/shop-web/public/images/CREDITS.md).
 - **Storefront:** home page, filterable product listing (filters live in the URL), product
   detail with a variant picker and gallery.
+- **Accounts:** register, sign in, or use a one-click demo account. Short-lived JWT access tokens
+  (15 minutes, kept in memory only) plus rotating refresh tokens in an HttpOnly, SameSite=Strict
+  cookie. Reuse of a refresh token revokes its whole token family, with a 30 second single-use
+  grace period so concurrent tabs do not log each other out.
+- **API hardening:** per-IP rate limits, and a required `X-Requested-With` header on API writes.
+- **Cart:** works for anonymous and signed-in users, with live prices and stock flags, and is
+  merged into your account when you sign in.
 
-Not built yet: basket, checkout, payments and sign-in (Plans 3-4).
+Not built yet: checkout and payments (Plan 4).
+
+### Identity design
+
+Own user model with JWT access tokens and a rotating refresh cookie rather than ASP.NET Identity;
+the trade-offs (token pruning, CSRF header, rate limits) are in
+[ADR-0007](docs/adr/0007-identity-own-user-model-jwt-refresh-cookie.md).
 
 ### Catalog design
 
@@ -77,6 +98,7 @@ Decisions are recorded as ADRs:
 - [0004 Outbox/inbox choreography](docs/adr/0004-outbox-inbox-choreography.md)
 - [0005 Own dispatcher instead of MediatR](docs/adr/0005-own-dispatcher-instead-of-mediatr.md)
 - [0006 Catalog search: Postgres FTS, JSONB specs, SQL read side](docs/adr/0006-catalog-search-postgres-fts-jsonb-sql-read-side.md)
+- [0007 Identity: own user model, JWT and refresh cookie](docs/adr/0007-identity-own-user-model-jwt-refresh-cookie.md)
 
 ## Run locally
 
@@ -107,7 +129,8 @@ dotnet test --solution VoltLane.slnx -c Release
 cd web/shop-web && npm ci && npx ng test --no-watch
 ```
 
-- **Unit tests** for domain logic and building blocks, including `Catalog.UnitTests`.
+- **Unit tests** for domain logic and building blocks, including `Catalog.UnitTests`, `Identity.UnitTests` and
+  `Basket.UnitTests`.
 - **Architecture tests** that fail the build if a module reaches into another module's internals.
 - **Integration tests** against a real PostgreSQL started by **Testcontainers** (no mocked
   database).
@@ -131,7 +154,7 @@ Server setup: [deploy/SERVER_SETUP.md](deploy/SERVER_SETUP.md).
 
 - [x] **Plan 1:** Foundation and walking skeleton (modules, CI/CD, first deploy)
 - [x] **Plan 2:** Catalog and storefront
-- [ ] **Plan 3:** Identity and Basket
+- [x] **Plan 3:** Identity and Basket
 - [ ] **Plan 4:** Ordering and Payments (Stripe test mode)
 - [ ] **Plan 5:** Admin, nightly demo reset, rate limiting, polish
 
