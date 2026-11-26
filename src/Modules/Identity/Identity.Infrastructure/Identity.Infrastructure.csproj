@@ -1,6 +1,11 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" />
+    <PackageReference Include="Microsoft.Extensions.Identity.Core" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="../Identity.Application/Identity.Application.csproj" />
     <ProjectReference Include="../../../BuildingBlocks/Shop.Infrastructure.Common/Shop.Infrastructure.Common.csproj" />
   </ItemGroup>

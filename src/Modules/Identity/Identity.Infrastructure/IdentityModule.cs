@@ -1,4 +1,6 @@
+using Identity.Application.Abstractions;
 using Identity.Infrastructure.Persistence;
+using Identity.Infrastructure.Security;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
@@ -16,6 +18,11 @@ public sealed class IdentityModule : IModule
     public void Register(IServiceCollection services, IConfiguration configuration)
     {
         services.AddModuleDbContext<IdentityDbContext>(configuration);
+        services.AddScoped<IUserRepository, UserRepository>();
+        services.AddSingleton<IPasswordHasher, AspNetPasswordHasher>();
+        services.AddSingleton<ITokenIssuer, JwtTokenIssuer>();
+        services.AddSingleton<IRefreshTokenFactory, RefreshTokenFactory>();
+        services.AddShopAuthentication(configuration);
         services.AddApplicationHandlers(typeof(Identity.Application.AssemblyReference).Assembly);
     }
 

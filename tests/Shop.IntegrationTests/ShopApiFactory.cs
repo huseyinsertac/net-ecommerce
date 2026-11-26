@@ -9,6 +9,9 @@ namespace Shop.IntegrationTests;
 /// <summary>Boots the real API in the Production environment against a throwaway Postgres container.</summary>
 public class ShopApiFactory : WebApplicationFactory<Program>, IAsyncLifetime
 {
+    /// <summary>Fixed, deliberately NON-SECRET signing key used only by the test host (48 characters).</summary>
+    public const string TestSigningKey = "test-only-NOT-A-SECRET-voltlane-jwt-key-48chars!";
+
     /// <summary>Seeding is off for the shared factory; a dedicated subclass can turn it on.</summary>
     protected virtual bool SeedOnStartup => false;
 
@@ -29,6 +32,7 @@ public class ShopApiFactory : WebApplicationFactory<Program>, IAsyncLifetime
         builder.UseEnvironment("Production");
         builder.UseSetting("ConnectionStrings:Shop", _postgres.GetConnectionString());
         builder.UseSetting("Database:SeedOnStartup", SeedOnStartup ? "true" : "false");
+        builder.UseSetting("Jwt:SigningKey", TestSigningKey);
         builder.ConfigureServices(services => services.AddSingleton<IStartupFilter, ThrowingEndpointStartupFilter>());
     }
 

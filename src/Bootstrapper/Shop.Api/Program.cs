@@ -7,6 +7,8 @@ using Serilog.Formatting.Compact;
 using Shop.Api;
 using Shop.Api.ErrorHandling;
 using Shop.Application.Abstractions;
+using Shop.Application.Abstractions.Identity;
+using Shop.Infrastructure.Common.Http;
 using Shop.Infrastructure.Common.Modules;
 using Shop.Infrastructure.Common.Persistence;
 
@@ -42,6 +44,9 @@ builder.Services.AddProblemDetails();
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddOpenApi(OpenApiConfiguration.Configure);
 
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<ICurrentUser, CurrentUser>();
+
 builder.Services.AddDispatcher();
 builder.Services.AddEventing(
     typeof(Catalog.Contracts.AssemblyReference).Assembly,
@@ -65,6 +70,10 @@ app.UseForwardedHeaders();
 app.UseSerilogRequestLogging();
 app.UseExceptionHandler();
 app.UseStatusCodePages();
+
+// Authentication itself (JWT bearer + the Admin policy) is registered by the Identity module.
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.MapOpenApi();
 app.MapScalarApiReference();

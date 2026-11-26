@@ -1,3 +1,4 @@
+using Identity.Domain.Users;
 using Microsoft.EntityFrameworkCore;
 using Shop.Infrastructure.Common.Events;
 using Shop.Infrastructure.Common.Outbox;
@@ -12,4 +13,12 @@ public sealed class IdentityDbContext(
     IntegrationEventTypeRegistry registry) : ModuleDbContext(options, dispatcher, pendingEvents, registry)
 {
     public override string Schema => "identity";
+
+    public DbSet<User> Users => Set<User>();
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        base.OnModelCreating(modelBuilder);
+        modelBuilder.ApplyConfigurationsFromAssembly(typeof(IdentityDbContext).Assembly);
+    }
 }
