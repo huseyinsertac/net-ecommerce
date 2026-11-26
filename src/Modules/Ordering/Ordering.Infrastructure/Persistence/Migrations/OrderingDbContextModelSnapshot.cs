@@ -23,6 +23,159 @@ namespace Ordering.Infrastructure.Persistence.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.HasSequence("order_number_seq")
+                .StartsAt(100001L);
+
+            modelBuilder.Entity("Ordering.Domain.Orders.Order", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<string>("CancellationReason")
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasColumnName("cancellation_reason");
+
+                    b.Property<string>("CustomerEmail")
+                        .IsRequired()
+                        .HasMaxLength(254)
+                        .HasColumnType("character varying(254)")
+                        .HasColumnName("customer_email");
+
+                    b.Property<Guid>("CustomerId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("customer_id");
+
+                    b.Property<decimal>("Discount")
+                        .HasColumnType("numeric(12,2)")
+                        .HasColumnName("discount");
+
+                    b.Property<string>("History")
+                        .IsRequired()
+                        .HasColumnType("jsonb")
+                        .HasColumnName("history");
+
+                    b.Property<Guid>("IdempotencyKey")
+                        .HasColumnType("uuid")
+                        .HasColumnName("idempotency_key");
+
+                    b.Property<string>("OrderNumber")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasColumnName("order_number");
+
+                    b.Property<DateTime>("PlacedAtUtc")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("placed_at_utc");
+
+                    b.Property<bool>("RefundRequired")
+                        .HasColumnType("boolean")
+                        .HasColumnName("refund_required");
+
+                    b.Property<uint>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("xid")
+                        .HasColumnName("xmin");
+
+                    b.Property<string>("ShippingAddress")
+                        .IsRequired()
+                        .HasColumnType("jsonb")
+                        .HasColumnName("shipping_address");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasColumnName("status");
+
+                    b.Property<decimal>("Subtotal")
+                        .HasColumnType("numeric(12,2)")
+                        .HasColumnName("subtotal");
+
+                    b.Property<decimal>("Total")
+                        .HasColumnType("numeric(12,2)")
+                        .HasColumnName("total");
+
+                    b.HasKey("Id")
+                        .HasName("pk_orders");
+
+                    b.HasIndex("OrderNumber")
+                        .IsUnique()
+                        .HasDatabaseName("ix_orders_order_number");
+
+                    b.HasIndex("CustomerId", "IdempotencyKey")
+                        .IsUnique()
+                        .HasDatabaseName("ix_orders_customer_id_idempotency_key");
+
+                    b.HasIndex("CustomerId", "PlacedAtUtc")
+                        .HasDatabaseName("ix_orders_customer_id_placed_at_utc");
+
+                    b.ToTable("orders", "ordering");
+                });
+
+            modelBuilder.Entity("Ordering.Domain.Orders.OrderLine", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<int>("LineNumber")
+                        .HasColumnType("integer")
+                        .HasColumnName("line_number");
+
+                    b.Property<decimal>("LineTotal")
+                        .HasColumnType("numeric(12,2)")
+                        .HasColumnName("line_total");
+
+                    b.Property<string>("OptionsLabel")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("options_label");
+
+                    b.Property<Guid>("OrderId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("order_id");
+
+                    b.Property<string>("ProductName")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasColumnName("product_name");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("integer")
+                        .HasColumnName("quantity");
+
+                    b.Property<string>("Sku")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("sku");
+
+                    b.Property<string>("ThumbnailUrl")
+                        .HasColumnType("text")
+                        .HasColumnName("thumbnail_url");
+
+                    b.Property<decimal>("UnitPrice")
+                        .HasColumnType("numeric(12,2)")
+                        .HasColumnName("unit_price");
+
+                    b.Property<Guid>("VariantId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("variant_id");
+
+                    b.HasKey("Id")
+                        .HasName("pk_order_lines");
+
+                    b.HasIndex("OrderId", "LineNumber")
+                        .IsUnique()
+                        .HasDatabaseName("ix_order_lines_order_id_line_number");
+
+                    b.ToTable("order_lines", "ordering");
+                });
+
             modelBuilder.Entity("Shop.Infrastructure.Common.Inbox.InboxMessage", b =>
                 {
                     b.Property<Guid>("MessageId")
@@ -89,6 +242,21 @@ namespace Ordering.Infrastructure.Persistence.Migrations
                         .HasFilter("processed_on_utc IS NULL");
 
                     b.ToTable("outbox_messages", "ordering");
+                });
+
+            modelBuilder.Entity("Ordering.Domain.Orders.OrderLine", b =>
+                {
+                    b.HasOne("Ordering.Domain.Orders.Order", null)
+                        .WithMany("Lines")
+                        .HasForeignKey("OrderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_order_lines_orders_order_id");
+                });
+
+            modelBuilder.Entity("Ordering.Domain.Orders.Order", b =>
+                {
+                    b.Navigation("Lines");
                 });
 #pragma warning restore 612, 618
         }

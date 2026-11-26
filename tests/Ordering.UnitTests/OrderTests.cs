@@ -45,6 +45,17 @@ public class OrderTests
     }
 
     [Fact]
+    public void Place_numbers_lines_from_one_in_the_order_given()
+    {
+        var (a, b, c) = (Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid());
+
+        var order = Order.Place("VL-1", Guid.NewGuid(), "a@b.c", Guid.NewGuid(), Address(),
+            [Line(a), Line(b), Line(c)], Now).Value;
+
+        order.Lines.Select(l => (l.LineNumber, l.VariantId)).ShouldBe([(1, a), (2, b), (3, c)]);
+    }
+
+    [Fact]
     public void Place_rejects_empty_duplicate_or_out_of_range_lines()
     {
         var v = Guid.NewGuid();

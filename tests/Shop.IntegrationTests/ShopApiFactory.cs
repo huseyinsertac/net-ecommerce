@@ -37,6 +37,7 @@ public class ShopApiFactory : WebApplicationFactory<Program>, IAsyncLifetime
         builder.UseSetting("RateLimiting:AuthPerMinute", "1000");
         builder.UseSetting("RateLimiting:RefreshPerMinute", "1000");
         builder.UseSetting("RateLimiting:BasketWritesPerMinute", "1000");
+        builder.UseSetting("RateLimiting:CheckoutPerMinute", "1000");
         builder.ConfigureServices(services => services.AddSingleton<IStartupFilter, ThrowingEndpointStartupFilter>());
     }
 

@@ -14,4 +14,7 @@ public static class RateLimitPolicies
 
     /// <summary>Basket writes (PUT, DELETE, merge) per client IP: each one reads the catalog and writes a row.</summary>
     public const string BasketWrite = "basket-write";
+
+    /// <summary>Placing an order per client IP: each one reads basket and catalog, takes an order number and writes the order.</summary>
+    public const string Checkout = "checkout";
 }

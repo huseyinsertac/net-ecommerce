@@ -2,7 +2,11 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Ordering.Application.Abstractions;
+using Ordering.Contracts.Orders;
+using Ordering.Infrastructure.Endpoints;
 using Ordering.Infrastructure.Persistence;
+using Ordering.Infrastructure.Reading;
 using Shop.Application.Abstractions;
 using Shop.Infrastructure.Common.Modules;
 using Shop.Infrastructure.Common.Persistence;
@@ -16,11 +20,13 @@ public sealed class OrderingModule : IModule
     public void Register(IServiceCollection services, IConfiguration configuration)
     {
         services.AddModuleDbContext<OrderingDbContext>(configuration);
+        services.AddScoped<IOrderRepository, OrderRepository>();
+        services.AddScoped<IOrderPaymentQuery, OrderPaymentQuery>();
         services.AddApplicationHandlers(typeof(Ordering.Application.AssemblyReference).Assembly);
     }
 
     public void MapEndpoints(IEndpointRouteBuilder app)
     {
-        app.MapGroup($"/api/{Name}");
+        OrderingEndpoints.Map(app.MapGroup($"/api/{Name}"));
     }
 }

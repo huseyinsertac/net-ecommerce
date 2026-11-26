@@ -38,7 +38,7 @@ public sealed class Order : AggregateRoot<Guid>
             return OrderErrors.InvalidLines(MaxLines, MaxQuantityPerLine);
         }
 
-        var orderLines = lines.Select(OrderLine.Create).ToList();
+        var orderLines = lines.Select((l, i) => OrderLine.Create(l, i + 1)).ToList();
         var subtotal = orderLines.Aggregate(Money.Zero, (sum, l) => sum + l.LineTotal);
         var discount = Money.Zero;
 

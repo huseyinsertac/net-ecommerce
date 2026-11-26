@@ -6,6 +6,9 @@ public sealed class OrderLine : Entity<Guid>
 {
     private OrderLine() { }
 
+    /// <summary>1-based position in the order, in the order the lines were supplied.</summary>
+    public int LineNumber { get; private set; }
+
     public Guid VariantId { get; private set; }
     public string ProductName { get; private set; } = null!;
     public string Sku { get; private set; } = null!;
@@ -15,12 +18,13 @@ public sealed class OrderLine : Entity<Guid>
     public int Quantity { get; private set; }
     public Money LineTotal { get; private set; } = null!;
 
-    internal static OrderLine Create(NewOrderLine line)
+    internal static OrderLine Create(NewOrderLine line, int lineNumber)
     {
         var unitPrice = Money.Usd(line.UnitPrice);
         return new OrderLine
         {
             Id = Guid.CreateVersion7(),
+            LineNumber = lineNumber,
             VariantId = line.VariantId,
             ProductName = line.ProductName,
             Sku = line.Sku,
