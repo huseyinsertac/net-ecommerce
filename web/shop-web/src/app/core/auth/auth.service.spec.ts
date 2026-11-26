@@ -86,6 +86,34 @@ describe('AuthService', () => {
     expect(auth.user()).toBeNull();
   });
 
+  it('refresh 204 (no cookie) means no session: resolves false, stays signed out, no retry', async () => {
+    const seen: string[] = [];
+    auth.signedIn.subscribe((u) => seen.push(u.id));
+    const p = auth.refresh();
+    http.expectOne('/api/identity/refresh').flush(null, { status: 204, statusText: 'No Content' });
+    expect(await p).toBe(false);
+    expect(auth.user()).toBeNull();
+    expect(auth.accessToken()).toBeNull();
+    expect(seen).toEqual([]);
+    http.expectNone('/api/identity/refresh');
+  });
+
+  it('refresh 204 for a signed-in user ends the local session', async () => {
+    await loginAs();
+    const p = auth.refresh();
+    http.expectOne('/api/identity/refresh').flush(null, { status: 204, statusText: 'No Content' });
+    expect(await p).toBe(false);
+    expect(auth.user()).toBeNull();
+  });
+
+  it('initialize with a 204 refresh becomes ready, signed out', async () => {
+    const p = auth.initialize();
+    http.expectOne('/api/identity/refresh').flush(null, { status: 204, statusText: 'No Content' });
+    await p;
+    expect(auth.ready()).toBe(true);
+    expect(auth.user()).toBeNull();
+  });
+
   it('initialize resolves after 5s when the refresh never responds', async () => {
     vi.useFakeTimers();
     try {

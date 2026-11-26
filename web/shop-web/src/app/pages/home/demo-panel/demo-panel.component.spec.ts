@@ -33,6 +33,14 @@ describe('DemoPanelComponent', () => {
     expect(nav).toHaveBeenCalledWith('/');
   });
 
+  it('describes the admin account honestly (no nightly reset claim)', async () => {
+    const f = TestBed.createComponent(DemoPanelComponent);
+    await f.whenStable();
+    const text = ((f.nativeElement as HTMLElement).textContent ?? '').replace(/\s+/g, ' ');
+    expect(text).toContain('Shared admin account — admin tools are coming soon.');
+    expect(text).not.toContain('nightly');
+  });
+
   it('disables both buttons while a request is in flight', async () => {
     auth.startDemoAdmin.mockReturnValue(new Promise(() => undefined));
     const f = TestBed.createComponent(DemoPanelComponent);

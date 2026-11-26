@@ -11,11 +11,13 @@ export const MAX_LINE_QUANTITY = 10;
 
 /**
  * Message to show for a failed basket call, or null when the error interceptor already toasted it
- * (network and 5xx). 404/409 carry a ProblemDetails title written for the shopper ("Only 3 left.").
+ * (network and 5xx). 403/404/409 carry a ProblemDetails title written for the shopper ("Only 3 left.").
  */
 export function basketErrorMessage(err: unknown): string | null {
   if (!(err instanceof HttpErrorResponse)) return "We couldn't update your cart.";
   if (err.status === 0 || err.status >= 500) return null;
+  // The interceptor already tried a refresh; the title would only say "Unauthorized".
+  if (err.status === 401) return 'Please sign in again.';
   const title = (err.error as { title?: unknown } | null)?.title;
   return typeof title === 'string' && title ? title : "We couldn't update your cart.";
 }

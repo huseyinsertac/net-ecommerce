@@ -72,7 +72,7 @@ export class AuthService {
    * so two parallel 401s (or two components) never rotate the token twice and trip reuse detection.
    * Never rejects. Returns true when a new access token was obtained.
    *
-   * 401 means the session is gone and clears local state. 429, 409, 5xx and network errors are
+   * 401 (bad cookie) and 204 (no cookie) mean the session is gone and clear local state. 429, 409, 5xx and network errors are
    * transient: the current state is kept so one hiccup does not sign the user out.
    */
   refresh(): Promise<boolean> {
@@ -104,6 +104,11 @@ export class AuthService {
       const res = await firstValueFrom(this.api.refresh());
       // A sign-in or sign-out happened meanwhile: this result describes a dead session.
       if (started !== this.generation) return false;
+      // 204: no refresh cookie, so no session. Stay (or become) signed out; nothing to retry.
+      if (res === null) {
+        this.clear();
+        return false;
+      }
       this.apply(res);
       return true;
     } catch (err) {

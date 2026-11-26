@@ -29,7 +29,13 @@ const basketOf = (...lines: Basket['lines']): Basket => ({
   hasIssues: lines.some((l) => l.issue),
 });
 
-const user: CurrentUser = { id: 'u1', email: 'a@x.io', displayName: 'Ada', roles: [], isDemo: false };
+const user: CurrentUser = {
+  id: 'u1',
+  email: 'a@x.io',
+  displayName: 'Ada',
+  roles: [],
+  isDemo: false,
+};
 const macrotask = () => new Promise<void>((r) => setTimeout(r));
 
 describe('BasketService', () => {
@@ -44,7 +50,10 @@ describe('BasketService', () => {
       providers: [
         provideHttpClient(),
         provideHttpClientTesting(),
-        { provide: AuthService, useValue: { user: currentUser, signedIn: signedIn.asObservable() } },
+        {
+          provide: AuthService,
+          useValue: { user: currentUser, signedIn: signedIn.asObservable() },
+        },
       ],
     });
     http = TestBed.inject(HttpTestingController);
@@ -238,6 +247,20 @@ describe('basketErrorMessage', () => {
     expect(basketErrorMessage(http(404, { title: 'This item is no longer available.' }))).toBe(
       'This item is no longer available.',
     );
+  });
+
+  it('shows the demo admin 403 title verbatim', () => {
+    const title = "The shared demo admin can't use the cart. Try the demo customer instead.";
+    expect(
+      basketErrorMessage(http(403, { type: 'basket.demo_admin_readonly', title, status: 403 })),
+    ).toBe(title);
+  });
+
+  it('maps a 401 to a friendly sign-in message instead of the "Unauthorized" title', () => {
+    expect(basketErrorMessage(http(401, { title: 'Unauthorized', status: 401 }))).toBe(
+      'Please sign in again.',
+    );
+    expect(basketErrorMessage(http(401, null))).toBe('Please sign in again.');
   });
 
   it('falls back for a 4xx without a title, and is silent for server and network errors', () => {

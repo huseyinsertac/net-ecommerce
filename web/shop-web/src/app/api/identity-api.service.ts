@@ -21,8 +21,9 @@ export class IdentityApi {
     return this.http.post<AuthResponse>('/api/identity/login', { email, password });
   }
 
-  refresh(): Observable<AuthResponse> {
-    return this.http.post<AuthResponse>('/api/identity/refresh', null);
+  /** Null on 204: no refresh cookie was sent, so there is no session to restore. */
+  refresh(): Observable<AuthResponse | null> {
+    return this.http.post<AuthResponse | null>('/api/identity/refresh', null);
   }
 
   logout(): Observable<void> {
