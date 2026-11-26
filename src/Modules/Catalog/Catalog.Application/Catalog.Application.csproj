@@ -3,6 +3,8 @@
   <ItemGroup>
     <ProjectReference Include="../Catalog.Domain/Catalog.Domain.csproj" />
     <ProjectReference Include="../Catalog.Contracts/Catalog.Contracts.csproj" />
+    <ProjectReference Include="../../Ordering/Ordering.Contracts/Ordering.Contracts.csproj" />
+    <ProjectReference Include="../../Payments/Payments.Contracts/Payments.Contracts.csproj" />
     <ProjectReference Include="../../../BuildingBlocks/Shop.Application.Abstractions/Shop.Application.Abstractions.csproj" />
   </ItemGroup>
 

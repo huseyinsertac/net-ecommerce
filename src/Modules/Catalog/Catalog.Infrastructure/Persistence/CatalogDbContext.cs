@@ -1,5 +1,6 @@
 using Catalog.Domain.Categories;
 using Catalog.Domain.Products;
+using Catalog.Domain.Reservations;
 using Microsoft.EntityFrameworkCore;
 using Shop.Infrastructure.Common.Events;
 using Shop.Infrastructure.Common.Outbox;
@@ -18,6 +19,8 @@ public sealed class CatalogDbContext(
     public DbSet<Category> Categories => Set<Category>();
 
     public DbSet<Product> Products => Set<Product>();
+
+    public DbSet<StockReservation> StockReservations => Set<StockReservation>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
