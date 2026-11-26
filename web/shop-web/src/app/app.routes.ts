@@ -38,6 +38,11 @@ export const routes: Routes = [
       import('./pages/product-detail/product-detail.page').then((m) => m.ProductDetailPage),
   },
   {
+    path: 'cart',
+    title: 'Cart · VoltLane',
+    loadComponent: () => import('./pages/cart/cart.page').then((m) => m.CartPage),
+  },
+  {
     path: '**',
     title: 'Page not found · VoltLane',
     loadComponent: () =>

@@ -1,6 +1,7 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  computed,
   ElementRef,
   Injector,
   afterNextRender,
@@ -20,6 +21,7 @@ import { NavigationEnd, Router, RouterLink } from '@angular/router';
 import { filter, map, startWith } from 'rxjs';
 import { BRAND } from '../../brand';
 import { AuthService } from '../../core/auth/auth.service';
+import { BasketService } from '../../core/basket/basket.service';
 
 @Component({
   selector: 'app-header',
@@ -39,7 +41,11 @@ import { AuthService } from '../../core/auth/auth.service';
 })
 export class HeaderComponent {
   protected readonly brand = BRAND;
-  protected readonly cartCount = 0;
+  protected readonly cart = inject(BasketService);
+  protected readonly cartLabel = computed(() => {
+    const n = this.cart.count();
+    return n === 0 ? 'Cart' : `Cart, ${n} ${n === 1 ? 'item' : 'items'}`;
+  });
   protected readonly auth = inject(AuthService);
   private readonly router = inject(Router);
   /** Phone layout only: whether the search row is expanded. */

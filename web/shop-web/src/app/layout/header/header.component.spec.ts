@@ -4,7 +4,9 @@ import { Component, signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { Router, provideRouter } from '@angular/router';
 import { BRAND } from '../../brand';
+import { Subject } from 'rxjs';
 import { AuthService, CurrentUser } from '../../core/auth/auth.service';
+import { BasketService } from '../../core/basket/basket.service';
 import { HeaderComponent } from './header.component';
 
 @Component({ template: '' })
@@ -38,6 +40,22 @@ describe('HeaderComponent', () => {
     const el = fixture.nativeElement as HTMLElement;
     expect(el.querySelector('.mat-badge')).not.toBeNull();
     expect(el.querySelector('.mat-badge-hidden')).not.toBeNull();
+  });
+
+  it('the cart link goes to /cart and the badge shows the live count', async () => {
+    const count = signal(0);
+    TestBed.overrideProvider(BasketService, { useValue: { count } });
+    const fixture = TestBed.createComponent(HeaderComponent);
+    await fixture.whenStable();
+    const el = fixture.nativeElement as HTMLElement;
+    const link = el.querySelector<HTMLAnchorElement>('a[href="/cart"]')!;
+    expect(link).not.toBeNull();
+    expect(el.querySelector('.mat-badge-hidden')).not.toBeNull();
+    count.set(3);
+    await fixture.whenStable();
+    expect(el.querySelector('.mat-badge-hidden')).toBeNull();
+    expect(el.querySelector('.mat-badge-content')?.textContent?.trim()).toBe('3');
+    expect(link.getAttribute('aria-label')).toBe('Cart, 3 items');
   });
 
   async function submit(value: string) {
@@ -121,7 +139,7 @@ describe('HeaderComponent', () => {
     beforeEach(() => {
       user.set(null);
       TestBed.overrideProvider(AuthService, {
-        useValue: { user, isAdmin: () => false, logout: vi.fn() },
+        useValue: { user, isAdmin: () => false, logout: vi.fn(), signedIn: new Subject() },
       });
     });
 

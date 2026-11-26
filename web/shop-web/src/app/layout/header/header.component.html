@@ -81,13 +81,19 @@
     <a mat-button class="sign-in" routerLink="/login">Sign in</a>
   }
 
-  <button mat-icon-button aria-label="Cart">
+  <a
+    mat-icon-button
+    class="cart-link"
+    routerLink="/cart"
+    [attr.aria-label]="cartLabel()"
+  >
     <mat-icon
       fontSet="material-symbols-outlined"
-      [matBadge]="cartCount"
+      [matBadge]="cart.count()"
       matBadgeSize="small"
-      [matBadgeHidden]="cartCount === 0"
+      [matBadgeHidden]="cart.count() === 0"
+      aria-hidden="false"
       >shopping_cart</mat-icon
     >
-  </button>
+  </a>
 </mat-toolbar>

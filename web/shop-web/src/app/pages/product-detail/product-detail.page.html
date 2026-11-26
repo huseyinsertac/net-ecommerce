@@ -40,8 +40,14 @@
           }
 
           <div class="cta">
-            <button mat-flat-button type="button" disabled>Add to cart — coming soon</button>
-            <p class="hint">The cart isn't open yet. Check back soon.</p>
+            <button
+              mat-flat-button
+              type="button"
+              [disabled]="!inStock() || adding()"
+              (click)="addToCart()"
+            >
+              {{ !variant() || inStock() ? (adding() ? 'Adding…' : 'Add to cart') : 'Out of stock' }}
+            </button>
           </div>
 
           <h2>About this product</h2>

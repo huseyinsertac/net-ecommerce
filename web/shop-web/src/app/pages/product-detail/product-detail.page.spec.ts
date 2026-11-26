@@ -4,7 +4,11 @@ import { TestBed } from '@angular/core/testing';
 import { Router, provideRouter } from '@angular/router';
 import { Title } from '@angular/platform-browser';
 import { RouterTestingHarness } from '@angular/router/testing';
+import { signal } from '@angular/core';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { HttpErrorResponse } from '@angular/common/http';
 import { ProductDetail } from '../../api/catalog-api.service';
+import { Basket, BasketService } from '../../core/basket/basket.service';
 import { ProductDetailPage } from './product-detail.page';
 
 const detail: ProductDetail = {
@@ -31,9 +35,18 @@ const detail: ProductDetail = {
   ],
 };
 
-async function setup(url: string, body: object = detail, status = 200) {
+function fakeBasket(lines: Basket['lines'] = []) {
+  return {
+    basket: signal<Basket | null>({ lines, itemCount: 0, subtotal: 0, hasIssues: false }),
+    count: () => 0,
+    setQuantity: vi.fn().mockResolvedValue(undefined),
+  };
+}
+
+async function setup(url: string, body: object = detail, status = 200, basket = fakeBasket()) {
   TestBed.configureTestingModule({
     providers: [
+      { provide: BasketService, useValue: basket },
       provideRouter([{ path: 'p/:slug', component: ProductDetailPage }]),
       provideHttpClient(),
       provideHttpClientTesting(),
@@ -47,7 +60,7 @@ async function setup(url: string, body: object = detail, status = 200) {
     .flush(body, status === 200 ? {} : { status, statusText: 'x' });
   await harness.fixture.whenStable();
   harness.detectChanges();
-  return { harness, el: harness.routeNativeElement as HTMLElement };
+  return { harness, basket, el: harness.routeNativeElement as HTMLElement };
 }
 
 describe('ProductDetailPage', () => {
@@ -144,5 +157,81 @@ describe('ProductDetailPage', () => {
     const { el } = await setup('/p/aurora-x', single);
     expect(el.querySelector('mat-button-toggle-group')).toBeNull();
     expect(el.querySelector('.price')?.textContent).toContain('$520.00');
+  });
+
+  describe('add to cart', () => {
+    const addButton = (el: HTMLElement) => el.querySelector<HTMLButtonElement>('.cta button')!;
+    const inCart = (variantId: string, quantity: number): Basket['lines'] => [
+      {
+        variantId,
+        productSlug: 'aurora-x',
+        productName: 'Aurora X',
+        brand: 'Voltra',
+        sku: 'BLU-128',
+        optionsLabel: 'Blue',
+        thumbnailUrl: null,
+        unitPrice: 520,
+        quantity,
+        available: 20,
+        lineTotal: 520 * quantity,
+        issue: null,
+      },
+    ];
+
+    it('Add to cart enabled for in-stock variant and calls setQuantity(current+1)', async () => {
+      const { el, harness, basket } = await setup(
+        '/p/aurora-x?variant=BLU-128',
+        detail,
+        200,
+        fakeBasket(inCart('3', 2)),
+      );
+      const open = vi.spyOn(TestBed.inject(MatSnackBar), 'open');
+      expect(addButton(el).disabled).toBe(false);
+      expect(addButton(el).textContent).toContain('Add to cart');
+      addButton(el).click();
+      expect(basket.setQuantity).toHaveBeenCalledWith('3', 3);
+      await harness.fixture.whenStable();
+      expect(open).toHaveBeenCalledWith('Added to cart', 'View cart', expect.anything());
+    });
+
+    it('adds 1 when the variant is not in the cart yet', async () => {
+      const { el, basket } = await setup('/p/aurora-x?variant=BLU-128');
+      addButton(el).click();
+      expect(basket.setQuantity).toHaveBeenCalledWith('3', 1);
+    });
+
+    it('is disabled while the request is in flight, so a double click sends once', async () => {
+      let release!: () => void;
+      const basket = fakeBasket();
+      basket.setQuantity.mockImplementation(() => new Promise<void>((r) => (release = r)));
+      const { el, harness } = await setup('/p/aurora-x?variant=BLU-128', detail, 200, basket);
+      addButton(el).click();
+      harness.detectChanges();
+      expect(addButton(el).disabled).toBe(true);
+      addButton(el).click();
+      expect(basket.setQuantity).toHaveBeenCalledTimes(1);
+      release();
+      await harness.fixture.whenStable();
+      harness.detectChanges();
+      expect(addButton(el).disabled).toBe(false);
+    });
+
+    it('out-of-stock variant shows disabled Out of stock', async () => {
+      const { el } = await setup('/p/aurora-x?variant=BLK-128');
+      expect(addButton(el).disabled).toBe(true);
+      expect(addButton(el).textContent).toContain('Out of stock');
+    });
+
+    it('shows the server message when stock runs short', async () => {
+      const basket = fakeBasket();
+      basket.setQuantity.mockRejectedValue(
+        new HttpErrorResponse({ status: 409, error: { title: 'Only 3 left.' }, statusText: 'x' }),
+      );
+      const { el, harness } = await setup('/p/aurora-x?variant=BLK-256', detail, 200, basket);
+      const open = vi.spyOn(TestBed.inject(MatSnackBar), 'open');
+      addButton(el).click();
+      await harness.fixture.whenStable();
+      expect(open).toHaveBeenCalledWith('Only 3 left.', 'Dismiss', expect.anything());
+    });
   });
 });
