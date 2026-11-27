@@ -117,13 +117,16 @@ Do not rotate the key casually: it invalidates all issued access tokens.
 
 ### 4.5 Stripe test-mode keys and webhook
 
-Checkout pays through Stripe Checkout in **test mode**. The API refuses live keys (`sk_live_`) in every
+Checkout pays through Stripe Checkout in **test mode**. The API refuses live keys (`sk_live_`, `rk_live_`) in every
 environment, and `docker-compose.prod.yml` will not start without both values below, so do this on
 new and existing servers **before the next deploy**. Nothing here costs money or moves real funds.
 
 In the Stripe dashboard, switch to **test mode** (the toggle is at the top right of the dashboard), then:
 
 1. **Developers > API keys**: reveal the **Secret key** (it starts with `sk_test_`). Keep the tab open.
+   A **restricted key** (`rk_test_`) works too, for example when the secret key belongs to another project.
+   Give it exactly one permission: **Checkout Sessions: Write** (the API creates, reads and expires sessions).
+   It still goes into `STRIPE_SECRET_KEY`.
 2. **Developers > Webhooks > Add endpoint**:
    - Endpoint URL: `https://<YOUR_DOMAIN>/api/payments/stripe/webhook`
    - Events to send (exactly these four):
@@ -141,7 +144,7 @@ on terminals without bracketed paste.
 Block 1: paste this line, press Enter, then paste the secret key and press Enter (nothing is shown):
 
 ```bash
-read -rsp "Stripe secret key (sk_test_...): " SK; echo
+read -rsp "Stripe secret or restricted key (sk_test_... or rk_test_...): " SK; echo
 ```
 
 Block 2: paste this line, press Enter, then paste the webhook signing secret and press Enter:
@@ -153,7 +156,7 @@ read -rsp "Stripe webhook signing secret (whsec_...): " WH; echo
 Block 3 checks both prefixes, appends each value only if absent, and keeps the file private:
 
 ```bash
-case "$SK" in sk_test_?*) ;; *) echo "Secret key must start with sk_test_"; false ;; esac &&
+case "$SK" in sk_test_?*|rk_test_?*) ;; *) echo "Key must start with sk_test_ or rk_test_"; false ;; esac &&
 case "$WH" in whsec_?*) ;; *) echo "Signing secret must start with whsec_"; false ;; esac &&
 {
   [ -n "$(tail -c1 /opt/voltlane/.env)" ] && echo >> /opt/voltlane/.env
