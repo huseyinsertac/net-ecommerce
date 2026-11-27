@@ -37,25 +37,25 @@ Normal registration and sign-in also work.
 
 ## Screenshots
 
-![Home page](docs/screenshots/home.png)
-*Home page with the demo panel and featured products.*
+![Home page](docs/screenshots/home.jpg)
+*Home page with the one-click demo panel.*
 
-![Product page](docs/screenshots/product.png)
-*Product detail with the variant picker and gallery.*
+![Product page](docs/screenshots/product.jpg)
+*Product detail with the variant picker and live price.*
 
-![Cart](docs/screenshots/cart.png)
+![Cart](docs/screenshots/cart.jpg)
 *Cart with live prices and stock flags.*
 
-![Checkout progress](docs/screenshots/checkout-progress.png)
-*Checkout waiting for stock reservation and payment.*
+![Checkout](docs/screenshots/checkout.jpg)
+*Checkout with the order summary and a pre-filled demo address.*
 
-![Order detail](docs/screenshots/order-detail.png)
-*Order detail with the status timeline.*
+![Order detail](docs/screenshots/order-detail.jpg)
+*A paid order right after checkout.*
 
-![Admin orders](docs/screenshots/admin-orders.png)
+![Admin orders](docs/screenshots/admin-orders.jpg)
 *Admin order list with filters and ship/deliver actions.*
 
-![Admin product editor](docs/screenshots/admin-product.png)
+![Admin product editor](docs/screenshots/admin-product.jpg)
 *Admin product editor with specs, variants and images.*
 
 ## Features
