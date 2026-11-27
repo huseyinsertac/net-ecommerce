@@ -1,0 +1,47 @@
+<mat-sidenav-container class="shell">
+  <mat-sidenav
+    #nav
+    class="nav"
+    [mode]="narrow() ? 'over' : 'side'"
+    [opened]="!narrow()"
+    [fixedInViewport]="false"
+  >
+    <nav aria-label="Admin">
+      @for (link of links; track link.path) {
+        <a
+          class="nav-link"
+          [routerLink]="link.path"
+          routerLinkActive="active"
+          ariaCurrentWhenActive="page"
+          (click)="narrow() && nav.close()"
+        >
+          <mat-icon fontSet="material-symbols-outlined">{{ link.icon }}</mat-icon>
+          {{ link.label }}
+        </a>
+      }
+    </nav>
+  </mat-sidenav>
+
+  <mat-sidenav-content>
+    <mat-toolbar class="topbar">
+      <button
+        mat-icon-button
+        type="button"
+        class="menu-button"
+        aria-label="Open admin menu"
+        [attr.aria-expanded]="nav.opened"
+        (click)="nav.toggle()"
+      >
+        <mat-icon fontSet="material-symbols-outlined">menu</mat-icon>
+      </button>
+      <span class="title">Admin · shared demo account</span>
+    </mat-toolbar>
+    <p class="notice">
+      <mat-icon fontSet="material-symbols-outlined">info</mat-icon>
+      Changes are visible to every visitor and reset nightly at 02:00 UTC.
+    </p>
+    <main class="content">
+      <router-outlet />
+    </main>
+  </mat-sidenav-content>
+</mat-sidenav-container>

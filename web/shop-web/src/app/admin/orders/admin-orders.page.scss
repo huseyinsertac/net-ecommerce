@@ -1,0 +1,107 @@
+:host {
+  display: block;
+}
+
+h1 {
+  margin: 0 0 16px;
+  font: var(--mat-sys-headline-medium);
+}
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 16px;
+  margin-bottom: 16px;
+}
+
+.search {
+  flex: 1 1 280px;
+  max-width: 420px;
+}
+
+.filters {
+  flex: 1 1 auto;
+}
+
+.table-wrap {
+  overflow: hidden;
+  border: 1px solid var(--mat-sys-outline-variant);
+  border-radius: 16px;
+  background: var(--mat-sys-surface-container-low);
+}
+
+table {
+  width: 100%;
+  background: transparent;
+}
+
+.row {
+  position: relative;
+  height: 56px;
+
+  &:hover {
+    background: var(--mat-sys-surface-container);
+  }
+}
+
+.order-link {
+  color: var(--mat-sys-primary);
+  font: var(--mat-sys-title-small);
+  text-decoration: none;
+
+  // The whole row is the click target.
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--mat-sys-primary);
+    outline-offset: -2px;
+  }
+}
+
+.num {
+  text-align: right;
+}
+
+.sub-email {
+  display: none;
+}
+
+.skeletons {
+  display: grid;
+  gap: 8px;
+}
+
+.sk-row {
+  height: 56px;
+  border-radius: 12px;
+}
+
+mat-paginator {
+  margin-top: 12px;
+  background: transparent;
+}
+
+@media (max-width: 899px) {
+  .col-email,
+  .col-items {
+    display: none;
+  }
+
+  .sub-email {
+    display: block;
+    overflow-wrap: anywhere;
+    color: var(--mat-sys-on-surface-variant);
+    font: var(--mat-sys-body-small);
+  }
+}
+
+@media (max-width: 599px) {
+  .col-date {
+    display: none;
+  }
+}

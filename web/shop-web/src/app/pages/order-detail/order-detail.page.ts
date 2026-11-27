@@ -16,11 +16,11 @@ import { RouterLink } from '@angular/router';
 import { Subscription, exhaustMap, takeUntil, takeWhile, tap, timer } from 'rxjs';
 import {
   OrderDto,
-  OrderStatus,
   OrderingApi,
 } from '../../api/ordering-api.service';
 import { MoneyPipe } from '../../core/money.pipe';
 import { RedirectService } from '../../core/redirect.service';
+import { OrderTimelineComponent } from '../../shared/order-timeline/order-timeline.component';
 import { OrderStatusChipComponent } from '../../shared/order-status-chip/order-status-chip.component';
 
 const POLL_MS = 1000;
@@ -28,20 +28,6 @@ const POLL_MS = 1000;
 const GIVE_UP_MS = 30_000;
 /** After `?checkout=cancelled`: a declined payment cancels the order a moment later. */
 const CANCELLED_GIVE_UP_MS = 10_000;
-const STEPS: OrderStatus[] = ['Placed', 'Paid', 'Shipped', 'Delivered'];
-
-const REASONS: Record<string, string> = {
-  OutOfStock: 'an item sold out',
-  PaymentFailed: 'payment was declined',
-  PaymentExpired: "payment wasn't completed in time",
-  Admin: 'cancelled by the store',
-};
-
-interface Step {
-  label: string;
-  at: string | null;
-  state: 'reached' | 'future' | 'cancelled';
-}
 
 /** `/orders/:id`: one order with its status timeline; also the return page after paying. */
 @Component({
@@ -52,6 +38,7 @@ interface Step {
     MatIconModule,
     MoneyPipe,
     OrderStatusChipComponent,
+    OrderTimelineComponent,
     RouterLink,
   ],
   templateUrl: './order-detail.page.html',
@@ -90,30 +77,6 @@ export class OrderDetailPage implements OnInit {
     if (this.checkout() === 'cancelled') return 'Payment not completed.';
     if (this.checkout() !== 'success' && this.payUrl()) return 'This order is waiting for payment.';
     return null;
-  });
-
-  protected readonly steps = computed<Step[]>(() => {
-    const order = this.order();
-    if (!order) return [];
-    const at = (s: OrderStatus) => order.history.find((h) => h.status === s)?.atUtc ?? null;
-    const rank = STEPS.indexOf(order.status);
-    const cancelled = order.status === 'Cancelled';
-    const reached = STEPS.map<Step>((label, i) => {
-      const time = at(label);
-      const done = time !== null || (!cancelled && i <= rank);
-      return { label, at: time, state: done ? 'reached' : 'future' };
-    });
-    if (!cancelled) return reached;
-    const before = reached.filter((s) => s.state === 'reached');
-    const reason = order.cancellationReason ? REASONS[order.cancellationReason] : null;
-    return [
-      ...before,
-      {
-        label: reason ? `Cancelled: ${reason}` : 'Cancelled',
-        at: at('Cancelled'),
-        state: 'cancelled',
-      },
-    ];
   });
 
   constructor() {
