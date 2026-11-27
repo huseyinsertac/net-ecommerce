@@ -140,17 +140,10 @@ docker compose up -d --build
 
 Then open http://localhost:8080.
 
-The local stack uses the **simulated payment page** (the Fake provider), so checkout works with no
-Stripe account: you choose whether the payment succeeds or fails. The Fake provider is allowed here
-through `Payments__AllowFakeProviderInProduction`, and `docker-compose.prod.yml` never sets it.
-
-To exercise real Stripe webhooks locally, run the API with `Payments__Provider=Stripe`, a test-mode
-`Stripe__SecretKey` (`sk_test_...`) and the signing secret the CLI prints as `Stripe__WebhookSecret`
-(`whsec_...`) in its environment, then forward events:
-
-```bash
-stripe listen --forward-to localhost:8080/api/payments/stripe/webhook
-```
+The local stack always uses the **simulated payment page** (the Fake provider), so checkout works
+with no Stripe account: you choose whether the payment succeeds or fails. The Fake provider is allowed
+here through `Payments__AllowFakeProviderInProduction`, and `docker-compose.prod.yml` never sets it.
+To try real Stripe test mode locally, run from source instead (next section).
 
 ## Develop from source
 
@@ -161,6 +154,30 @@ cd web/shop-web && npm ci && npx ng serve                    # UI on http://loca
 ```
 
 (`deploy/.env` must exist first: `cp deploy/.env.example deploy/.env`.)
+
+### Checkout with Stripe test mode
+
+You need a Stripe account in test mode and the [Stripe CLI](https://docs.stripe.com/stripe-cli).
+
+1. Start forwarding webhooks to the API's dev port (5080, from `launchSettings.json`). The CLI prints a
+   signing secret (`whsec_...`); leave it running.
+
+   ```bash
+   stripe listen --forward-to localhost:5080/api/payments/stripe/webhook
+   ```
+
+2. In a second terminal, start the API with the Stripe provider, your test secret key and that signing
+   secret (Postgres and the UI as above):
+
+   ```bash
+   Payments__Provider=Stripe \
+   Stripe__SecretKey=sk_test_... \
+   Stripe__WebhookSecret=whsec_... \
+   dotnet run --project src/Bootstrapper/Shop.Api
+   ```
+
+3. Open http://localhost:4200, place an order and pay with `4242 4242 4242 4242`. Stripe returns you to
+   the order page, which turns Paid once the forwarded webhook lands.
 
 ## Testing
 
