@@ -1,0 +1,69 @@
+<div class="page">
+  <h1>My orders</h1>
+
+  @switch (view()) {
+    @case ('loading') {
+      <div class="list" aria-busy="true" aria-label="Loading your orders">
+        @for (row of skeletonRows; track row) {
+          <div class="sk sk-row"></div>
+        }
+      </div>
+    }
+    @case ('error') {
+      <div class="empty">
+        <h2>We couldn't load your orders</h2>
+        <p>Please try again in a moment.</p>
+        <button mat-flat-button type="button" (click)="load((result()?.page ?? 1))">Retry</button>
+      </div>
+    }
+    @case ('ready') {
+      @let data = result()!;
+      @if (data.items.length === 0) {
+        <div class="empty">
+          <mat-icon class="empty-icon" fontSet="material-symbols-outlined">receipt_long</mat-icon>
+          <h2>No orders yet</h2>
+          <p>When you place an order, it will show up here.</p>
+          <a mat-flat-button routerLink="/">Start shopping</a>
+        </div>
+      } @else {
+        <ul class="list" aria-label="Your orders">
+          @for (order of data.items; track order.id) {
+            <li>
+              <a class="order-card" [routerLink]="['/orders', order.id]">
+                @if (order.firstThumbnailUrl) {
+                  <img class="thumb" [src]="order.firstThumbnailUrl" alt="" width="72" height="72" loading="lazy" />
+                } @else {
+                  <span class="thumb placeholder" aria-hidden="true">
+                    <mat-icon fontSet="material-symbols-outlined">inventory_2</mat-icon>
+                  </span>
+                }
+                <div class="main">
+                  <span class="number">{{ order.orderNumber }}</span>
+                  <span class="meta">
+                    <time [attr.datetime]="order.placedAtUtc">{{ order.placedAtUtc | date: 'mediumDate' }}</time>
+                    · {{ order.itemCount }} {{ order.itemCount === 1 ? 'item' : 'items' }}
+                  </span>
+                </div>
+                <div class="side">
+                  <app-order-status-chip [status]="order.status" />
+                  <strong class="total">{{ order.total | money }}</strong>
+                </div>
+              </a>
+            </li>
+          }
+        </ul>
+        @if (data.totalCount > pageSize) {
+          <mat-paginator
+            [length]="data.totalCount"
+            [pageSize]="pageSize"
+            [pageIndex]="data.page - 1"
+            [hidePageSize]="true"
+            [showFirstLastButtons]="true"
+            aria-label="Select page of orders"
+            (page)="onPage($event)"
+          />
+        }
+      }
+    }
+  }
+</div>

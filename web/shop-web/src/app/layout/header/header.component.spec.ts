@@ -159,5 +159,17 @@ describe('HeaderComponent', () => {
       expect(avatar.textContent?.trim()).toBe('A');
       expect(avatar.getAttribute('aria-label')).toContain('ada');
     });
+
+    it('has a My orders item in the account menu', async () => {
+      user.set({ id: '1', email: 'a@x.io', displayName: 'ada', roles: [], isDemo: false });
+      const fixture = TestBed.createComponent(HeaderComponent);
+      await fixture.whenStable();
+      (fixture.nativeElement as HTMLElement)
+        .querySelector<HTMLButtonElement>('.account-button')!
+        .click();
+      await fixture.whenStable();
+      const link = document.querySelector<HTMLAnchorElement>('a[href="/orders"]');
+      expect(link?.textContent).toContain('My orders');
+    });
   });
 });

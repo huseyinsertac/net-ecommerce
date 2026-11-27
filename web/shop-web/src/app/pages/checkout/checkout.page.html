@@ -1,0 +1,104 @@
+<div class="page">
+  <h1>Checkout</h1>
+
+  @let basket = cart.basket();
+  @if (basket === null) {
+    <div class="layout" aria-busy="true" aria-label="Loading your checkout">
+      <div class="sk sk-form"></div>
+      <div class="sk sk-summary"></div>
+    </div>
+  } @else if (basket.lines.length === 0) {
+    <div class="empty">
+      <h2>Your cart is empty</h2>
+      <p>Add something before checking out.</p>
+      <a mat-flat-button routerLink="/">Start shopping</a>
+    </div>
+  } @else {
+    <div class="layout">
+      <form class="card" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+        <h2>Shipping address</h2>
+
+        @if (cartChanged()) {
+          <p class="notice" role="alert">
+            Your cart changed. Please review it before paying.
+            <a routerLink="/cart">Review cart</a>
+          </p>
+        }
+        @if (error()) {
+          <p class="notice error" role="alert">{{ error() }}</p>
+        }
+
+        <mat-form-field appearance="outline">
+          <mat-label>Full name</mat-label>
+          <input matInput formControlName="fullName" autocomplete="name" required />
+          <mat-error>Enter your full name.</mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Address</mat-label>
+          <input matInput formControlName="line1" autocomplete="address-line1" required />
+          <mat-error>Enter your street address.</mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Apartment, suite, etc. (optional)</mat-label>
+          <input matInput formControlName="line2" autocomplete="address-line2" />
+        </mat-form-field>
+
+        <div class="pair">
+          <mat-form-field appearance="outline">
+            <mat-label>City</mat-label>
+            <input matInput formControlName="city" autocomplete="address-level2" required />
+            <mat-error>Enter your city.</mat-error>
+          </mat-form-field>
+          <mat-form-field appearance="outline">
+            <mat-label>Postal code</mat-label>
+            <input matInput formControlName="postalCode" autocomplete="postal-code" required />
+            <mat-error>Enter your postal code.</mat-error>
+          </mat-form-field>
+        </div>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Country</mat-label>
+          <mat-select formControlName="country" required>
+            @for (c of countries; track c) {
+              <mat-option [value]="c">{{ c }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+
+        <button mat-flat-button class="submit" type="submit" [disabled]="busy()">
+          @if (busy()) {
+            <mat-spinner class="spinner" diameter="18" aria-hidden="true" />
+          }
+          Place order
+        </button>
+      </form>
+
+      <aside class="summary" aria-label="Order summary">
+        <h2>Order summary</h2>
+        <ul>
+          @for (line of basket.lines; track line.variantId) {
+            <li>
+              <span class="item">
+                {{ line.productName ?? 'Unavailable item' }}
+                @if (line.optionsLabel) {
+                  <small>{{ line.optionsLabel }}</small>
+                }
+                <small>Qty {{ line.quantity }}</small>
+              </span>
+              @if (line.lineTotal !== null) {
+                <span>{{ line.lineTotal | money }}</span>
+              }
+            </li>
+          }
+        </ul>
+        <div class="total">
+          <span>Total</span>
+          <strong>{{ basket.subtotal | money }}</strong>
+        </div>
+        <a mat-button routerLink="/cart">Back to cart</a>
+      </aside>
+    </div>
+  }
+</div>

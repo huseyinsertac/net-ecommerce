@@ -1,0 +1,52 @@
+<div class="page">
+  <div class="card">
+    <h1>Test payment</h1>
+    <p class="lede">This is a simulated payment page. No real money moves.</p>
+
+    @if (order(); as o) {
+      <dl>
+        <div>
+          <dt>Order</dt>
+          <dd>{{ o.orderNumber }}</dd>
+        </div>
+        <div>
+          <dt>Total</dt>
+          <dd class="total">{{ o.total | money }}</dd>
+        </div>
+      </dl>
+    } @else if (loadFailed()) {
+      <p class="form-error" role="alert">We couldn't load this order.</p>
+    } @else {
+      <div class="sk" aria-busy="true" aria-label="Loading your order"></div>
+    }
+
+    @if (error()) {
+      <p class="form-error" role="alert">{{ error() }}</p>
+    }
+
+    <div class="actions">
+      <button
+        mat-flat-button
+        type="button"
+        [disabled]="busy() !== null || !order()"
+        (click)="pay()"
+      >
+        @if (busy() === 'pay') {
+          <mat-spinner class="spinner" diameter="18" aria-hidden="true" />
+        }
+        Pay
+      </button>
+      <button
+        mat-stroked-button
+        type="button"
+        [disabled]="busy() !== null || !order()"
+        (click)="decline()"
+      >
+        @if (busy() === 'decline') {
+          <mat-spinner class="spinner" diameter="18" aria-hidden="true" />
+        }
+        Decline
+      </button>
+    </div>
+  </div>
+</div>

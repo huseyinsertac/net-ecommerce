@@ -8,11 +8,12 @@ using Shop.Infrastructure.Common.Http;
 namespace Shop.Api;
 
 /// <summary>
-/// Per-client-IP fixed-window limits on the account endpoints and basket writes. Limits come from configuration so tests
-/// can lower or raise them: <c>RateLimiting:DemoCustomerPerMinute</c> (5), <c>RateLimiting:AuthPerMinute</c> (20),
-/// <c>RateLimiting:RefreshPerMinute</c> (120; only calls that carry the refresh cookie count) and
-/// <c>RateLimiting:BasketWritesPerMinute</c> (60). The client address is <c>RemoteIpAddress</c>, which the forwarded-headers middleware (first in the pipeline)
-/// has already replaced with the real client IP from <c>X-Forwarded-For</c>.
+/// Per-client-IP fixed-window limits on the account endpoints, basket writes and checkout. Limits come from configuration so
+/// tests can lower or raise them: <c>RateLimiting:DemoCustomerPerMinute</c> (5), <c>RateLimiting:AuthPerMinute</c> (20),
+/// <c>RateLimiting:RefreshPerMinute</c> (120; only calls that carry the refresh cookie count),
+/// <c>RateLimiting:BasketWritesPerMinute</c> (60) and <c>RateLimiting:CheckoutPerMinute</c> (10). The client address is
+/// <c>RemoteIpAddress</c>, which the forwarded-headers middleware (first in the pipeline) has already replaced with the real
+/// client IP from <c>X-Forwarded-For</c>.
 /// </summary>
 internal static class RateLimitingConfiguration
 {
@@ -20,6 +21,7 @@ internal static class RateLimitingConfiguration
     private const int DefaultAuthPerMinute = 20;
     private const int DefaultRefreshPerMinute = 120;
     private const int DefaultBasketWritesPerMinute = 60;
+    private const int DefaultCheckoutPerMinute = 10;
 
     public static IServiceCollection AddShopRateLimiting(this IServiceCollection services)
     {
@@ -59,6 +61,8 @@ internal static class RateLimitingConfiguration
                     : RateLimitPartition.GetNoLimiter($"{RateLimitPolicies.AuthRefresh}:no-cookie"));
             options.AddPolicy(RateLimitPolicies.BasketWrite, context =>
                 PerIp(context, RateLimitPolicies.BasketWrite, "RateLimiting:BasketWritesPerMinute", DefaultBasketWritesPerMinute));
+            options.AddPolicy(RateLimitPolicies.Checkout, context =>
+                PerIp(context, RateLimitPolicies.Checkout, "RateLimiting:CheckoutPerMinute", DefaultCheckoutPerMinute));
         });
 
         return services;

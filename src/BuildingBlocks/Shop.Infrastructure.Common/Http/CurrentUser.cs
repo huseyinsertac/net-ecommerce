@@ -4,10 +4,11 @@ using Shop.Application.Abstractions.Identity;
 
 namespace Shop.Infrastructure.Common.Http;
 
-/// <summary>Reads the authenticated caller from the request's principal (<c>sub</c>, <c>role</c> and <c>demo</c> claims, unmapped).</summary>
+/// <summary>Reads the authenticated caller from the request's principal (<c>sub</c>, <c>email</c>, <c>role</c> and <c>demo</c> claims, unmapped).</summary>
 public sealed class CurrentUser(IHttpContextAccessor accessor) : ICurrentUser
 {
     private const string SubjectClaim = "sub";
+    private const string EmailClaim = "email";
     private const string RoleClaim = "role";
     private const string DemoClaim = "demo";
 
@@ -17,6 +18,8 @@ public sealed class CurrentUser(IHttpContextAccessor accessor) : ICurrentUser
 
     public Guid? UserId =>
         IsAuthenticated && Guid.TryParse(Principal!.FindFirst(SubjectClaim)?.Value, out var id) ? id : null;
+
+    public string? Email => IsAuthenticated ? Principal!.FindFirst(EmailClaim)?.Value : null;
 
     public bool IsInRole(string role) => IsAuthenticated && Principal!.HasClaim(RoleClaim, role);
 

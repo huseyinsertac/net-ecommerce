@@ -137,8 +137,12 @@
               Some items need attention.
             </p>
           }
-          <button mat-flat-button type="button" disabled>Checkout — coming soon</button>
-          <p class="caption">Checkout arrives with payments.</p>
+          @if (basket.hasIssues) {
+            <button mat-flat-button type="button" class="checkout" disabled>Checkout</button>
+            <p class="caption">Fix the flagged items to continue.</p>
+          } @else {
+            <a mat-flat-button class="checkout" routerLink="/checkout">Checkout</a>
+          }
           <a mat-button routerLink="/">Continue shopping</a>
         </aside>
       </div>

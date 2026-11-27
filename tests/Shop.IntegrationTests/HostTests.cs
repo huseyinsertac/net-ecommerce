@@ -1,7 +1,9 @@
 using System.Net;
 using System.Net.Http.Json;
 using System.Text.Json;
+using Microsoft.AspNetCore.Http;
 using Npgsql;
+using Shop.Infrastructure.Common.Http;
 using Shouldly;
 
 namespace Shop.IntegrationTests;
@@ -156,6 +158,25 @@ public sealed class HostTests(ShopApiFactory factory)
         var response = await client.PostAsync("/api/identity/logout", null, Ct);
 
         response.StatusCode.ShouldBe(HttpStatusCode.NoContent);
+    }
+
+    [Fact]
+    public async Task CsrfExemptPath_IsNotChecked()
+    {
+        CsrfHeader.ExemptPaths.ShouldBe(["/api/payments/stripe/webhook"]);
+        using var client = WithoutCsrfHeader();
+
+        // Stripe cannot send the header. The test host runs the Fake provider, so the webhook is not mapped: a 404 (not the
+        // CSRF 400) shows the request got past the check.
+        var response = await client.PostAsync("/api/payments/stripe/webhook", new StringContent("{}"), Ct);
+
+        response.StatusCode.ShouldBe(HttpStatusCode.NotFound);
+        var context = new DefaultHttpContext();
+        context.Request.Method = "POST";
+        context.Request.Path = "/API/Payments/Stripe/Webhook";
+        CsrfHeader.AppliesTo(context.Request).ShouldBeFalse();
+        context.Request.Path = "/api/payments/stripe/webhook/other";
+        CsrfHeader.AppliesTo(context.Request).ShouldBeTrue();
     }
 
     private HttpClient WithoutCsrfHeader()

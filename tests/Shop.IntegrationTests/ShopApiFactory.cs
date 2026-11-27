@@ -17,7 +17,8 @@ public class ShopApiFactory : WebApplicationFactory<Program>, IAsyncLifetime
 
     private readonly PostgreSqlContainer _postgres = new PostgreSqlBuilder("postgres:18-alpine").Build();
 
-    public string ConnectionString => _postgres.GetConnectionString();
+    /// <summary>With a longer open timeout than Npgsql's 15 s: several containers start in parallel under the test run.</summary>
+    public string ConnectionString => $"{_postgres.GetConnectionString()};Timeout=30";
 
     public async ValueTask InitializeAsync() => await _postgres.StartAsync();
 
@@ -30,13 +31,21 @@ public class ShopApiFactory : WebApplicationFactory<Program>, IAsyncLifetime
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
         builder.UseEnvironment("Production");
-        builder.UseSetting("ConnectionStrings:Shop", _postgres.GetConnectionString());
+        builder.UseSetting("ConnectionStrings:Shop", ConnectionString);
         builder.UseSetting("Database:SeedOnStartup", SeedOnStartup ? "true" : "false");
         builder.UseSetting("Jwt:SigningKey", TestSigningKey);
         builder.UseSetting("RateLimiting:DemoCustomerPerMinute", "1000");
         builder.UseSetting("RateLimiting:AuthPerMinute", "1000");
         builder.UseSetting("RateLimiting:RefreshPerMinute", "1000");
         builder.UseSetting("RateLimiting:BasketWritesPerMinute", "1000");
+        builder.UseSetting("RateLimiting:CheckoutPerMinute", "1000");
+        // The simulated gateway: nothing leaves the process. Production refuses it unless explicitly allowed, as here.
+        builder.UseSetting("Payments:Provider", "Fake");
+        builder.UseSetting("Payments:AllowFakeProviderInProduction", "true");
+        // Long enough that no happy-path test races the expiry job; PaymentExpiryApiFactory shortens it.
+        builder.UseSetting("Payments:Timeout", "00:05:00");
+        builder.UseSetting("Payments:ExpiryScanInterval", "00:00:01");
+        builder.UseSetting("App:PublicBaseUrl", "http://test.local");
         builder.ConfigureServices(services => services.AddSingleton<IStartupFilter, ThrowingEndpointStartupFilter>());
     }
 

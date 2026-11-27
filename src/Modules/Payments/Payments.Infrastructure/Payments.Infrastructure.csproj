@@ -1,6 +1,14 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
+    <PackageReference Include="Stripe.net" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="Shop.IntegrationTests" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="../Payments.Application/Payments.Application.csproj" />
     <ProjectReference Include="../../../BuildingBlocks/Shop.Infrastructure.Common/Shop.Infrastructure.Common.csproj" />
   </ItemGroup>

@@ -19,6 +19,9 @@ public sealed class OutboxMessage
     public int Attempts { get; set; }
 
     public string? Error { get; set; }
+
+    /// <summary>Earliest time the next delivery attempt may run; <c>null</c> means due immediately (never failed).</summary>
+    public DateTime? NextAttemptOnUtc { get; set; }
 }
 
 public sealed class OutboxOptions
@@ -31,5 +34,11 @@ public sealed class OutboxOptions
     public int BatchSize { get; set; } = 20;
 
     /// <summary>After this many failed attempts a message is parked (never picked up again).</summary>
-    public int MaxAttempts { get; set; } = 5;
+    public int MaxAttempts { get; set; } = 10;
+
+    /// <summary>Delay after the first failure; it doubles with each further failure of the same message.</summary>
+    public TimeSpan RetryBaseDelay { get; set; } = TimeSpan.FromSeconds(1);
+
+    /// <summary>Upper bound for the per-message retry delay.</summary>
+    public TimeSpan RetryMaxDelay { get; set; } = TimeSpan.FromMinutes(5);
 }

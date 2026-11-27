@@ -42,6 +42,16 @@ public sealed class TestModule2DbContext(
     public override string Schema => "test2";
 }
 
+/// <summary>A <see cref="TimeProvider"/> whose clock only moves when a test advances it.</summary>
+public sealed class TestClock : TimeProvider
+{
+    private DateTimeOffset _now = new(2026, 1, 1, 0, 0, 0, TimeSpan.Zero);
+
+    public override DateTimeOffset GetUtcNow() => _now;
+
+    public void Advance(TimeSpan by) => _now += by;
+}
+
 /// <summary>Scoped marker: a distinct Id per DI scope.</summary>
 public sealed class ScopeMarker
 {

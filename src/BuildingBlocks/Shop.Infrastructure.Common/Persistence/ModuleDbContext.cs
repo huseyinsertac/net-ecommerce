@@ -50,8 +50,9 @@ public abstract class ModuleDbContext(
             b.Property(m => m.ProcessedOnUtc).HasColumnName("processed_on_utc");
             b.Property(m => m.Attempts).HasColumnName("attempts");
             b.Property(m => m.Error).HasColumnName("error");
-            // Matches the processor's polling query (pending rows ordered by occurrence).
-            b.HasIndex(m => m.OccurredOnUtc).HasFilter("processed_on_utc IS NULL");
+            b.Property(m => m.NextAttemptOnUtc).HasColumnName("next_attempt_on_utc");
+            // Matches the processor's polling query (pending rows that are due, ordered by occurrence).
+            b.HasIndex(m => new { m.NextAttemptOnUtc, m.OccurredOnUtc }).HasFilter("processed_on_utc IS NULL");
         });
 
         modelBuilder.Entity<InboxMessage>(b =>

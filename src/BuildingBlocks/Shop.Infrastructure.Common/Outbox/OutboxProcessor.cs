@@ -15,6 +15,9 @@ namespace Shop.Infrastructure.Common.Outbox;
 /// <c>FOR UPDATE SKIP LOCKED</c> inside a transaction that stays open for the whole batch, so several processors
 /// (threads or app instances) never deliver the same row concurrently. Delivery is at-least-once: if the process dies
 /// after a handler committed but before this transaction commits, the row is delivered again and the inbox dedupes it.
+/// A failed message is rescheduled with its own exponential backoff (<see cref="OutboxOptions.RetryBaseDelay"/> doubling up to
+/// <see cref="OutboxOptions.RetryMaxDelay"/>) and parked after <see cref="OutboxOptions.MaxAttempts"/> failures; the poll only
+/// selects rows that are due, comparing against <see cref="TimeProvider"/> time rather than the database clock.
 /// </summary>
 public sealed class OutboxProcessor<TContext>(
     IServiceScopeFactory scopeFactory,
@@ -44,11 +47,12 @@ public sealed class OutboxProcessor<TContext>(
                 $$"""
                  SELECT * FROM "{{db.Schema}}".outbox_messages
                  WHERE processed_on_utc IS NULL AND attempts < {0}
+                   AND (next_attempt_on_utc IS NULL OR next_attempt_on_utc <= {2})
                  ORDER BY occurred_on_utc
                  LIMIT {1}
                  FOR UPDATE SKIP LOCKED
                  """,
-                _options.MaxAttempts, _options.BatchSize)
+                _options.MaxAttempts, _options.BatchSize, clock.GetUtcNow().UtcDateTime)
             .ToListAsync(ct);
 #pragma warning restore EF1002
 
@@ -97,10 +101,19 @@ public sealed class OutboxProcessor<TContext>(
             }
             else
             {
-                logger.LogWarning(ex, "Outbox message {MessageId} ({Type}) in {Context} failed (attempt {Attempts})",
-                    message.Id, message.Type, typeof(TContext).Name, message.Attempts);
+                var delay = RetryDelay(message.Attempts);
+                message.NextAttemptOnUtc = clock.GetUtcNow().UtcDateTime + delay;
+                logger.LogWarning(ex, "Outbox message {MessageId} ({Type}) in {Context} failed (attempt {Attempts}); retrying in {Delay}",
+                    message.Id, message.Type, typeof(TContext).Name, message.Attempts, delay);
             }
         }
+    }
+
+    /// <summary>Delay after failure number <paramref name="failures"/>: base * 2^(n-1), capped at the maximum.</summary>
+    private TimeSpan RetryDelay(int failures)
+    {
+        var ticks = _options.RetryBaseDelay.Ticks * Math.Pow(2, Math.Max(failures - 1, 0));
+        return TimeSpan.FromTicks((long)Math.Min(ticks, _options.RetryMaxDelay.Ticks));
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)

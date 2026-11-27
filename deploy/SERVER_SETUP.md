@@ -115,6 +115,63 @@ grep -c '^JWT_SIGNING_KEY=' /opt/voltlane/.env    # expect: 1
 Compose reads `.env` from `/opt/voltlane` automatically, so the deploy workflow needs no change.
 Do not rotate the key casually: it invalidates all issued access tokens.
 
+### 4.5 Stripe test-mode keys and webhook
+
+Checkout pays through Stripe Checkout in **test mode**. The API refuses live keys (`sk_live_`) in every
+environment, and `docker-compose.prod.yml` will not start without both values below, so do this on
+new and existing servers **before the next deploy**. Nothing here costs money or moves real funds.
+
+In the Stripe dashboard, switch to **test mode** (the toggle is at the top right of the dashboard), then:
+
+1. **Developers > API keys**: reveal the **Secret key** (it starts with `sk_test_`). Keep the tab open.
+2. **Developers > Webhooks > Add endpoint**:
+   - Endpoint URL: `https://<YOUR_DOMAIN>/api/payments/stripe/webhook`
+   - Events to send (exactly these four):
+     - `checkout.session.completed`
+     - `checkout.session.async_payment_succeeded`
+     - `checkout.session.async_payment_failed`
+     - `checkout.session.expired`
+3. Open the new endpoint and reveal its **Signing secret** (it starts with `whsec_`).
+
+On the server, as root, run the three blocks below in order, one at a time. The first two read a
+value each without echoing it (so it never reaches the terminal or shell history). They are separate
+blocks on purpose: pasting both `read` lines together can make the first prompt swallow the second line
+on terminals without bracketed paste.
+
+Block 1: paste this line, press Enter, then paste the secret key and press Enter (nothing is shown):
+
+```bash
+read -rsp "Stripe secret key (sk_test_...): " SK; echo
+```
+
+Block 2: paste this line, press Enter, then paste the webhook signing secret and press Enter:
+
+```bash
+read -rsp "Stripe webhook signing secret (whsec_...): " WH; echo
+```
+
+Block 3 checks both prefixes, appends each value only if absent, and keeps the file private:
+
+```bash
+case "$SK" in sk_test_?*) ;; *) echo "Secret key must start with sk_test_"; false ;; esac &&
+case "$WH" in whsec_?*) ;; *) echo "Signing secret must start with whsec_"; false ;; esac &&
+{
+  [ -n "$(tail -c1 /opt/voltlane/.env)" ] && echo >> /opt/voltlane/.env
+  grep -q '^STRIPE_SECRET_KEY=' /opt/voltlane/.env || echo "STRIPE_SECRET_KEY=$SK" >> /opt/voltlane/.env
+  grep -q '^STRIPE_WEBHOOK_SECRET=' /opt/voltlane/.env || echo "STRIPE_WEBHOOK_SECRET=$WH" >> /opt/voltlane/.env
+}
+unset SK WH
+chown deploy:deploy /opt/voltlane/.env
+chmod 600 /opt/voltlane/.env
+grep -c '^STRIPE_SECRET_KEY=' /opt/voltlane/.env      # expect: 1
+grep -c '^STRIPE_WEBHOOK_SECRET=' /opt/voltlane/.env  # expect: 1
+```
+
+If a value was already present and you need to change it (for example after rolling the signing
+secret), edit `/opt/voltlane/.env` by hand; the block above never overwrites. The webhook route only
+exists while the Stripe provider is active, so it answers `404` until the deploy that adds these
+values has run.
+
 ## 5. Create the deploy SSH key
 
 On your own machine (not the server):
@@ -177,6 +234,8 @@ read-only `read:packages` personal access token.)
 - The Deploy workflow is green, including the final health-check step.
 - `https://<YOUR_DOMAIN>` loads with a valid certificate and the footer shows `API <commit sha>`.
 - `https://<YOUR_DOMAIN>/health/ready` returns `Healthy`; `https://<YOUR_DOMAIN>/scalar` loads.
+- Stripe dashboard > Developers > Webhooks > your endpoint shows deliveries answered `200` after your
+  first test checkout (card `4242 4242 4242 4242`, any future expiry, any CVC).
 - On the server: `cd /opt/voltlane && docker compose -f docker-compose.prod.yml ps` shows all four
   services running.
 

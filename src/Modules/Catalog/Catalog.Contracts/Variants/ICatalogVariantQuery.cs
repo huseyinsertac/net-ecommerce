@@ -9,5 +9,11 @@ public interface ICatalogVariantQuery
     /// </summary>
     Task<IReadOnlyDictionary<Guid, VariantSnapshot>> GetAsync(IReadOnlyCollection<Guid> variantIds, CancellationToken ct);
 
+    /// <summary>
+    /// The first variant (lowest SKU) of up to <paramref name="count"/> featured Active products, ordered by product name
+    /// then id, so the result is deterministic. Fewer are returned when the catalog has fewer.
+    /// </summary>
+    Task<IReadOnlyList<VariantSnapshot>> GetSampleAsync(int count, CancellationToken ct);
+
     const int MaxIds = 100;
 }

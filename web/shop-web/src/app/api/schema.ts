@@ -160,6 +160,91 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/ordering/checkout": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Places an order from the basket at live prices. Repeating a request with the same Idempotency-Key returns the same order. The client then polls the Location (checkout-status). */
+        post: operations["Checkout"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/ordering/orders": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The caller's orders, newest first. */
+        get: operations["GetMyOrders"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/ordering/orders/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** One of the caller's orders with its lines, address, totals and status history. */
+        get: operations["GetOrder"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/ordering/orders/{id}/checkout-status": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Where one of the caller's checkouts stands. Poll while the state is Pending; ReadyToPay carries the payment URL. */
+        get: operations["GetCheckoutStatus"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/payments/simulated/{orderId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Reports the outcome chosen on the simulated payment page (test mode without Stripe). A payment that has already ended is left unchanged. */
+        post: operations["SimulatePayment"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/identity/register": {
         parameters: {
             query?: never;
@@ -318,6 +403,8 @@ export interface components {
         };
         /** @enum {unknown} */
         BasketLineIssue: "unavailable" | "insufficientStock" | null;
+        /** @enum {unknown} */
+        CancellationReason: "OutOfStock" | "PaymentFailed" | "PaymentExpired" | "Admin" | null;
         CategoryFacetsDto: {
             slug: string;
             name: string;
@@ -340,6 +427,23 @@ export interface components {
         CategoryRefDto: {
             slug: string;
             name: string;
+        };
+        CheckoutRequest: {
+            shippingAddress: null | components["schemas"]["ShippingAddressDto"];
+            /**
+             * Format: double
+             * @description The total the shopper was shown, in USD. A different live total is refused with price_changed.
+             */
+            expectedTotal: number;
+        };
+        /** @enum {unknown} */
+        CheckoutState: "Pending" | "OutOfStock" | "ReadyToPay" | "Paid" | "Failed";
+        CheckoutStatusDto: {
+            state: components["schemas"]["CheckoutState"];
+            paymentUrl?: null | string;
+            reason?: null | string;
+            /** Format: date-time */
+            expiresAtUtc?: null | string;
         };
         FacetOptionDto: {
             value: string;
@@ -366,6 +470,64 @@ export interface components {
             label: string;
             values: string[];
         };
+        OrderDto: {
+            /** Format: uuid */
+            id: string;
+            orderNumber: string;
+            /** Format: date-time */
+            placedAtUtc: string;
+            status: components["schemas"]["OrderStatus"];
+            cancellationReason: null | components["schemas"]["CancellationReason"];
+            lines: components["schemas"]["OrderLineDto"][];
+            shippingAddress: components["schemas"]["ShippingAddressDto"];
+            /** Format: double */
+            subtotal: number;
+            /** Format: double */
+            discount: number;
+            /** Format: double */
+            total: number;
+            history: components["schemas"]["StatusChangeDto"][];
+        };
+        OrderLineDto: {
+            /** Format: uuid */
+            variantId: string;
+            productName: string;
+            sku: string;
+            optionsLabel: string;
+            thumbnailUrl: null | string;
+            /** Format: double */
+            unitPrice: number;
+            /** Format: int32 */
+            quantity: number;
+            /** Format: double */
+            lineTotal: number;
+        };
+        /** @enum {unknown} */
+        OrderStatus: "Placed" | "Paid" | "Shipped" | "Delivered" | "Cancelled";
+        OrderSummaryDto: {
+            /** Format: uuid */
+            id: string;
+            orderNumber: string;
+            /** Format: date-time */
+            placedAtUtc: string;
+            status: components["schemas"]["OrderStatus"];
+            /** Format: double */
+            total: number;
+            /** Format: int32 */
+            itemCount: number;
+            firstThumbnailUrl: null | string;
+        };
+        PagedResultOfOrderSummaryDto: {
+            items: components["schemas"]["OrderSummaryDto"][];
+            /** Format: int32 */
+            page: number;
+            /** Format: int32 */
+            pageSize: number;
+            /** Format: int32 */
+            totalCount: number;
+            /** Format: int32 */
+            totalPages: number;
+        };
         PagedResultOfProductSummaryDto: {
             items: components["schemas"]["ProductSummaryDto"][];
             /** Format: int32 */
@@ -376,6 +538,11 @@ export interface components {
             totalCount: number;
             /** Format: int32 */
             totalPages: number;
+        };
+        PlaceOrderResult: {
+            /** Format: uuid */
+            orderId: string;
+            orderNumber: string;
         };
         ProblemDetails: {
             type?: null | string;
@@ -426,6 +593,18 @@ export interface components {
             /** Format: int32 */
             quantity: number;
         };
+        ShippingAddressDto: {
+            fullName: string;
+            line1: string;
+            line2: null | string;
+            city: string;
+            postalCode: string;
+            country: string;
+        };
+        SimulatedPaymentRequest: {
+            /** @description True for "Pay", false for "Decline". */
+            succeed: boolean;
+        };
         SpecFacetDto: {
             key: string;
             label: string;
@@ -443,6 +622,12 @@ export interface components {
             key: string;
             label: string;
             value: string;
+        };
+        StatusChangeDto: {
+            status: components["schemas"]["OrderStatus"];
+            /** Format: date-time */
+            atUtc: string;
+            note: null | string;
         };
         SystemInfoDto: {
             name: string;
@@ -856,6 +1041,248 @@ export interface operations {
             };
             /** @description Conflict */
             409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    Checkout: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description A GUID chosen by the client per checkout attempt; reuse it when retrying. */
+                "Idempotency-Key"?: string;
+                /** @description Must be "voltlane". Without it the API answers 400 request.missing_csrf_header. */
+                "X-Requested-With": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CheckoutRequest"];
+            };
+        };
+        responses: {
+            /** @description Accepted */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PlaceOrderResult"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Too Many Requests */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    GetMyOrders: {
+        parameters: {
+            query?: {
+                /** @description 1-based page number. Defaults to 1. */
+                page?: number;
+                /** @description Page size, 1 to 50. Defaults to 10. */
+                pageSize?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PagedResultOfOrderSummaryDto"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    GetOrder: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OrderDto"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    GetCheckoutStatus: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CheckoutStatusDto"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    SimulatePayment: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Must be "voltlane". Without it the API answers 400 request.missing_csrf_header. */
+                "X-Requested-With": string;
+            };
+            path: {
+                orderId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SimulatedPaymentRequest"];
+            };
+        };
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Not Found */
+            404: {
                 headers: {
                     [name: string]: unknown;
                 };

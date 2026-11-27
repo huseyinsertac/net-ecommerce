@@ -83,7 +83,7 @@ public sealed class HardeningTests(PostgresFixture postgres)
         var options = sp.GetRequiredService<IOptions<OutboxOptions>>().Value;
 
         options.BatchSize.ShouldBe(7);
-        options.MaxAttempts.ShouldBe(5);
+        options.MaxAttempts.ShouldBe(10);
     }
 
     private sealed class CapturingLogger : ILogger<PendingIntegrationEvents>
