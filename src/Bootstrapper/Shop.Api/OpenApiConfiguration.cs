@@ -12,8 +12,23 @@ internal static class OpenApiConfiguration
 
     public static void Configure(OpenApiOptions options)
     {
-        options.AddSchemaTransformer((schema, _, _) =>
+        options.AddSchemaTransformer((schema, context, _) =>
         {
+            // Raw spec maps (key → JsonElement) only ever hold a JSON number, string or boolean; without this the values
+            // are typed as an empty object.
+            if (IsJsonElementMap(context.JsonTypeInfo.Type))
+            {
+                schema.AdditionalProperties = new OpenApiSchema
+                {
+                    AnyOf =
+                    [
+                        new OpenApiSchema { Type = JsonSchemaType.Number },
+                        new OpenApiSchema { Type = JsonSchemaType.String },
+                        new OpenApiSchema { Type = JsonSchemaType.Boolean },
+                    ],
+                };
+            }
+
             // .NET advertises numbers as number|string (it accepts quoted numbers); the contract is plain numbers.
             if (schema.Type is { } type && type.HasFlag(JsonSchemaType.String)
                 && (type.HasFlag(JsonSchemaType.Number) || type.HasFlag(JsonSchemaType.Integer)))
@@ -85,4 +100,10 @@ internal static class OpenApiConfiguration
             return Task.CompletedTask;
         });
     }
+
+    private static bool IsJsonElementMap(Type type) =>
+        type.IsGenericType
+        && type.GetGenericArguments() is [var key, var value]
+        && key == typeof(string) && value == typeof(System.Text.Json.JsonElement)
+        && typeof(IEnumerable<KeyValuePair<string, System.Text.Json.JsonElement>>).IsAssignableFrom(type);
 }

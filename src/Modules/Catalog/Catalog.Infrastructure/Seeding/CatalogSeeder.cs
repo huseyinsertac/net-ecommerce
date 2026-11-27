@@ -4,6 +4,7 @@ using System.Text.Json.Serialization;
 using Catalog.Domain.Categories;
 using Catalog.Domain.Products;
 using Catalog.Infrastructure.Persistence;
+using Catalog.Infrastructure.Persistence.Converters;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Shop.Infrastructure.Common.Modules;
@@ -109,14 +110,9 @@ internal sealed class CatalogSeeder(CatalogDbContext db, ILogger<CatalogSeeder> 
         return product;
     }
 
-    private static SpecValue ToSpecValue(string product, string key, JsonElement value) => value.ValueKind switch
-    {
-        JsonValueKind.Number => new NumberValue(value.GetDecimal()),
-        JsonValueKind.String => new TextValue(value.GetString()!),
-        JsonValueKind.True => new BoolValue(true),
-        JsonValueKind.False => new BoolValue(false),
-        _ => throw new InvalidOperationException($"Product '{product}' has an unsupported value for spec '{key}'."),
-    };
+    private static SpecValue ToSpecValue(string product, string key, JsonElement value) =>
+        SpecValuesJsonConverter.FromJson(value)
+        ?? throw new InvalidOperationException($"Product '{product}' has an unsupported value for spec '{key}'.");
 
     private static T Unwrap<T>(Result<T> result) =>
         result.IsSuccess

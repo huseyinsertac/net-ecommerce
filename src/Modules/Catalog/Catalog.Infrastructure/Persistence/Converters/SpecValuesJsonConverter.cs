@@ -59,16 +59,29 @@ public sealed class SpecValuesJsonConverter() : ValueConverter<IReadOnlyDictiona
         var specs = new Dictionary<string, SpecValue>();
         foreach (var property in document.RootElement.EnumerateObject())
         {
-            specs[property.Name] = property.Value.ValueKind switch
-            {
-                JsonValueKind.Number => new NumberValue(property.Value.GetDecimal()),
-                JsonValueKind.True => new BoolValue(true),
-                JsonValueKind.False => new BoolValue(false),
-                JsonValueKind.String => new TextValue(property.Value.GetString()!),
-                var kind => throw new NotSupportedException($"Spec '{property.Name}' has unsupported JSON kind {kind}."),
-            };
+            specs[property.Name] = FromJson(property.Value)
+                ?? throw new NotSupportedException($"Spec '{property.Name}' has unsupported JSON kind {property.Value.ValueKind}.");
         }
 
         return specs;
     }
+
+    /// <summary>A JSON number, string or boolean as a spec value; null for any other JSON kind.</summary>
+    public static SpecValue? FromJson(JsonElement value) => value.ValueKind switch
+    {
+        JsonValueKind.Number when value.TryGetDecimal(out var number) => new NumberValue(number),
+        JsonValueKind.True => new BoolValue(true),
+        JsonValueKind.False => new BoolValue(false),
+        JsonValueKind.String => new TextValue(value.GetString()!),
+        _ => null,
+    };
+
+    /// <summary>The spec value as the JSON number, string or boolean it is stored as.</summary>
+    public static JsonElement ToJson(SpecValue value) => value switch
+    {
+        NumberValue n => JsonSerializer.SerializeToElement(n.Value),
+        BoolValue b => JsonSerializer.SerializeToElement(b.Value),
+        TextValue t => JsonSerializer.SerializeToElement(t.Value),
+        _ => throw new NotSupportedException($"Unsupported spec value type '{value?.GetType().Name}'."),
+    };
 }

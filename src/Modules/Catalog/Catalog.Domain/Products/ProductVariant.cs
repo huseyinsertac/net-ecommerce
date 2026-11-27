@@ -25,6 +25,10 @@ public sealed class ProductVariant : Entity<Guid>
             StockOnHand = stockOnHand,
         };
 
+    internal void SetPrice(Money price) => Price = price;
+
+    internal void SetStockOnHand(int stockOnHand) => StockOnHand = stockOnHand;
+
     internal void Reserve(int quantity) => StockReserved += quantity;
 
     internal void Release(int quantity) => StockReserved -= quantity;

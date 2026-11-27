@@ -67,4 +67,17 @@ public static class CatalogErrors
 
     public static Error ProductNotFound(string slug) =>
         Error.NotFound("catalog.product_not_found", $"Product '{slug}' was not found.");
+
+    public static Error InvalidSpecs(string message) =>
+        Error.Validation("catalog.invalid_specs", message);
+
+    public static Error ConcurrentUpdate() =>
+        Error.Conflict("catalog.concurrent_update", "Someone else changed this product. Reload to see their changes.");
+
+    public static Error StockBelowReserved(string sku, int reserved) =>
+        Error.Conflict("catalog.stock_below_reserved",
+            $"SKU '{sku}' has {reserved} units reserved by open orders, so its stock cannot go below {reserved}.");
+
+    public static Error SkuInUse(string sku) =>
+        Error.Validation("catalog.duplicate_sku", $"SKU '{sku}' is already used by another product.");
 }

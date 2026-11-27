@@ -107,6 +107,93 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/catalog/admin/products": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Products in every status, searched by name, brand or SKU, ordered by name. */
+        get: operations["ListAdminProducts"];
+        put?: never;
+        /** Creates a Draft product. Its slug comes from the name; a taken slug gets -2, -3 and so on. */
+        post: operations["CreateAdminProduct"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/catalog/admin/products/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** One product as the editor needs it: raw spec values, the category's spec schema, stock and the version. */
+        get: operations["GetAdminProduct"];
+        /** Saves a product's details, specs and status (Draft, Active or Archived). Returns the product with its new version. */
+        put: operations["UpdateAdminProduct"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/catalog/admin/products/{id}/variants/{variantId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Sets a variant's price and stock on hand (never below its reserved stock). Returns the product with its new version. */
+        put: operations["UpdateAdminVariant"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/catalog/admin/image-keys": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Every product photo in use, to pick images from. */
+        get: operations["ListAdminImageKeys"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/catalog/admin/categories": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Leaf categories (the ones products belong to) with their full spec schema, ordered by name. */
+        get: operations["ListAdminCategories"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/basket": {
         parameters: {
             query?: never;
@@ -368,6 +455,84 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        AdminCategoryDto: {
+            /** Format: uuid */
+            id: string;
+            slug: string;
+            name: string;
+            specSchema: components["schemas"]["AdminSpecDefinitionDto"][];
+        };
+        AdminImageKeyDto: {
+            key: string;
+            thumbnailUrl: string;
+        };
+        AdminProductDto: {
+            /** Format: uuid */
+            id: string;
+            slug: string;
+            name: string;
+            brand: string;
+            description: string;
+            /** Format: uuid */
+            categoryId: string;
+            categorySlug: string;
+            status: components["schemas"]["AdminProductStatus"];
+            isFeatured: boolean;
+            imageKeys: string[];
+            specs: {
+                [key: string]: number | string | boolean;
+            };
+            specSchema: components["schemas"]["AdminSpecDefinitionDto"][];
+            optionAxes: components["schemas"]["OptionAxisDto"][];
+            variants: components["schemas"]["AdminVariantDto"][];
+            /** Format: uint32 */
+            version: number;
+        };
+        /** @enum {unknown} */
+        AdminProductStatus: "Draft" | "Active" | "Archived";
+        AdminProductSummaryDto: {
+            /** Format: uuid */
+            id: string;
+            slug: string;
+            name: string;
+            brand: string;
+            categoryName: string;
+            status: components["schemas"]["AdminProductStatus"];
+            isFeatured: boolean;
+            /** Format: int32 */
+            variantCount: number;
+            /** Format: int32 */
+            totalStock: number;
+            /** Format: int32 */
+            totalReserved: number;
+            /** Format: double */
+            minPrice: number;
+            thumbnailUrl: string;
+        };
+        AdminSpecDefinitionDto: {
+            key: string;
+            label: string;
+            type: components["schemas"]["AdminSpecType"];
+            unit: null | string;
+            required: boolean;
+            allowedValues: null | string[];
+        };
+        /** @enum {unknown} */
+        AdminSpecType: "number" | "text" | "bool" | "enum";
+        AdminVariantDto: {
+            /** Format: uuid */
+            id: string;
+            sku: string;
+            options: {
+                [key: string]: string;
+            };
+            /** Format: double */
+            price: number;
+            /** Format: int32 */
+            stockOnHand: number;
+            /** Format: int32 */
+            stockReserved: number;
+        };
         AuthResponse: {
             accessToken: string;
             /** Format: date-time */
@@ -445,6 +610,24 @@ export interface components {
             /** Format: date-time */
             expiresAtUtc?: null | string;
         };
+        CreatedProductDto: {
+            /** Format: uuid */
+            id: string;
+            slug: string;
+        };
+        CreateProductRequest: {
+            categorySlug: null | string;
+            name: null | string;
+            brand: null | string;
+            description: null | string;
+            isFeatured: boolean;
+            imageKeys: null | string[];
+            specs: null | {
+                [key: string]: number | string | boolean;
+            };
+            optionAxes: null | components["schemas"]["NewOptionAxisInput"][];
+            variants: null | components["schemas"]["NewVariantInput"][];
+        };
         FacetOptionDto: {
             value: string;
             /** Format: int32 */
@@ -464,6 +647,20 @@ export interface components {
         LoginRequest: {
             email: string;
             password: string;
+        };
+        NewOptionAxisInput: {
+            name: null | string;
+            values: null | string[];
+        };
+        NewVariantInput: {
+            sku: null | string;
+            options: null | {
+                [key: string]: string;
+            };
+            /** Format: double */
+            price: null | number;
+            /** Format: int32 */
+            stockOnHand: null | number;
         };
         OptionAxisDto: {
             key: string;
@@ -516,6 +713,17 @@ export interface components {
             /** Format: int32 */
             itemCount: number;
             firstThumbnailUrl: null | string;
+        };
+        PagedResultOfAdminProductSummaryDto: {
+            items: components["schemas"]["AdminProductSummaryDto"][];
+            /** Format: int32 */
+            page: number;
+            /** Format: int32 */
+            pageSize: number;
+            /** Format: int32 */
+            totalCount: number;
+            /** Format: int32 */
+            totalPages: number;
         };
         PagedResultOfOrderSummaryDto: {
             items: components["schemas"]["OrderSummaryDto"][];
@@ -633,6 +841,41 @@ export interface components {
             name: string;
             version: string;
             environment: string;
+        };
+        UpdateProductRequest: {
+            name: null | string;
+            brand: null | string;
+            description: null | string;
+            isFeatured: boolean;
+            imageKeys: null | string[];
+            /** @description Spec key to value: a JSON number, string or boolean, exactly as the admin product returns them. */
+            specs: null | {
+                [key: string]: number | string | boolean;
+            };
+            /** @description Draft, Active or Archived. Only Active products are public. */
+            status: null | string;
+            /**
+             * Format: uint32
+             * @description The version from the admin product this edit is based on.
+             */
+            version: null | number;
+        };
+        UpdateVariantRequest: {
+            /**
+             * Format: double
+             * @description USD, 0.01 to 100000.00, at most 2 decimals.
+             */
+            price: null | number;
+            /**
+             * Format: int32
+             * @description 0 to 100000, and not below the variant's reserved stock.
+             */
+            stockOnHand: null | number;
+            /**
+             * Format: uint32
+             * @description The version from the admin product this edit is based on.
+             */
+            version: null | number;
         };
         UserDto: {
             /** Format: uuid */
@@ -797,6 +1040,401 @@ export interface operations {
             };
             /** @description Not Found */
             404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    ListAdminProducts: {
+        parameters: {
+            query?: {
+                /** @description Case-insensitive substring of the name, the brand or a SKU. */
+                q?: string;
+                /** @description Draft, Active or Archived; every status when omitted. */
+                status?: string;
+                /** @description Only products of this category. */
+                categorySlug?: string;
+                /** @description 1-based page number. Defaults to 1. */
+                page?: number;
+                /** @description Page size, 1 to 100. Defaults to 20. */
+                pageSize?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PagedResultOfAdminProductSummaryDto"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    CreateAdminProduct: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Must be "voltlane". Without it the API answers 400 request.missing_csrf_header. */
+                "X-Requested-With": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateProductRequest"];
+            };
+        };
+        responses: {
+            /** @description Created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CreatedProductDto"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    GetAdminProduct: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminProductDto"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    UpdateAdminProduct: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Must be "voltlane". Without it the API answers 400 request.missing_csrf_header. */
+                "X-Requested-With": string;
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateProductRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminProductDto"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    UpdateAdminVariant: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Must be "voltlane". Without it the API answers 400 request.missing_csrf_header. */
+                "X-Requested-With": string;
+            };
+            path: {
+                id: string;
+                variantId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateVariantRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminProductDto"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    ListAdminImageKeys: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminImageKeyDto"][];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    ListAdminCategories: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminCategoryDto"][];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
                 headers: {
                     [name: string]: unknown;
                 };

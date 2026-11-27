@@ -1,4 +1,5 @@
 using System.Text;
+using Identity.Contracts;
 using Identity.Domain.Users;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Configuration;
@@ -10,14 +11,12 @@ namespace Identity.Infrastructure.Security;
 
 public static class AuthenticationSetup
 {
-    public const string AdminPolicy = "Admin";
-
     public const string RoleClaimType = "role";
 
     public const string NameClaimType = "name";
 
     /// <summary>
-    /// JWT bearer authentication for the whole host plus the <see cref="AdminPolicy"/> authorization policy.
+    /// JWT bearer authentication for the whole host plus the <see cref="AuthorizationPolicies.Admin"/> authorization policy.
     /// <see cref="JwtOptions"/> is validated on start, so a missing or short signing key stops the host before it
     /// serves a request (the message never echoes the key).
     /// </summary>
@@ -57,7 +56,7 @@ public static class AuthenticationSetup
             });
 
         services.AddAuthorizationBuilder()
-            .AddPolicy(AdminPolicy, policy => policy.RequireRole(Roles.Admin));
+            .AddPolicy(AuthorizationPolicies.Admin, policy => policy.RequireRole(Roles.Admin));
 
         return services;
     }

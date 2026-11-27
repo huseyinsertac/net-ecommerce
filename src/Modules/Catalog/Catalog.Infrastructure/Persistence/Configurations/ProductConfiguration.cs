@@ -11,6 +11,20 @@ internal sealed class ProductConfiguration : IEntityTypeConfiguration<Product>
 {
     public const string SearchVector = "SearchVector";
 
+    /// <summary>
+    /// Shadow property mapped to PostgreSQL's <c>xmin</c> system column (no real column is created): the product's
+    /// version for the admin's optimistic concurrency.
+    /// </summary>
+    public const string RowVersion = "RowVersion";
+
+    /// <summary>
+    /// Shadow property written on every admin save, so the product row (and so its <see cref="RowVersion"/>) changes even
+    /// when only a variant was edited. Stock reservations touch only variant rows and leave the product's version alone.
+    /// </summary>
+    public const string UpdatedAtUtc = "UpdatedAtUtc";
+
+    public const string SlugIndex = "ix_products_slug";
+
     public const string SearchVectorSql =
         "setweight(to_tsvector('english', coalesce(name,'')), 'A') || " +
         "setweight(to_tsvector('english', coalesce(brand,'')), 'B') || " +
@@ -65,5 +79,8 @@ internal sealed class ProductConfiguration : IEntityTypeConfiguration<Product>
         b.HasIndex(SearchVector).HasMethod("gin");
         b.HasIndex(p => p.Specs).HasMethod("gin").HasOperators("jsonb_path_ops");
         b.HasIndex(p => new { p.Status, p.CategoryId });
+
+        b.Property<uint>(RowVersion).IsRowVersion();
+        b.Property<DateTime?>(UpdatedAtUtc);
     }
 }

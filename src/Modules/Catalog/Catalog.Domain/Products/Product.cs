@@ -6,8 +6,11 @@ namespace Catalog.Domain.Products;
 
 public sealed partial class Product : AggregateRoot<Guid>
 {
-    private const int MaxNameLength = 200;
-    private const int MaxSlugLength = 120;
+    public const int MaxNameLength = 200;
+    public const int MaxSlugLength = 120;
+    public const int MaxStock = 100_000;
+    public const decimal MinPrice = 0.01m;
+    public const decimal MaxPrice = 100_000m;
 
     [GeneratedRegex("^[a-z0-9]+(-[a-z0-9]+)*$")]
     private static partial Regex SlugPattern();
@@ -51,24 +54,9 @@ public sealed partial class Product : AggregateRoot<Guid>
             return CatalogErrors.InvalidSlug(slug ?? string.Empty);
         }
 
-        if (string.IsNullOrWhiteSpace(name) || name.Length > MaxNameLength)
+        if (CheckDetails(name, brand, description, imageKeys) is { } detailsError)
         {
-            return CatalogErrors.InvalidProduct($"Name must be 1-{MaxNameLength} characters.");
-        }
-
-        if (string.IsNullOrWhiteSpace(brand))
-        {
-            return CatalogErrors.InvalidName("Brand");
-        }
-
-        if (string.IsNullOrWhiteSpace(description))
-        {
-            return CatalogErrors.InvalidName("Description");
-        }
-
-        if (imageKeys is null || imageKeys.Count == 0 || imageKeys.Any(string.IsNullOrWhiteSpace))
-        {
-            return CatalogErrors.InvalidProduct("At least one non-blank image key is required.");
+            return detailsError;
         }
 
         if (specs is null)
@@ -115,22 +103,12 @@ public sealed partial class Product : AggregateRoot<Guid>
                 return CatalogErrors.DuplicateSku(v.Sku);
             }
 
-            if (v.Price is null)
+            if (CheckPrice(v.Sku, v.Price) is { } priceError)
             {
-                return CatalogErrors.InvalidPrice($"SKU '{v.Sku}' needs a price.");
+                return priceError;
             }
 
-            if (v.Price.Currency != Money.UsdCurrency)
-            {
-                return CatalogErrors.InvalidPrice($"SKU '{v.Sku}' must be priced in USD.");
-            }
-
-            if (v.Price.Amount <= 0)
-            {
-                return CatalogErrors.InvalidPrice($"SKU '{v.Sku}' must have a price greater than zero.");
-            }
-
-            if (v.StockOnHand < 0)
+            if (v.StockOnHand is < 0 or > MaxStock)
             {
                 return CatalogErrors.InvalidStock(v.Sku);
             }
@@ -168,6 +146,104 @@ public sealed partial class Product : AggregateRoot<Guid>
             IsFeatured = isFeatured,
             CreatedAtUtc = createdAtUtc,
         };
+    }
+
+    /// <summary>Replaces the editable details. The slug never changes, so existing links keep working.</summary>
+    public Result UpdateDetails(
+        string name, string brand, string description, bool isFeatured, IReadOnlyList<string> imageKeys)
+    {
+        if (CheckDetails(name, brand, description, imageKeys) is { } error)
+        {
+            return Result.Failure(error);
+        }
+
+        Name = name;
+        Brand = brand;
+        Description = description;
+        IsFeatured = isFeatured;
+        _imageKeys = [.. imageKeys];
+        return Result.Success();
+    }
+
+    /// <summary>Replaces all spec values; <paramref name="category"/> must be this product's category.</summary>
+    public Result SetSpecs(Category category, IReadOnlyDictionary<string, SpecValue> specs)
+    {
+        if (category is null || category.Id != CategoryId)
+        {
+            return Result.Failure(CatalogErrors.InvalidSpecs("Specs must be validated against the product's own category."));
+        }
+
+        if (specs is null)
+        {
+            return Result.Failure(CatalogErrors.NullSpecValues());
+        }
+
+        var copy = new Dictionary<string, SpecValue>(specs);
+        var valid = category.ValidateSpecs(copy);
+        if (valid.IsFailure)
+        {
+            return valid;
+        }
+
+        _specs = copy;
+        return Result.Success();
+    }
+
+    /// <summary>The admin's status switch: Draft, Active or Archived, in any direction (the same status is a no-op).</summary>
+    public Result SetStatus(ProductStatus status)
+    {
+        if (!Enum.IsDefined(status))
+        {
+            return Result.Failure(CatalogErrors.InvalidProduct($"Unknown status '{status}'."));
+        }
+
+        if (status == ProductStatus.Active && _variants.Count == 0)
+        {
+            return Result.Failure(CatalogErrors.InvalidProduct("An Active product needs at least one variant."));
+        }
+
+        Status = status;
+        return Result.Success();
+    }
+
+    public Result SetVariantPrice(Guid variantId, Money price)
+    {
+        var variant = _variants.Find(v => v.Id == variantId);
+        if (variant is null)
+        {
+            return Result.Failure(CatalogErrors.VariantNotFound(variantId));
+        }
+
+        if (CheckPrice(variant.Sku, price) is { } error)
+        {
+            return Result.Failure(error);
+        }
+
+        variant.SetPrice(price);
+        return Result.Success();
+    }
+
+    /// <summary>Sets the units on hand, never below what open orders have reserved.</summary>
+    public Result SetVariantStock(Guid variantId, int stockOnHand)
+    {
+        var variant = _variants.Find(v => v.Id == variantId);
+        if (variant is null)
+        {
+            return Result.Failure(CatalogErrors.VariantNotFound(variantId));
+        }
+
+        if (stockOnHand is < 0 or > MaxStock)
+        {
+            return Result.Failure(CatalogErrors.InvalidStock(variant.Sku));
+        }
+
+        if (stockOnHand < variant.StockReserved)
+        {
+            return Result.Failure(CatalogErrors.StockBelowReserved(variant.Sku, variant.StockReserved));
+        }
+
+        variant.SetStockOnHand(stockOnHand);
+        return Result.Success();
     }
 
     public Result Publish()
@@ -241,6 +317,48 @@ public sealed partial class Product : AggregateRoot<Guid>
 
         variant.Commit(quantity);
         return Result.Success();
+    }
+
+    private static Error? CheckDetails(string name, string brand, string description, IReadOnlyList<string> imageKeys)
+    {
+        if (string.IsNullOrWhiteSpace(name) || name.Length > MaxNameLength)
+        {
+            return CatalogErrors.InvalidProduct($"Name must be 1-{MaxNameLength} characters.");
+        }
+
+        if (string.IsNullOrWhiteSpace(brand))
+        {
+            return CatalogErrors.InvalidName("Brand");
+        }
+
+        if (string.IsNullOrWhiteSpace(description))
+        {
+            return CatalogErrors.InvalidName("Description");
+        }
+
+        if (imageKeys is null || imageKeys.Count == 0 || imageKeys.Any(string.IsNullOrWhiteSpace))
+        {
+            return CatalogErrors.InvalidProduct("At least one non-blank image key is required.");
+        }
+
+        return null;
+    }
+
+    private static Error? CheckPrice(string sku, Money? price)
+    {
+        if (price is null)
+        {
+            return CatalogErrors.InvalidPrice($"SKU '{sku}' needs a price.");
+        }
+
+        if (price.Currency != Money.UsdCurrency)
+        {
+            return CatalogErrors.InvalidPrice($"SKU '{sku}' must be priced in USD.");
+        }
+
+        return price.Amount is < MinPrice or > MaxPrice
+            ? CatalogErrors.InvalidPrice($"SKU '{sku}' must cost between 0.01 and 100000.00 USD.")
+            : null;
     }
 
     private Result Locate(Guid variantId, int quantity, out ProductVariant? variant)
