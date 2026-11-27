@@ -8,7 +8,11 @@ public sealed class StripeOptions
 {
     public const string SectionName = "Stripe";
 
-    public const string TestSecretKeyPrefix = "sk_test_";
+    /// <summary>Test-mode secret (<c>sk_test_</c>) and restricted (<c>rk_test_</c>) keys; live keys are refused.</summary>
+    public static readonly IReadOnlyList<string> TestKeyPrefixes = ["sk_test_", "rk_test_"];
+
+    public static bool IsTestModeKey(string key) =>
+        TestKeyPrefixes.Any(prefix => key.StartsWith(prefix, StringComparison.Ordinal) && key.Length > prefix.Length);
 
     public const string WebhookSecretPrefix = "whsec_";
 

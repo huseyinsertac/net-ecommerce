@@ -26,6 +26,42 @@ public sealed class PaymentsStartupValidationTests
     }
 
     [Fact]
+    public async Task Production_with_live_restricted_key_fails_startup()
+    {
+        const string liveRestricted = "rk_live_NOT-A-REAL-KEY-0000";
+        var validation = await StartupFailureAsync(new()
+        {
+            ["Payments:Provider"] = "Stripe",
+            ["Payments:Timeout"] = "00:30:00",
+            ["Stripe:SecretKey"] = liveRestricted,
+            ["Stripe:WebhookSecret"] = "whsec_test",
+        });
+
+        validation.Message.ShouldContain("Stripe:SecretKey");
+        validation.Message.ShouldNotContain(liveRestricted);
+    }
+
+    [Theory]
+    [InlineData("sk_test_dummy")]
+    [InlineData("rk_test_dummy")]
+    public async Task Production_with_test_mode_key_starts(string key)
+    {
+        await using var factory = new SettingsFactory(new()
+        {
+            ["Payments:Provider"] = "Stripe",
+            ["Payments:Timeout"] = "00:30:00",
+            ["Stripe:SecretKey"] = key,
+            ["Stripe:WebhookSecret"] = "whsec_test",
+        });
+        await factory.InitializeAsync();
+
+        using var client = factory.CreateClient();
+        var response = await client.GetAsync("/health", TestContext.Current.CancellationToken);
+
+        response.IsSuccessStatusCode.ShouldBeTrue();
+    }
+
+    [Fact]
     public async Task Production_with_fake_provider_fails_startup()
     {
         var validation = await StartupFailureAsync(new()

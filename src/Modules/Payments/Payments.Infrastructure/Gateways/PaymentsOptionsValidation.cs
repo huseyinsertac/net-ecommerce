@@ -5,7 +5,7 @@ namespace Payments.Infrastructure.Gateways;
 
 /// <summary>
 /// Startup checks that keep the demo from ever charging a real card. Production must use Stripe (unless the host opts in
-/// to the Fake provider); Stripe accepts only <c>sk_test_</c> secret keys and <c>whsec_</c> webhook secrets, in every
+/// to the Fake provider); Stripe accepts only test-mode keys (<c>sk_test_</c> secret or <c>rk_test_</c> restricted) and <c>whsec_</c> webhook secrets, in every
 /// environment, and a timeout Stripe can honour (30 minutes to 23 hours). Messages name settings, never their values.
 /// </summary>
 internal sealed class PaymentsOptionsValidation(IHostEnvironment environment, IOptions<StripeOptions> stripeOptions)
@@ -41,10 +41,10 @@ internal sealed class PaymentsOptionsValidation(IHostEnvironment environment, IO
         if (options.Provider == PaymentProviders.Stripe)
         {
             var stripe = stripeOptions.Value;
-            if (!stripe.SecretKey.StartsWith(StripeOptions.TestSecretKeyPrefix, StringComparison.Ordinal))
+            if (!StripeOptions.IsTestModeKey(stripe.SecretKey))
             {
                 failures.Add(
-                    $"Stripe:SecretKey must be a test-mode key (starting with '{StripeOptions.TestSecretKeyPrefix}'); " +
+                    $"Stripe:SecretKey must be a test-mode key (starting with '{string.Join("' or '", StripeOptions.TestKeyPrefixes)}'); " +
                     "supply it through the Stripe__SecretKey environment variable.");
             }
 
