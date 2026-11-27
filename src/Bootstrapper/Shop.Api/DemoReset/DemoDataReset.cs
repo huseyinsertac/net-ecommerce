@@ -13,7 +13,11 @@ namespace Shop.Api.DemoReset;
 /// Safety: only the schemas of the module DbContexts in <see cref="ModuleDatabaseRegistry"/> are touched, never
 /// <c>public</c> or anything else, and never the EF migrations history. Table and sequence names come from the database
 /// catalog, filtered to those schemas; no name ever comes from input. The wipe is one transaction with a statement
-/// timeout: it either empties every module table or changes nothing.
+/// and lock timeout: it either empties every module table or changes nothing.
+/// </para>
+/// <para>
+/// A wipe that loses a lock race (lock timeout, deadlock, statement timeout) is rolled back and retried with backoff,
+/// and so is a failed re-seed after the wipe has committed (seeders are idempotent).
 /// </para>
 /// </summary>
 public sealed class DemoDataReset(
@@ -33,14 +37,55 @@ public sealed class DemoDataReset(
         var started = clock.GetTimestamp();
         var schemas = ModuleSchemas();
 
-        var (tables, sequences) = await TruncateAsync(schemas, ct);
+        var (tables, sequences) = await WithRetriesAsync(
+            "Demo data wipe", IsTransientLockFailure, () => TruncateAsync(schemas, ct), ct);
         logger.LogInformation(
             "Demo reset truncated {Tables} tables and restarted {Sequences} sequences in schemas {Schemas}",
             tables, sequences, string.Join(", ", schemas));
 
-        await ModuleSeeding.RunAllAsync(services, logger, ct);
+        // The wipe is committed, so the demo stays broken until a seed succeeds; seeders are idempotent, so retry them.
+        await WithRetriesAsync("Demo re-seed", _ => true, async () =>
+        {
+            await ModuleSeeding.RunAllAsync(services, logger, ct);
+            return true;
+        }, ct);
 
         logger.LogInformation("Demo reset finished in {ElapsedMs:0} ms", clock.GetElapsedTime(started).TotalMilliseconds);
+    }
+
+    /// <summary>Lock wait timeout, deadlock, or statement timeout: a concurrent transaction was in the way.</summary>
+    private static bool IsTransientLockFailure(Exception ex) => ex is PostgresException
+    {
+        SqlState: PostgresErrorCodes.LockNotAvailable or PostgresErrorCodes.DeadlockDetected or PostgresErrorCodes.QueryCanceled,
+    };
+
+    /// <summary>
+    /// Runs <paramref name="action"/> up to <c>MaxAttempts</c> times, waiting <c>RetryBackoff</c> (doubling) between
+    /// attempts. Each retry is logged at Warning, the final failure at Error; the last exception propagates.
+    /// </summary>
+    private async Task<T> WithRetriesAsync<T>(
+        string operation, Func<Exception, bool> isRetryable, Func<Task<T>> action, CancellationToken ct)
+    {
+        var maxAttempts = Math.Max(1, options.Value.MaxAttempts);
+        for (var attempt = 1; ; attempt++)
+        {
+            try
+            {
+                return await action();
+            }
+            catch (Exception ex) when (!ct.IsCancellationRequested && isRetryable(ex) && attempt < maxAttempts)
+            {
+                var delay = options.Value.RetryBackoff * Math.Pow(2, attempt - 1);
+                logger.LogWarning(ex, "{Operation} failed (attempt {Attempt}/{Max}); retrying in {DelayMs:0} ms",
+                    operation, attempt, maxAttempts, delay.TotalMilliseconds);
+                await Task.Delay(delay, clock, ct);
+            }
+            catch (Exception ex) when (!ct.IsCancellationRequested)
+            {
+                logger.LogError(ex, "{Operation} failed (attempt {Attempt}/{Max}); giving up", operation, attempt, maxAttempts);
+                throw;
+            }
+        }
     }
 
     /// <summary>The schema of every registered module DbContext, validated as a plain lower-case identifier.</summary>
@@ -75,9 +120,10 @@ public sealed class DemoDataReset(
     private async Task<(int Tables, int Sequences)> TruncateAsync(List<string> schemas, CancellationToken ct)
     {
         var timeoutMs = (long)Math.Ceiling(options.Value.StatementTimeout.TotalMilliseconds);
-        if (timeoutMs < 1)
+        var lockTimeoutMs = (long)Math.Ceiling(options.Value.LockTimeout.TotalMilliseconds);
+        if (timeoutMs < 1 || lockTimeoutMs < 1)
         {
-            throw new InvalidOperationException("DemoReset:StatementTimeout must be positive.");
+            throw new InvalidOperationException("DemoReset:StatementTimeout and DemoReset:LockTimeout must be positive.");
         }
 
         var connectionString = configuration.GetConnectionString(ModuleDbContextRegistration.ConnectionStringName)
@@ -88,9 +134,11 @@ public sealed class DemoDataReset(
         await connection.OpenAsync(ct);
         await using var transaction = await connection.BeginTransactionAsync(ct);
 
-        // An integer from configuration, formatted invariantly: SET does not take parameters.
+        // Integers from configuration, formatted invariantly: SET does not take parameters.
         await ExecuteAsync(connection, transaction,
             $"SET LOCAL statement_timeout = {timeoutMs.ToString(CultureInfo.InvariantCulture)}", ct);
+        await ExecuteAsync(connection, transaction,
+            $"SET LOCAL lock_timeout = {lockTimeoutMs.ToString(CultureInfo.InvariantCulture)}", ct);
 
         var tables = await ReadNamesAsync(connection, transaction, """
             SELECT table_schema, table_name

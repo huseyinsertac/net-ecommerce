@@ -1,5 +1,6 @@
 using System.Net;
 using Catalog.Contracts.Variants;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
@@ -20,6 +21,37 @@ namespace Shop.IntegrationTests.DemoReset;
 public sealed class DemoResetApiFactory : ShopApiFactory
 {
     protected override bool SeedOnStartup => true;
+
+    /// <summary>Registered after every module seeder; fails as many times as a test asks, then succeeds.</summary>
+    public FlakySeeder Flaky { get; } = new();
+
+    protected override void ConfigureWebHost(IWebHostBuilder builder)
+    {
+        base.ConfigureWebHost(builder);
+        // Fast retries, so a retried seed or truncate does not slow the suite.
+        builder.UseSetting("DemoReset:RetryBackoff", "00:00:00.100");
+        builder.ConfigureServices(s => s.AddSingleton<IModuleSeeder>(Flaky));
+    }
+
+    public sealed class FlakySeeder : IModuleSeeder
+    {
+        private int _failuresLeft;
+        private int _calls;
+
+        public int Calls => Volatile.Read(ref _calls);
+
+        public string Module => "test-flaky";
+
+        public void FailNext(int times) => Volatile.Write(ref _failuresLeft, times);
+
+        public Task SeedAsync(CancellationToken ct)
+        {
+            Interlocked.Increment(ref _calls);
+            return Interlocked.Decrement(ref _failuresLeft) >= 0
+                ? throw new InvalidOperationException("Simulated seeder failure")
+                : Task.CompletedTask;
+        }
+    }
 }
 
 public sealed class DemoResetTests(DemoResetApiFactory factory) : IClassFixture<DemoResetApiFactory>
@@ -162,8 +194,37 @@ public sealed class DemoResetTests(DemoResetApiFactory factory) : IClassFixture<
         first.Products.ShouldBeGreaterThan(0);
     }
 
-    [Fact]
-    public async Task Reset_rolls_back_when_a_truncate_fails()
+    private DemoDataReset ResetWith(DemoResetOptions options) =>
+        ActivatorUtilities.CreateInstance<DemoDataReset>(Services, Options.Create(options));
+
+    /// <summary>Holds ACCESS EXCLUSIVE on ordering.orders from another connection until the returned handle is disposed.</summary>
+    private async Task<IAsyncDisposable> HoldOrdersLockAsync()
+    {
+        var locker = new NpgsqlConnection(factory.ConnectionString);
+        await locker.OpenAsync(Ct);
+        var hold = await locker.BeginTransactionAsync(Ct);
+        await using (var lockCommand = new NpgsqlCommand("LOCK TABLE ordering.orders IN ACCESS EXCLUSIVE MODE", locker, hold))
+        {
+            await lockCommand.ExecuteNonQueryAsync(Ct);
+        }
+
+        return new LockHandle(locker, hold);
+    }
+
+    private sealed class LockHandle(NpgsqlConnection connection, NpgsqlTransaction transaction) : IAsyncDisposable
+    {
+        public async ValueTask DisposeAsync()
+        {
+            await transaction.RollbackAsync();
+            await transaction.DisposeAsync();
+            await connection.DisposeAsync();
+        }
+    }
+
+    [Theory]
+    [InlineData("lock", PostgresErrorCodes.LockNotAvailable)]
+    [InlineData("statement", PostgresErrorCodes.QueryCanceled)]
+    public async Task Reset_rolls_back_when_a_truncate_fails(string timeout, string expectedSqlState)
     {
         using var client = factory.CreateClient();
         var email = AuthTestClient.NewEmail();
@@ -171,26 +232,69 @@ public sealed class DemoResetTests(DemoResetApiFactory factory) : IClassFixture<
         var (slug, _) = await FirstProductAsync();
         await RenameProductAsync(slug, "Kept after a failed reset");
         var before = await CountsAsync();
-        var reset = ActivatorUtilities.CreateInstance<DemoDataReset>(
-            Services, Options.Create(new DemoResetOptions { StatementTimeout = TimeSpan.FromSeconds(1) }));
-
-        await using (var locker = new NpgsqlConnection(factory.ConnectionString))
+        // The lock outlives every attempt; whichever timeout is shorter is the one that fires.
+        var reset = ResetWith(new DemoResetOptions
         {
-            await locker.OpenAsync(Ct);
-            await using var hold = await locker.BeginTransactionAsync(Ct);
-            await using (var lockCommand = new NpgsqlCommand("LOCK TABLE ordering.orders IN ACCESS EXCLUSIVE MODE", locker, hold))
-            {
-                await lockCommand.ExecuteNonQueryAsync(Ct);
-            }
+            LockTimeout = timeout == "lock" ? TimeSpan.FromMilliseconds(300) : TimeSpan.FromSeconds(30),
+            StatementTimeout = timeout == "lock" ? TimeSpan.FromSeconds(30) : TimeSpan.FromSeconds(1),
+            MaxAttempts = 2,
+            RetryBackoff = TimeSpan.FromMilliseconds(100),
+        });
 
+        await using (await HoldOrdersLockAsync())
+        {
             var failure = await Should.ThrowAsync<PostgresException>(() => reset.ResetAsync(Ct));
-            failure.SqlState.ShouldBe(PostgresErrorCodes.QueryCanceled);
-            await hold.RollbackAsync(Ct);
+            failure.SqlState.ShouldBe(expectedSqlState);
         }
 
         (await CountsAsync()).ShouldBe(before);
         (await ProductNameAsync(slug)).ShouldBe("Kept after a failed reset");
         (await AuthTestClient.LoginAsync(client, email)).StatusCode.ShouldBe(HttpStatusCode.OK);
+    }
+
+    [Fact]
+    public async Task Reset_retries_while_a_short_lock_is_held_and_then_succeeds()
+    {
+        using var client = factory.CreateClient();
+        var email = AuthTestClient.NewEmail();
+        (await AuthTestClient.RegisterAsync(client, email)).EnsureSuccessStatusCode();
+        var reset = ResetWith(new DemoResetOptions
+        {
+            LockTimeout = TimeSpan.FromMilliseconds(500),
+            MaxAttempts = 6,
+            RetryBackoff = TimeSpan.FromMilliseconds(250),
+        });
+
+        var held = await HoldOrdersLockAsync();
+        var release = Task.Run(async () =>
+        {
+            await Task.Delay(TimeSpan.FromSeconds(2), Ct);
+            await held.DisposeAsync();
+        }, Ct);
+
+        await reset.ResetAsync(Ct); // attempts at about 0, 0.75, 1.75 and 3.25 s: the lock is gone by the fourth
+        await release;
+
+        (await AuthTestClient.LoginAsync(client, email)).StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
+        (await OrdersAsync()).Count.ShouldBe(24);
+    }
+
+    [Fact]
+    public async Task Reset_retries_a_failed_seed_after_the_wipe()
+    {
+        using var client = factory.CreateClient();
+        var email = AuthTestClient.NewEmail();
+        (await AuthTestClient.RegisterAsync(client, email)).EnsureSuccessStatusCode();
+        var callsBefore = factory.Flaky.Calls;
+        factory.Flaky.FailNext(1);
+
+        await Reset.ResetAsync(Ct);
+
+        (factory.Flaky.Calls - callsBefore).ShouldBe(2);
+        (await AuthTestClient.LoginAsync(client, email)).StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
+        (await client.PostAsync("/api/identity/demo/admin", null, Ct)).StatusCode.ShouldBe(HttpStatusCode.OK);
+        (await OrdersAsync()).Count.ShouldBe(24);
+        (await ScalarAsync<long>("SELECT count(*) FROM catalog.products")).ShouldBeGreaterThan(0);
     }
 
     [Fact]
@@ -302,5 +406,58 @@ public sealed class NightlyResetScheduleTests
     {
         NightlyResetService.NextRunUtc(new DateTimeOffset(2026, 12, 31, 23, 0, 0, TimeSpan.Zero), TwoAm)
             .ShouldBe(new DateTimeOffset(2027, 1, 1, 2, 0, 0, TimeSpan.Zero));
+    }
+
+    private static readonly DemoResetOptions Defaults = new(); // 02:00, retry after 5 min, 3 retries
+    private static readonly DateTimeOffset TodaysSlot = new(2026, 11, 27, 2, 0, 0, TimeSpan.Zero);
+
+    [Fact]
+    public void Defaults_retry_three_times_five_minutes_apart()
+    {
+        Defaults.RetryDelay.ShouldBe(TimeSpan.FromMinutes(5));
+        Defaults.RetryCount.ShouldBe(3);
+        Defaults.LockTimeout.ShouldBe(TimeSpan.FromSeconds(5));
+        Defaults.MaxAttempts.ShouldBe(5);
+        Defaults.RetryBackoff.ShouldBe(TimeSpan.FromSeconds(1));
+    }
+
+    [Fact]
+    public void Without_failures_the_next_attempt_is_the_daily_slot()
+    {
+        var next = NightlyResetService.ScheduleNext(TodaysSlot.AddSeconds(3), TodaysSlot, 0, Defaults);
+
+        next.ShouldBe(new NightlyResetService.Attempt(TodaysSlot.AddDays(1), IsRetry: false));
+    }
+
+    [Theory]
+    [InlineData(1)]
+    [InlineData(2)]
+    [InlineData(3)]
+    public void After_a_failure_the_reset_is_retried_after_the_retry_delay(int failures)
+    {
+        var now = TodaysSlot.AddMinutes(1 + 5 * (failures - 1));
+
+        var next = NightlyResetService.ScheduleNext(now, TodaysSlot, failures, Defaults);
+
+        next.ShouldBe(new NightlyResetService.Attempt(now.AddMinutes(5), IsRetry: true));
+    }
+
+    [Fact]
+    public void After_the_last_retry_fails_the_next_attempt_is_tomorrow()
+    {
+        var now = TodaysSlot.AddMinutes(16);
+
+        var next = NightlyResetService.ScheduleNext(now, TodaysSlot, 4, Defaults);
+
+        next.ShouldBe(new NightlyResetService.Attempt(TodaysSlot.AddDays(1), IsRetry: false));
+    }
+
+    [Fact]
+    public void A_slot_that_already_ran_is_never_scheduled_again()
+    {
+        // The timer fired a hair early and the reset was quick: still tomorrow, not today's slot again.
+        var next = NightlyResetService.ScheduleNext(TodaysSlot.AddMilliseconds(-5), TodaysSlot, 0, Defaults);
+
+        next.ShouldBe(new NightlyResetService.Attempt(TodaysSlot.AddDays(1), IsRetry: false));
     }
 }

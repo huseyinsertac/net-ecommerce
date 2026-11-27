@@ -258,6 +258,9 @@ docker compose -f docker-compose.prod.yml exec api dotnet Shop.Api.dll reset-dem
 
 The command migrates, resets, seeds, logs each step and exits `0` (non-zero, with an Error log, on
 failure). It runs beside the live API in the same container without starting a second web server.
+If live traffic holds a table lock, the wipe rolls back and retries a few times with backoff, and a
+failed re-seed is retried too. A nightly reset that still fails is retried every 5 minutes, up to 3
+times, before waiting for the next night (`DemoReset__RetryDelay`, `DemoReset__RetryCount`).
 To move the nightly time, add `DemoReset__TimeOfDayUtc: "03:30"` to the `api` environment; to turn the
 nightly reset off, set `DemoReset__Enabled: "false"`.
 
