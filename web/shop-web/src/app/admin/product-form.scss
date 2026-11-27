@@ -130,6 +130,7 @@
 }
 
 .variants-wrap {
+  position: relative;
   max-width: 100%;
   overflow-x: auto;
   border: 1px solid var(--mat-sys-outline-variant);
