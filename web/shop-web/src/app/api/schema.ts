@@ -315,6 +315,74 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/ordering/admin/orders": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Every customer's orders, newest first. Filter by status, or search by order number (or prefix) or customer email. */
+        get: operations["ListAdminOrders"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/ordering/admin/orders/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Any customer's order with its lines, address, totals, history, owner and whether a refund is owed. */
+        get: operations["GetAdminOrder"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/ordering/admin/orders/{id}/ship": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Marks a Paid order as Shipped. Any other state is a 409. */
+        post: operations["ShipAdminOrder"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/ordering/admin/orders/{id}/deliver": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Marks a Shipped order as Delivered. Any other state is a 409. */
+        post: operations["DeliverAdminOrder"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/payments/simulated/{orderId}": {
         parameters: {
             query?: never;
@@ -465,6 +533,41 @@ export interface components {
         AdminImageKeyDto: {
             key: string;
             thumbnailUrl: string;
+        };
+        AdminOrderDto: {
+            /** Format: uuid */
+            id: string;
+            orderNumber: string;
+            /** Format: date-time */
+            placedAtUtc: string;
+            status: components["schemas"]["OrderStatus"];
+            cancellationReason: null | components["schemas"]["CancellationReason"];
+            lines: components["schemas"]["OrderLineDto"][];
+            shippingAddress: components["schemas"]["ShippingAddressDto"];
+            /** Format: double */
+            subtotal: number;
+            /** Format: double */
+            discount: number;
+            /** Format: double */
+            total: number;
+            history: components["schemas"]["StatusChangeDto"][];
+            customerEmail: string;
+            /** Format: uuid */
+            customerId: string;
+            refundRequired: boolean;
+        };
+        AdminOrderSummaryDto: {
+            /** Format: uuid */
+            id: string;
+            orderNumber: string;
+            /** Format: date-time */
+            placedAtUtc: string;
+            status: components["schemas"]["OrderStatus"];
+            customerEmail: string;
+            /** Format: int32 */
+            itemCount: number;
+            /** Format: double */
+            total: number;
         };
         AdminProductDto: {
             /** Format: uuid */
@@ -713,6 +816,17 @@ export interface components {
             /** Format: int32 */
             itemCount: number;
             firstThumbnailUrl: null | string;
+        };
+        PagedResultOfAdminOrderSummaryDto: {
+            items: components["schemas"]["AdminOrderSummaryDto"][];
+            /** Format: int32 */
+            page: number;
+            /** Format: int32 */
+            pageSize: number;
+            /** Format: int32 */
+            totalCount: number;
+            /** Format: int32 */
+            totalPages: number;
         };
         PagedResultOfAdminProductSummaryDto: {
             items: components["schemas"]["AdminProductSummaryDto"][];
@@ -1867,6 +1981,233 @@ export interface operations {
             };
             /** @description Not Found */
             404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    ListAdminOrders: {
+        parameters: {
+            query?: {
+                /** @description Placed, Paid, Shipped, Delivered or Cancelled (any case). */
+                status?: string;
+                /** @description An order number or prefix (VL-1234, or just digits), or part of a customer email. */
+                q?: string;
+                /** @description 1-based page number. Defaults to 1. */
+                page?: number;
+                /** @description Page size, 1 to 50. Defaults to 20. */
+                pageSize?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PagedResultOfAdminOrderSummaryDto"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    GetAdminOrder: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminOrderDto"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    ShipAdminOrder: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Must be "voltlane". Without it the API answers 400 request.missing_csrf_header. */
+                "X-Requested-With": string;
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminOrderDto"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    DeliverAdminOrder: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Must be "voltlane". Without it the API answers 400 request.missing_csrf_header. */
+                "X-Requested-With": string;
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminOrderDto"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Conflict */
+            409: {
                 headers: {
                     [name: string]: unknown;
                 };

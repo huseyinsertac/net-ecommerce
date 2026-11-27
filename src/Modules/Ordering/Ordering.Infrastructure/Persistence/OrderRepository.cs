@@ -34,6 +34,48 @@ internal sealed class OrderRepository(OrderingDbContext db) : IOrderRepository
         return new PagedResult<Order>(items, page, pageSize, total);
     }
 
+    public Task<Order?> GetReadOnlyAsync(Guid orderId, CancellationToken ct) =>
+        ReadOnlyOrders.SingleOrDefaultAsync(o => o.Id == orderId, ct);
+
+    public async Task<PagedResult<Order>> GetPageForAdminAsync(AdminOrderFilter filter, int page, int pageSize, CancellationToken ct)
+    {
+        var matching = db.Orders.AsNoTracking();
+        if (filter.Status is { } status)
+        {
+            matching = matching.Where(o => o.Status == status);
+        }
+
+        if (filter.OrderNumberPrefix is { } prefix)
+        {
+            var pattern = EscapeLike(prefix) + "%";
+            matching = matching.Where(o => EF.Functions.ILike(o.OrderNumber, pattern, LikeEscape));
+        }
+
+        if (filter.EmailContains is { } fragment)
+        {
+            var pattern = "%" + EscapeLike(fragment) + "%";
+            matching = matching.Where(o => EF.Functions.ILike(o.CustomerEmail, pattern, LikeEscape));
+        }
+
+        var total = await matching.CountAsync(ct);
+        var items = await matching
+            .OrderByDescending(o => o.PlacedAtUtc)
+            .ThenByDescending(o => o.Id)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .Include(o => o.Lines)
+            .AsSplitQuery()
+            .ToListAsync(ct);
+        return new PagedResult<Order>(items, page, pageSize, total);
+    }
+
+    private const string LikeEscape = "\\";
+
+    private static string EscapeLike(string text) => text
+        .Replace("\\", "\\\\", StringComparison.Ordinal)
+        .Replace("%", "\\%", StringComparison.Ordinal)
+        .Replace("_", "\\_", StringComparison.Ordinal);
+
     public async Task<long> NextOrderNumberAsync(CancellationToken ct)
     {
         // The sequence name comes from code, never from input.
@@ -52,6 +94,11 @@ internal sealed class OrderRepository(OrderingDbContext db) : IOrderRepository
         try
         {
             await db.SaveChangesAsync(ct);
+        }
+        catch (DbUpdateConcurrencyException ex)
+        {
+            db.ChangeTracker.Clear();
+            throw new OrderConcurrencyException(ex);
         }
         catch (DbUpdateException ex) when (ex.InnerException is PostgresException
                                            {

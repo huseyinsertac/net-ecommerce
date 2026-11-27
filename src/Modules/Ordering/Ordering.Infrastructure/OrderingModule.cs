@@ -29,5 +29,6 @@ public sealed class OrderingModule : IModule
     public void MapEndpoints(IEndpointRouteBuilder app)
     {
         OrderingEndpoints.Map(app.MapGroup($"/api/{Name}"));
+        OrderingAdminEndpoints.Map(app.MapGroup($"/api/{Name}/admin"));
     }
 }
