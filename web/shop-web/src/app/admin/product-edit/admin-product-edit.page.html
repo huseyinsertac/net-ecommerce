@@ -1,0 +1,159 @@
+@switch (view()) {
+  @case ('loading') {
+    <div class="stack" aria-busy="true" aria-label="Loading product">
+      @for (row of skeleton; track row) {
+        <div class="sk sk-card"></div>
+      }
+    </div>
+  }
+  @case ('notFound') {
+    <div class="empty">
+      <h1>Product not found</h1>
+      <p>It may have been removed in the nightly reset.</p>
+      <a mat-flat-button routerLink="/admin/products">Back to products</a>
+    </div>
+  }
+  @case ('error') {
+    <div class="empty">
+      <h2>We couldn't load this product</h2>
+      <p>Please try again in a moment.</p>
+      <button mat-flat-button type="button" (click)="load(false)">Retry</button>
+    </div>
+  }
+  @case ('ready') {
+    @let p = product()!;
+    <a class="back" routerLink="/admin/products">
+      <mat-icon fontSet="material-symbols-outlined">arrow_back</mat-icon>
+      Products
+    </a>
+    <div class="head">
+      <div class="title">
+        <h1>{{ p.name }}</h1>
+        <app-product-status-chip [status]="p.status" />
+      </div>
+      @if (p.status === 'Active') {
+        <a mat-stroked-button [routerLink]="['/p', p.slug]">
+          <mat-icon fontSet="material-symbols-outlined">storefront</mat-icon>
+          View in shop
+        </a>
+      }
+    </div>
+
+    @if (conflict(); as message) {
+      <div class="banner warning" role="alert">
+        <mat-icon fontSet="material-symbols-outlined">sync_problem</mat-icon>
+        <span>{{ message }}</span>
+        <button mat-flat-button type="button" (click)="load(true)">Reload</button>
+      </div>
+    }
+
+    <div class="stack">
+      <form class="card" [formGroup]="form" (ngSubmit)="save()" novalidate>
+        <h2>Details</h2>
+        <div class="form-grid">
+          <mat-form-field appearance="outline" subscriptSizing="dynamic">
+            <mat-label>Name</mat-label>
+            <input matInput name="name" formControlName="name" maxlength="200" required />
+            <mat-error>Name is required.</mat-error>
+          </mat-form-field>
+          <mat-form-field appearance="outline" subscriptSizing="dynamic">
+            <mat-label>Brand</mat-label>
+            <input matInput name="brand" formControlName="brand" maxlength="100" required />
+            <mat-error>Brand is required.</mat-error>
+          </mat-form-field>
+          <mat-form-field class="span" appearance="outline" subscriptSizing="dynamic">
+            <mat-label>Description</mat-label>
+            <textarea matInput name="description" formControlName="description" rows="4" required></textarea>
+            <mat-error>Description is required.</mat-error>
+          </mat-form-field>
+          <mat-form-field appearance="outline" subscriptSizing="dynamic">
+            <mat-label>Status</mat-label>
+            <mat-select formControlName="status">
+              @for (s of statuses; track s) {
+                <mat-option [value]="s">{{ s }}</mat-option>
+              }
+            </mat-select>
+            <mat-hint>Only Active products appear in the shop.</mat-hint>
+          </mat-form-field>
+          <div class="toggle">
+            <mat-slide-toggle formControlName="isFeatured">Featured on the home page</mat-slide-toggle>
+          </div>
+          <div class="span">
+            <app-image-picker [options]="imageOptions()" [(selected)]="images" />
+          </div>
+        </div>
+
+        <h2 class="subhead">Specifications</h2>
+        @if (specForm(); as specs) {
+          <div class="form-grid">
+            @for (def of p.specSchema; track def.key) {
+              <app-spec-field [def]="def" [control]="specs.controls[def.key]" />
+            }
+          </div>
+        }
+
+        @if (formError(); as text) {
+          <p class="field-error" role="alert">{{ text }}</p>
+        }
+        <div class="actions">
+          <button mat-flat-button type="submit" [disabled]="saving()">
+            {{ saving() ? 'Saving…' : 'Save changes' }}
+          </button>
+        </div>
+      </form>
+
+      <section class="card">
+        <h2>Variants</h2>
+        <div class="variants-wrap">
+          <table class="variants" aria-label="Variants">
+            <thead>
+              <tr>
+                <th>SKU</th>
+                <th>Options</th>
+                <th>Price (USD)</th>
+                <th>Stock on hand</th>
+                <th class="num">Reserved</th>
+                <th><span class="visually-hidden">Actions</span></th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (v of p.variants; track v.id) {
+                @let vf = variantForms()[v.id];
+                <tr class="variant-row" [formGroup]="vf">
+                  <td class="sku">{{ v.sku }}</td>
+                  <td>{{ optionsLabel(p, v.options) }}</td>
+                  <td>
+                    <mat-form-field class="cell-input" appearance="outline" subscriptSizing="dynamic">
+                      <input matInput class="price" type="number" step="0.01" formControlName="price" [attr.aria-label]="'Price for ' + v.sku" />
+                      <span matTextPrefix>$&nbsp;</span>
+                    </mat-form-field>
+                  </td>
+                  <td>
+                    <mat-form-field class="cell-input" appearance="outline" subscriptSizing="dynamic">
+                      <input matInput class="stock" type="number" step="1" formControlName="stock" [attr.aria-label]="'Stock for ' + v.sku" />
+                    </mat-form-field>
+                  </td>
+                  <td class="num reserved">{{ v.stockReserved }}</td>
+                  <td class="row-action">
+                    <button
+                      mat-stroked-button
+                      type="button"
+                      [disabled]="savingVariant() !== null"
+                      (click)="saveVariant(v.id)"
+                    >
+                      Save
+                    </button>
+                    @if (rowErrors()[v.id]; as text) {
+                      <span class="row-error" role="alert">{{ text }}</span>
+                    }
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+        <p class="muted">Price and stock save per row. Stock cannot go below the reserved count.</p>
+      </section>
+    </div>
+  }
+}

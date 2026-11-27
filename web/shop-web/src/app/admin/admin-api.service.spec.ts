@@ -44,4 +44,26 @@ describe('AdminApi', () => {
     expect(deliver.request.method).toBe('POST');
     deliver.flush({});
   });
+
+  it('lists products, sending only the filters that are set', () => {
+    api.products({ status: 'Draft', q: '', page: 2, pageSize: 20 }).subscribe();
+    const req = http.expectOne((r) => r.url === '/api/catalog/admin/products');
+    expect(req.request.params.get('status')).toBe('Draft');
+    expect(req.request.params.has('q')).toBe(false);
+    expect(req.request.params.get('page')).toBe('2');
+    req.flush({});
+  });
+
+  it('updates a product and a variant with PUT', () => {
+    api.updateProduct('p1', { name: 'N', brand: 'B', description: 'D', isFeatured: false, imageKeys: ['a'], specs: {}, status: 'Draft', version: 3 }).subscribe();
+    const product = http.expectOne('/api/catalog/admin/products/p1');
+    expect(product.request.method).toBe('PUT');
+    expect(product.request.body.version).toBe(3);
+    product.flush({});
+
+    api.updateVariant('p1', 'v1', { price: 5, stockOnHand: 2, version: 3 }).subscribe();
+    const variant = http.expectOne('/api/catalog/admin/products/p1/variants/v1');
+    expect(variant.request.method).toBe('PUT');
+    variant.flush({});
+  });
 });

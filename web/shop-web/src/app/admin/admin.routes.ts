@@ -19,6 +19,25 @@ export const adminRoutes: Routes = [
         loadComponent: () =>
           import('./order-detail/admin-order-detail.page').then((m) => m.AdminOrderDetailPage),
       },
+      {
+        path: 'products',
+        title: 'Products · Admin · VoltLane',
+        loadComponent: () =>
+          import('./products/admin-products.page').then((m) => m.AdminProductsPage),
+      },
+      // 'new' must come before ':id'.
+      {
+        path: 'products/new',
+        title: 'New product · Admin · VoltLane',
+        loadComponent: () =>
+          import('./product-create/admin-product-create.page').then((m) => m.AdminProductCreatePage),
+      },
+      {
+        path: 'products/:id',
+        title: 'Product · Admin · VoltLane',
+        loadComponent: () =>
+          import('./product-edit/admin-product-edit.page').then((m) => m.AdminProductEditPage),
+      },
     ],
   },
 ];

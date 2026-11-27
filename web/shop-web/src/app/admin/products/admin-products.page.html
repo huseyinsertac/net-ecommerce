@@ -1,0 +1,114 @@
+<div class="head">
+  <h1>Products</h1>
+  <a mat-flat-button routerLink="/admin/products/new">
+    <mat-icon fontSet="material-symbols-outlined">add</mat-icon>
+    New product
+  </a>
+</div>
+
+<div class="toolbar">
+  <mat-form-field class="search" appearance="outline" subscriptSizing="dynamic">
+    <mat-icon matPrefix fontSet="material-symbols-outlined">search</mat-icon>
+    <input
+      matInput
+      type="search"
+      placeholder="Name, brand or SKU"
+      aria-label="Search products"
+      [value]="q()"
+      (input)="onSearch($event)"
+    />
+  </mat-form-field>
+  <mat-chip-listbox
+    class="filters"
+    aria-label="Filter by status"
+    [value]="status()"
+    (change)="onStatus($event.value)"
+  >
+    <mat-chip-option value="">All</mat-chip-option>
+    @for (s of statuses; track s) {
+      <mat-chip-option [value]="s">{{ s }}</mat-chip-option>
+    }
+  </mat-chip-listbox>
+</div>
+
+@switch (view()) {
+  @case ('loading') {
+    <div class="skeletons" aria-busy="true" aria-label="Loading products">
+      @for (row of skeletonRows; track row) {
+        <div class="sk sk-row"></div>
+      }
+    </div>
+  }
+  @case ('error') {
+    <div class="empty">
+      <h2>We couldn't load the products</h2>
+      <p>Please try again in a moment.</p>
+      <button mat-flat-button type="button" (click)="load()">Retry</button>
+    </div>
+  }
+  @case ('ready') {
+    @let data = result()!;
+    @if (data.items.length === 0) {
+      <div class="empty">
+        <mat-icon class="empty-icon" fontSet="material-symbols-outlined">inventory_2</mat-icon>
+        <h2>No products match.</h2>
+        @if (status() || q()) {
+          <button mat-stroked-button type="button" (click)="clearFilters()">Clear filters</button>
+        }
+      </div>
+    } @else {
+      <div class="table-wrap">
+        <table mat-table [dataSource]="data.items" aria-label="Products">
+          <ng-container matColumnDef="name">
+            <th mat-header-cell *matHeaderCellDef>Product</th>
+            <td mat-cell *matCellDef="let p">
+              <div class="product">
+                <img class="thumb" [src]="p.thumbnailUrl" alt="" loading="lazy" />
+                <div class="info">
+                  <a class="order-link" [routerLink]="['/admin/products', p.id]">{{ p.name }}</a>
+                  <span class="muted">{{ p.brand }}</span>
+                </div>
+              </div>
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="category">
+            <th mat-header-cell *matHeaderCellDef class="col-category">Category</th>
+            <td mat-cell *matCellDef="let p" class="col-category">{{ p.categoryName }}</td>
+          </ng-container>
+          <ng-container matColumnDef="status">
+            <th mat-header-cell *matHeaderCellDef>Status</th>
+            <td mat-cell *matCellDef="let p"><app-product-status-chip [status]="p.status" /></td>
+          </ng-container>
+          <ng-container matColumnDef="variants">
+            <th mat-header-cell *matHeaderCellDef class="col-variants num">Variants</th>
+            <td mat-cell *matCellDef="let p" class="col-variants num">{{ p.variantCount }}</td>
+          </ng-container>
+          <ng-container matColumnDef="stock">
+            <th mat-header-cell *matHeaderCellDef class="col-stock num">Stock</th>
+            <td mat-cell *matCellDef="let p" class="col-stock num">
+              {{ p.totalStock }}@if (p.totalReserved > 0) {
+                <span class="muted"> · {{ p.totalReserved }} reserved</span>
+              }
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="price">
+            <th mat-header-cell *matHeaderCellDef class="num">Price</th>
+            <td mat-cell *matCellDef="let p" class="num">from {{ p.minPrice | money }}</td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="columns"></tr>
+          <tr mat-row class="row" *matRowDef="let row; columns: columns"></tr>
+        </table>
+      </div>
+      <mat-paginator
+        [length]="data.totalCount"
+        [pageSize]="pageSize"
+        [pageIndex]="pageNumber() - 1"
+        [hidePageSize]="true"
+        [showFirstLastButtons]="true"
+        aria-label="Select page of products"
+        (page)="onPage($event)"
+      />
+    }
+  }
+}
