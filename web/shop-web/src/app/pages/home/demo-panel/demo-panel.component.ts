@@ -30,7 +30,7 @@ export class DemoPanelComponent {
     this.error.set('');
     try {
       await (kind === 'customer' ? this.auth.startDemoCustomer() : this.auth.startDemoAdmin());
-      await this.router.navigateByUrl('/');
+      await this.router.navigateByUrl(kind === 'admin' ? '/admin' : '/');
     } catch (err) {
       this.error.set(messageFor(err));
     } finally {

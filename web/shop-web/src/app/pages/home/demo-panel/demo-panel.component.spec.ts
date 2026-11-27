@@ -33,12 +33,26 @@ describe('DemoPanelComponent', () => {
     expect(nav).toHaveBeenCalledWith('/');
   });
 
-  it('describes the admin account honestly (no nightly reset claim)', async () => {
+  it('clicking Try as admin signs in and navigates to /admin', async () => {
+    auth.startDemoAdmin.mockResolvedValue(undefined);
+    const nav = vi.spyOn(TestBed.inject(Router), 'navigateByUrl').mockResolvedValue(true);
+    const f = TestBed.createComponent(DemoPanelComponent);
+    await f.whenStable();
+    buttons(f.nativeElement as HTMLElement)
+      .find((b) => b.textContent?.includes('Try as admin'))!
+      .click();
+    await f.whenStable();
+    expect(auth.startDemoAdmin).toHaveBeenCalledTimes(1);
+    expect(nav).toHaveBeenCalledWith('/admin');
+  });
+
+  it('describes the admin account and the nightly reset', async () => {
     const f = TestBed.createComponent(DemoPanelComponent);
     await f.whenStable();
     const text = ((f.nativeElement as HTMLElement).textContent ?? '').replace(/\s+/g, ' ');
-    expect(text).toContain('Shared admin account — admin tools are coming soon.');
-    expect(text).not.toContain('nightly');
+    expect(text).toContain(
+      'Shared admin account — manage products and ship orders. Resets nightly.',
+    );
   });
 
   it('mentions the Stripe test card', async () => {
