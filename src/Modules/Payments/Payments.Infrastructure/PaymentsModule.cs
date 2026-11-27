@@ -21,6 +21,8 @@ namespace Payments.Infrastructure;
 
 public sealed class PaymentsModule : IModule
 {
+    internal static readonly TimeSpan StripeHttpTimeout = TimeSpan.FromSeconds(15);
+
     public string Name => "payments";
 
     public void Register(IServiceCollection services, IConfiguration configuration)
@@ -47,8 +49,10 @@ public sealed class PaymentsModule : IModule
         switch (ConfiguredProvider(configuration))
         {
             case PaymentProviders.Stripe:
-                services.AddSingleton<IStripeClient>(sp =>
-                    new StripeClient(sp.GetRequiredService<IOptions<StripeOptions>>().Value.SecretKey));
+                // Session creation runs inside the inbox/outbox transaction, so a slow Stripe must not hold it for long.
+                services.AddSingleton<IStripeClient>(sp => new StripeClient(
+                    sp.GetRequiredService<IOptions<StripeOptions>>().Value.SecretKey,
+                    httpClient: new SystemNetHttpClient(new HttpClient { Timeout = StripeHttpTimeout })));
                 services.AddSingleton<IPaymentGateway, StripeGateway>();
                 break;
             case PaymentProviders.Fake:

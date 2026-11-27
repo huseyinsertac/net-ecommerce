@@ -28,6 +28,9 @@ internal sealed class StripeGateway(IStripeClient client, ILogger<StripeGateway>
         var options = new SessionCreateOptions
         {
             Mode = "payment",
+            // Cards only: they settle while the shopper waits, where asynchronous methods would complete the session
+            // unpaid. (This SDK's replacement for payment_method_types; it filters the eligible methods to this list.)
+            AllowedPaymentMethodTypes = ["card"],
             CustomerEmail = request.CustomerEmail,
             ClientReferenceId = request.OrderId.ToString(),
             Metadata = new Dictionary<string, string>
@@ -75,13 +78,17 @@ internal sealed class StripeGateway(IStripeClient client, ILogger<StripeGateway>
     public async Task<GatewaySessionState> GetSessionStateAsync(string sessionId, CancellationToken ct)
     {
         var session = await new SessionService(client).GetAsync(sessionId, cancellationToken: ct);
-        return session switch
-        {
-            { Status: "expired" } => GatewaySessionState.Expired,
-            { PaymentStatus: "paid" } => GatewaySessionState.Paid,
-            _ => GatewaySessionState.Open,
-        };
+        return ToState(session.Status, session.PaymentStatus);
     }
+
+    /// <summary>Maps a Checkout Session's <c>status</c> and <c>payment_status</c> to the gateway-neutral state.</summary>
+    internal static GatewaySessionState ToState(string? status, string? paymentStatus) => (status, paymentStatus) switch
+    {
+        ("expired", _) => GatewaySessionState.Expired,
+        (_, "paid") => GatewaySessionState.Paid,
+        ("complete", _) => GatewaySessionState.Processing, // finished, money not landed (an asynchronous method)
+        _ => GatewaySessionState.Open,
+    };
 
     public Task ExpireSessionAsync(string sessionId, CancellationToken ct) =>
         new SessionService(client).ExpireAsync(sessionId, cancellationToken: ct);

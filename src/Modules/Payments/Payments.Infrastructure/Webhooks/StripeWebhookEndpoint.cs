@@ -1,6 +1,7 @@
 using System.Text;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -18,8 +19,9 @@ namespace Payments.Infrastructure.Webhooks;
 
 /// <summary>
 /// <c>POST /api/payments/stripe/webhook</c>, mapped only with the Stripe provider. Anonymous (Stripe signs instead),
-/// not rate-limited, and exempt from the CSRF header (<see cref="CsrfHeader.ExemptPaths"/>). The signature is checked over
-/// the raw body; each event id is recorded in the same transaction as the payment change, so a redelivery is a no-op.
+/// not rate-limited, and exempt from the CSRF header (<see cref="CsrfHeader.ExemptPaths"/>). Because anyone can call it,
+/// the body is capped at <see cref="MaxBodyBytes"/> (413 beyond that) before the signature is checked over the raw body;
+/// each event id is recorded in the same transaction as the payment change, so a redelivery is a no-op.
 /// </summary>
 internal static class StripeWebhookEndpoint
 {
@@ -29,10 +31,14 @@ internal static class StripeWebhookEndpoint
 
     public const string AsyncPaymentFailedReason = "async_payment_failed";
 
+    /// <summary>Checkout Session events are a few KB; anything far larger is not from Stripe.</summary>
+    public const int MaxBodyBytes = 64 * 1024;
+
     public static void Map(RouteGroupBuilder group)
     {
         group.MapPost(Path, HandleAsync)
             .AllowAnonymous()
+            .WithMetadata(new RequestSizeLimitAttribute(MaxBodyBytes)) // enforced by the server where it supports a limit
             .ExcludeFromDescription(); // called by Stripe, not by the SPA
     }
 
@@ -47,8 +53,11 @@ internal static class StripeWebhookEndpoint
     {
         var logger = loggers.CreateLogger(typeof(StripeWebhookEndpoint).FullName!);
 
-        using var reader = new StreamReader(request.Body, Encoding.UTF8);
-        var body = await reader.ReadToEndAsync(ct);
+        if (await ReadBodyAsync(request, ct) is not { } body)
+        {
+            logger.LogWarning("Rejected a Stripe webhook: body over {MaxBodyBytes} bytes.", MaxBodyBytes);
+            return Results.StatusCode(StatusCodes.Status413PayloadTooLarge);
+        }
 
         Event stripeEvent;
         try
@@ -99,6 +108,40 @@ internal static class StripeWebhookEndpoint
         }
 
         return Results.Ok();
+    }
+
+    /// <summary>
+    /// The body as text, or null when it is over <see cref="MaxBodyBytes"/>: refused up front from the Content-Length,
+    /// and otherwise counted while reading (a chunked body has no length up front).
+    /// </summary>
+    private static async Task<string?> ReadBodyAsync(HttpRequest request, CancellationToken ct)
+    {
+        if (request.ContentLength > MaxBodyBytes)
+        {
+            return null;
+        }
+
+        using var buffer = new MemoryStream();
+        var chunk = new byte[8 * 1024];
+        try
+        {
+            int read;
+            while ((read = await request.Body.ReadAsync(chunk, ct)) > 0)
+            {
+                if (buffer.Length + read > MaxBodyBytes)
+                {
+                    return null;
+                }
+
+                buffer.Write(chunk, 0, read);
+            }
+        }
+        catch (BadHttpRequestException ex) when (ex.StatusCode == StatusCodes.Status413PayloadTooLarge)
+        {
+            return null; // the server's own limit (from the metadata above) tripped first
+        }
+
+        return Encoding.UTF8.GetString(buffer.GetBuffer(), 0, (int)buffer.Length);
     }
 
     /// <summary>The outcome an event reports, or null when it reports none (ignored with 200).</summary>

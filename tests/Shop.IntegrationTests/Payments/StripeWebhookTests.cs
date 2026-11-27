@@ -5,6 +5,8 @@ using System.Text;
 using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Payments.Application.Gateways;
 using Payments.Contracts.Events;
 using Payments.Domain.Payments;
 using Payments.Infrastructure.Persistence;
@@ -240,7 +242,7 @@ public sealed class StripeWebhookTests(StripeModeApiFactory factory) : IClassFix
     {
         var paid = await SeedPendingAsync(Services, "Stripe", NewSessionId(), Ct);
         var open = await SeedPendingAsync(Services, "Stripe", NewSessionId(), Ct);
-        factory.Gateway.States[paid.ProviderSessionId] = global::Payments.Application.Gateways.GatewaySessionState.Paid;
+        factory.Gateway.States[paid.ProviderSessionId] = GatewaySessionState.Paid;
 
         await using (var scope = Services.CreateAsyncScope())
         {
@@ -257,5 +259,83 @@ public sealed class StripeWebhookTests(StripeModeApiFactory factory) : IClassFix
         factory.Gateway.ExpiredSessions.ShouldContain(open.ProviderSessionId); // an open session is closed at Stripe first
         factory.Gateway.ExpiredSessions.ShouldNotContain(paid.ProviderSessionId);
         (await OutboxEventsAsync<PaymentSucceeded>(Services, Ct)).ShouldContain(e => e.PaymentId == paid.Id);
+    }
+
+    [Fact]
+    public async Task Expiry_job_leaves_a_processing_payment_pending()
+    {
+        var processing = await SeedPendingAsync(Services, "Stripe", NewSessionId(), Ct);
+        factory.Gateway.States[processing.ProviderSessionId] = GatewaySessionState.Processing;
+
+        await using (var scope = Services.CreateAsyncScope())
+        {
+            var db = scope.ServiceProvider.GetRequiredService<PaymentsDbContext>();
+            await db.Payments
+                .Where(p => p.Id == processing.Id)
+                .ExecuteUpdateAsync(s => s.SetProperty(p => p.ExpiresAtUtc, DateTime.UtcNow.AddMinutes(-1)), Ct);
+        }
+
+        // The job has looked at it (twice, so a second scan behaves the same) and said so at Information.
+        var id = processing.Id.ToString();
+        await factory.Logs.WaitForAsync(
+            e => e.Message.Contains(id) && e.Message.Contains("processing"), TimeSpan.FromSeconds(20), Ct, count: 2);
+
+        (await PaymentAsync(processing.OrderId)).Status.ShouldBe(PaymentStatus.Pending);
+        factory.Gateway.ExpiredSessions.ShouldNotContain(processing.ProviderSessionId);
+        var mine = factory.Logs.Entries.Where(e => e.Message.Contains(id)).ToList();
+        mine.ShouldNotContain(e => e.Level >= LogLevel.Warning);
+        mine.ShouldContain(e => e.Level == LogLevel.Information && e.Message.Contains("processing"));
+    }
+
+    [Fact]
+    public async Task Paid_event_for_an_expired_payment_logs_an_error_for_a_refund()
+    {
+        var payment = await SeedPendingAsync(Services, "Stripe", NewSessionId(), Ct);
+        (await SendEventAsync(NewEventId(), "checkout.session.expired", payment.ProviderSessionId, "unpaid"))
+            .StatusCode.ShouldBe(HttpStatusCode.OK);
+
+        var response = await SendEventAsync(NewEventId(), "checkout.session.completed", payment.ProviderSessionId);
+
+        response.StatusCode.ShouldBe(HttpStatusCode.OK);
+        (await PaymentAsync(payment.OrderId)).Status.ShouldBe(PaymentStatus.Expired);
+        (await OutboxEventsAsync<PaymentSucceeded>(Services, Ct)).ShouldNotContain(e => e.OrderId == payment.OrderId);
+        var refund = factory.Logs.Entries
+            .Where(e => e.Message.Contains(payment.Id.ToString()) && e.Message.Contains("needs a refund"))
+            .ShouldHaveSingleItem();
+        refund.Level.ShouldBe(LogLevel.Error);
+        refund.Message.ShouldContain(payment.OrderId.ToString());
+        refund.Message.ShouldContain(payment.ProviderSessionId);
+        refund.Message.ShouldContain("Expired");
+    }
+
+    [Fact]
+    public async Task Body_over_64_KB_is_413_and_changes_nothing()
+    {
+        var payment = await SeedPendingAsync(Services, "Stripe", NewSessionId(), Ct);
+        var eventId = NewEventId();
+        var json = EventJson(eventId, "checkout.session.completed", payment.ProviderSessionId);
+        var body = json.Insert(1, $"\"padding\":\"{new string('x', 65 * 1024)}\",");
+
+        // With a Content-Length, and chunked (no length up front).
+        (await PostAsync(body, Sign(body))).StatusCode.ShouldBe(HttpStatusCode.RequestEntityTooLarge);
+        using (var client = factory.CreateClient())
+        {
+            using var request = new HttpRequestMessage(HttpMethod.Post, WebhookPath)
+            {
+                Content = new StreamContent(new NoLengthStream(Encoding.UTF8.GetBytes(body))),
+            };
+            request.Content.Headers.ContentType = new("application/json");
+            request.Headers.TryAddWithoutValidation("Stripe-Signature", Sign(body));
+            (await client.SendAsync(request, Ct)).StatusCode.ShouldBe(HttpStatusCode.RequestEntityTooLarge);
+        }
+
+        (await PaymentAsync(payment.OrderId)).Status.ShouldBe(PaymentStatus.Pending);
+        (await EventRecordedAsync(eventId)).ShouldBeFalse();
+    }
+
+    /// <summary>A readable stream that cannot report its length, so the request goes out without a Content-Length.</summary>
+    private sealed class NoLengthStream(byte[] bytes) : MemoryStream(bytes)
+    {
+        public override bool CanSeek => false;
     }
 }

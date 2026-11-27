@@ -10,7 +10,8 @@ namespace Payments.Application.Payments;
 /// <summary>
 /// Ends a Pending payment whose time is up. The gateway is asked first, because a payment can succeed just before its
 /// session closes and the notification may not have arrived: Paid → Succeeded; Open → the session is closed at the
-/// gateway, then Expired; Expired → Expired.
+/// gateway, then Expired; Expired → Expired; Processing (finished, money not landed) → left Pending until the gateway
+/// reports the result.
 /// </summary>
 public sealed record ResolveOverduePayment(Guid PaymentId) : ICommand;
 
@@ -53,6 +54,13 @@ internal sealed class ResolveOverduePaymentHandler(
                 case GatewaySessionState.Expired:
                     applied = payment.Expire(now);
                     break;
+                case GatewaySessionState.Processing:
+                    // Finished by the shopper, money not landed yet: the session can no longer be closed, and the result
+                    // arrives as a notification. Ask again on the next scan.
+                    logger.LogInformation(
+                        "Overdue payment {PaymentId} for order {OrderId} is still processing at the gateway; leaving it Pending.",
+                        payment.Id, payment.OrderId);
+                    return Result.Success();
                 default:
                     throw new InvalidOperationException($"Unknown gateway session state {state}.");
             }
