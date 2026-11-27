@@ -74,8 +74,18 @@
 
 .stack {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: 16px;
   min-width: 0;
+
+  > * {
+    min-width: 0;
+  }
+}
+
+.card {
+  min-width: 0;
+  max-width: 100%;
 }
 
 .form-grid {
@@ -86,6 +96,10 @@
   mat-form-field,
   app-spec-field {
     width: 100%;
+    min-width: 0;
+  }
+
+  > * {
     min-width: 0;
   }
 
@@ -116,6 +130,7 @@
 }
 
 .variants-wrap {
+  max-width: 100%;
   overflow-x: auto;
   border: 1px solid var(--mat-sys-outline-variant);
   border-radius: 12px;
