@@ -51,10 +51,10 @@
           <span>Thank you! Order {{ o.orderNumber }} is paid.</span>
         </div>
       }
-      @if (showCancelledBanner()) {
+      @if (payBanner(); as message) {
         <div class="banner warning" role="status">
           <mat-icon fontSet="material-symbols-outlined">info</mat-icon>
-          <span class="grow">Payment not completed.</span>
+          <span class="grow">{{ message }}</span>
           @if (payUrl()) {
             <button mat-flat-button type="button" (click)="payNow()">Pay now</button>
           }

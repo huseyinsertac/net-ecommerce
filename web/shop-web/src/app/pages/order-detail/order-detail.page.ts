@@ -24,7 +24,10 @@ import { RedirectService } from '../../core/redirect.service';
 import { OrderStatusChipComponent } from '../../shared/order-status-chip/order-status-chip.component';
 
 const POLL_MS = 1000;
+/** After `?checkout=success`: how long to wait for the payment to be confirmed. */
 const GIVE_UP_MS = 30_000;
+/** After `?checkout=cancelled`: a declined payment cancels the order a moment later. */
+const CANCELLED_GIVE_UP_MS = 10_000;
 const STEPS: OrderStatus[] = ['Placed', 'Paid', 'Shipped', 'Delivered'];
 
 const REASONS: Record<string, string> = {
@@ -78,9 +81,16 @@ export class OrderDetailPage implements OnInit {
   });
 
   protected readonly showPaidBanner = computed(() => this.checkout() === 'success' && this.paid());
-  protected readonly showCancelledBanner = computed(
-    () => this.checkout() === 'cancelled' && this.order()?.status === 'Placed',
-  );
+  /**
+   * The unpaid-order banner: always after `?checkout=cancelled` ("Payment not completed."), otherwise only when the
+   * payment can be resumed ("This order is waiting for payment."). Never once the order has moved on.
+   */
+  protected readonly payBanner = computed<string | null>(() => {
+    if (this.order()?.status !== 'Placed') return null;
+    if (this.checkout() === 'cancelled') return 'Payment not completed.';
+    if (this.checkout() !== 'success' && this.payUrl()) return 'This order is waiting for payment.';
+    return null;
+  });
 
   protected readonly steps = computed<Step[]>(() => {
     const order = this.order();
@@ -135,13 +145,18 @@ export class OrderDetailPage implements OnInit {
   }
 
   private afterPlaced(): void {
-    if (this.checkout() === 'success') this.pollUntilSettled();
-    else if (this.checkout() === 'cancelled') this.loadPaymentUrl();
+    if (this.checkout() === 'success') {
+      this.confirming.set(true);
+      this.pollWhilePlaced(GIVE_UP_MS, () => this.confirming.set(false));
+      return;
+    }
+    // Any other arrival (a cancelled checkout, My orders, a bookmark) may still have a payment to resume.
+    this.loadPaymentUrl();
+    if (this.checkout() === 'cancelled') this.pollWhilePlaced(CANCELLED_GIVE_UP_MS);
   }
 
-  /** The webhook may land a moment after the redirect, so re-read the order until it moves on. */
-  private pollUntilSettled(): void {
-    this.confirming.set(true);
+  /** The outcome may land a moment after the redirect, so re-read the order until it moves on. */
+  private pollWhilePlaced(giveUpMs: number, done?: () => void): void {
     const id = this.id();
     this.subs.push(
       timer(POLL_MS, POLL_MS)
@@ -149,12 +164,9 @@ export class OrderDetailPage implements OnInit {
           exhaustMap(() => this.api.order(id)),
           tap((order) => this.order.set(order)),
           takeWhile((order) => order.status === 'Placed'),
-          takeUntil(timer(GIVE_UP_MS)),
+          takeUntil(timer(giveUpMs)),
         )
-        .subscribe({
-          error: () => this.confirming.set(false),
-          complete: () => this.confirming.set(false),
-        }),
+        .subscribe({ error: () => done?.(), complete: () => done?.() }),
     );
   }
 

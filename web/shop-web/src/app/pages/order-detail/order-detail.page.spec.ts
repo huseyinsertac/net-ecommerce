@@ -150,6 +150,58 @@ describe('OrderDetailPage', () => {
     expect(el.textContent).not.toContain('Pay now');
   });
 
+  it('offers Pay now on a Placed order opened without a query param when the payment is ready', () => {
+    const { api, el, redirect } = setup([base], undefined, {
+      state: 'ReadyToPay',
+      paymentUrl: 'https://pay/y',
+    });
+    expect(api.checkoutStatus).toHaveBeenCalledTimes(1);
+    expect(el.textContent).toContain('This order is waiting for payment.');
+    expect(el.textContent).not.toContain('Payment not completed.');
+    [...el.querySelectorAll('button')].find((b) => b.textContent?.includes('Pay now'))!.click();
+    expect(redirect.to).toHaveBeenCalledWith('https://pay/y');
+  });
+
+  it('shows no Pay now on a Placed order while the payment is still Pending', () => {
+    const { api, el } = setup([base]);
+    expect(api.checkoutStatus).toHaveBeenCalledTimes(1);
+    expect(el.textContent).not.toContain('Pay now');
+    expect(el.textContent).not.toContain('This order is waiting for payment.');
+  });
+
+  it('does not ask for the payment after checkout=success or on a non-Placed order', () => {
+    expect(setup([base], 'success').api.checkoutStatus).not.toHaveBeenCalled();
+    TestBed.resetTestingModule();
+    expect(setup([{ ...base, status: 'Paid' }]).api.checkoutStatus).not.toHaveBeenCalled();
+  });
+
+  it('polls after checkout=cancelled and shows the Cancelled timeline once it lands', () => {
+    const cancelled: OrderDto = {
+      ...base,
+      status: 'Cancelled',
+      cancellationReason: 'PaymentFailed',
+      history: [...base.history, { status: 'Cancelled', atUtc: '2026-11-20T10:01:00Z', note: null }],
+    };
+    const { api, fixture, el } = setup([base, base, cancelled], 'cancelled', { state: 'Failed' });
+    expect(el.textContent).toContain('Payment not completed.');
+    vi.advanceTimersByTime(2100);
+    fixture.detectChanges();
+    expect(el.textContent).toContain('Cancelled: payment was declined');
+    expect(el.textContent).not.toContain('Payment not completed.');
+    const calls = api.order.mock.calls.length;
+    vi.advanceTimersByTime(5000);
+    expect(api.order.mock.calls.length).toBe(calls);
+  });
+
+  it('stops polling after checkout=cancelled after 10 s', () => {
+    const { api } = setup([base], 'cancelled');
+    vi.advanceTimersByTime(11_000);
+    const calls = api.order.mock.calls.length;
+    expect(calls).toBeGreaterThan(5);
+    vi.advanceTimersByTime(5000);
+    expect(api.order.mock.calls.length).toBe(calls);
+  });
+
   it('renders the not-found state on 404', () => {
     const { el } = setup('notfound');
     expect(el.textContent).toContain('Order not found');
