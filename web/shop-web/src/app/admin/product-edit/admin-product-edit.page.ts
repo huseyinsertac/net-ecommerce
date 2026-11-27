@@ -66,8 +66,8 @@ export class AdminProductEditPage implements OnInit {
   protected readonly images = signal<string[]>([]);
   protected readonly specForm = signal<SpecForm | null>(null);
   protected readonly variantForms = signal<Record<string, VariantForm>>({});
-  protected readonly saving = signal(false);
-  protected readonly savingVariant = signal<string | null>(null);
+  /** The one save in flight ('details' or a variant id); every Save button waits on it so versions never race. */
+  protected readonly pending = signal<string | null>(null);
   protected readonly formError = signal<string | null>(null);
   protected readonly rowErrors = signal<Record<string, string>>({});
   /** Set when someone else saved first: the page offers Reload instead of retrying. */
@@ -99,7 +99,7 @@ export class AdminProductEditPage implements OnInit {
       forkJoin({ product: this.api.product(this.id()), images: this.api.imageKeys() }).subscribe({
         next: ({ product, images }) => {
           this.imageOptions.set(images);
-          this.apply(product);
+          this.apply(product, 'all');
           this.conflict.set(null);
           this.formError.set(null);
           this.rowErrors.set({});
@@ -113,7 +113,7 @@ export class AdminProductEditPage implements OnInit {
 
   protected save(): void {
     const specForm = this.specForm();
-    if (this.saving() || !specForm) return;
+    if (this.pending() !== null || !specForm) return;
     this.form.markAllAsTouched();
     specForm.markAllAsTouched();
     if (this.form.invalid || specForm.invalid || this.images().length === 0) {
@@ -122,7 +122,7 @@ export class AdminProductEditPage implements OnInit {
     }
     const product = this.product()!;
     const v = this.form.getRawValue();
-    this.saving.set(true);
+    this.pending.set('details');
     this.formError.set(null);
     this.subs.push(
       this.api
@@ -138,12 +138,12 @@ export class AdminProductEditPage implements OnInit {
         })
         .subscribe({
           next: (dto) => {
-            this.saving.set(false);
-            this.rowErrors.set({});
-            this.apply(dto);
+            this.pending.set(null);
+            this.formError.set(null);
+            this.apply(dto, 'details');
           },
           error: (err: unknown) => {
-            this.saving.set(false);
+            this.pending.set(null);
             this.fail(err, (text) => this.formError.set(text));
           },
         }),
@@ -152,23 +152,23 @@ export class AdminProductEditPage implements OnInit {
 
   protected saveVariant(variantId: string): void {
     const form = this.variantForms()[variantId];
-    if (this.savingVariant() || !form) return;
+    if (this.pending() !== null || !form) return;
     form.markAllAsTouched();
     if (form.invalid) return;
     const product = this.product()!;
     const { price, stock } = form.getRawValue();
-    this.savingVariant.set(variantId);
+    this.pending.set(variantId);
     this.setRowError(variantId, null);
     this.subs.push(
       this.api
         .updateVariant(product.id, variantId, { price, stockOnHand: stock, version: product.version })
         .subscribe({
           next: (dto) => {
-            this.savingVariant.set(null);
-            this.apply(dto);
+            this.pending.set(null);
+            this.apply(dto, variantId);
           },
           error: (err: unknown) => {
-            this.savingVariant.set(null);
+            this.pending.set(null);
             this.fail(err, (text) => this.setRowError(variantId, text));
           },
         }),
@@ -198,37 +198,59 @@ export class AdminProductEditPage implements OnInit {
     });
   }
 
-  /** Replaces all local state with the DTO the server returned, so every form carries the fresh version. */
-  private apply(dto: AdminProductDto): void {
+  /**
+   * Adopts the returned DTO. Its version and server-owned data (reserved counts, slug, status) are always taken;
+   * the saved scope ('details' or a variant id) and any form the admin has not touched are reset from it.
+   * Forms with unsaved edits in other scopes are left alone.
+   */
+  private apply(dto: AdminProductDto, scope: 'all' | 'details' | string): void {
+    const previous = this.product();
+    const detailsPristine =
+      !previous ||
+      (this.form.pristine &&
+        (this.specForm()?.pristine ?? true) &&
+        this.images().join('|') === previous.imageKeys.join('|'));
     this.product.set(dto);
-    this.form.reset({
-      name: dto.name,
-      brand: dto.brand,
-      description: dto.description,
-      isFeatured: dto.isFeatured,
-      status: dto.status,
-    });
-    this.images.set([...dto.imageKeys]);
-    this.specForm.set(buildSpecForm(dto.specSchema, dto.specs));
+    if (scope === 'all' || scope === 'details' || detailsPristine) {
+      this.form.reset({
+        name: dto.name,
+        brand: dto.brand,
+        description: dto.description,
+        isFeatured: dto.isFeatured,
+        status: dto.status,
+      });
+      this.images.set([...dto.imageKeys]);
+      this.specForm.set(buildSpecForm(dto.specSchema, dto.specs));
+    }
+    const forms = scope === 'all' ? {} : this.variantForms();
     this.variantForms.set(
       Object.fromEntries(
-        dto.variants.map((variant) => [
-          variant.id,
-          new FormGroup({
-            price: new FormControl<number | null>(variant.price, [
-              Validators.required,
-              Validators.min(0.01),
-              Validators.max(100000),
-            ]),
-            stock: new FormControl<number | null>(variant.stockOnHand, [
-              Validators.required,
-              Validators.min(0),
-              Validators.max(100000),
-              Validators.pattern(/^\d+$/),
-            ]),
-          }),
-        ]),
+        dto.variants.map((variant) => {
+          const existing = forms[variant.id];
+          if (existing && existing.dirty && scope !== variant.id) return [variant.id, existing];
+          if (existing) {
+            existing.reset({ price: variant.price, stock: variant.stockOnHand });
+            return [variant.id, existing];
+          }
+          return [variant.id, this.newVariantForm(variant.price, variant.stockOnHand)];
+        }),
       ),
     );
+  }
+
+  private newVariantForm(price: number, stock: number): VariantForm {
+    return new FormGroup({
+      price: new FormControl<number | null>(price, [
+        Validators.required,
+        Validators.min(0.01),
+        Validators.max(100000),
+      ]),
+      stock: new FormControl<number | null>(stock, [
+        Validators.required,
+        Validators.min(0),
+        Validators.max(100000),
+        Validators.pattern(/^\d+$/),
+      ]),
+    });
   }
 }

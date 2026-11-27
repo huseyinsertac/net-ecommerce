@@ -1,7 +1,7 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
-import { NEVER, of, throwError } from 'rxjs';
+import { NEVER, Subject, of, throwError } from 'rxjs';
 import { AdminApi } from '../admin-api.service';
 import { AdminProductEditPage } from './admin-product-edit.page';
 
@@ -178,5 +178,37 @@ describe('AdminProductEditPage', () => {
       product: vi.fn().mockReturnValue(throwError(() => new HttpErrorResponse({ status: 404 }))),
     });
     expect(el.textContent).toContain('Product not found');
+  });
+
+  it('keeps unsaved edits in other rows when one row saves, and uses the new version next', () => {
+    const updateVariant = vi.fn().mockReturnValue(of(dto({ version: 8 })));
+    const { el, button, fixture } = setup({ updateVariant });
+    const rows = el.querySelectorAll('tr.variant-row');
+    type(rows[0].querySelector<HTMLInputElement>('input.price')!, '600');
+    type(rows[1].querySelector<HTMLInputElement>('input.price')!, '520');
+    button('Save', rows[1]).click();
+    fixture.detectChanges();
+    expect(rows[0].querySelector<HTMLInputElement>('input.price')!.value).toBe('600');
+    button('Save', rows[0]).click();
+    expect(updateVariant.mock.calls[1][2]).toEqual({ price: 600, stockOnHand: 10, version: 8 });
+  });
+
+  it('keeps unsaved detail edits when a variant row saves', () => {
+    const updateVariant = vi.fn().mockReturnValue(of(dto({ version: 8 })));
+    const { el, button, fixture } = setup({ updateVariant });
+    type(el.querySelector<HTMLTextAreaElement>('textarea[name="description"]') as unknown as HTMLInputElement, 'Mine');
+    button('Save', el.querySelectorAll('tr.variant-row')[0]).click();
+    fixture.detectChanges();
+    expect(el.querySelector<HTMLTextAreaElement>('textarea[name="description"]')!.value).toBe('Mine');
+  });
+
+  it('disables every Save button while one save is pending', () => {
+    const pending = new Subject<unknown>();
+    const { el, button, fixture } = setup({ updateProduct: vi.fn().mockReturnValue(pending) });
+    button('Save changes').click();
+    fixture.detectChanges();
+    const rowButtons = [...el.querySelectorAll('tr.variant-row')].map((r) => button('Save', r));
+    expect(rowButtons.every((b) => b.disabled)).toBe(true);
+    expect(el.querySelector<HTMLButtonElement>('button[type="submit"]')!.disabled).toBe(true);
   });
 });

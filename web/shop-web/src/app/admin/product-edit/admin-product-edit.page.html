@@ -96,8 +96,8 @@
           <p class="field-error" role="alert">{{ text }}</p>
         }
         <div class="actions">
-          <button mat-flat-button type="submit" [disabled]="saving()">
-            {{ saving() ? 'Saving…' : 'Save changes' }}
+          <button mat-flat-button type="submit" [disabled]="pending() !== null">
+            {{ pending() === 'details' ? 'Saving…' : 'Save changes' }}
           </button>
         </div>
       </form>
@@ -138,7 +138,7 @@
                     <button
                       mat-stroked-button
                       type="button"
-                      [disabled]="savingVariant() !== null"
+                      [disabled]="pending() !== null"
                       (click)="saveVariant(v.id)"
                     >
                       Save
