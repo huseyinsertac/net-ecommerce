@@ -7,6 +7,7 @@ using Ordering.Contracts.Orders;
 using Ordering.Infrastructure.Endpoints;
 using Ordering.Infrastructure.Persistence;
 using Ordering.Infrastructure.Reading;
+using Ordering.Infrastructure.Seeding;
 using Shop.Application.Abstractions;
 using Shop.Infrastructure.Common.Modules;
 using Shop.Infrastructure.Common.Persistence;
@@ -22,6 +23,8 @@ public sealed class OrderingModule : IModule
         services.AddModuleDbContext<OrderingDbContext>(configuration);
         services.AddScoped<IOrderRepository, OrderRepository>();
         services.AddScoped<IOrderPaymentQuery, OrderPaymentQuery>();
+        // Runs after the catalog seeder (Ordering is registered after Catalog): the orders use catalog variants.
+        services.AddScoped<IModuleSeeder, OrderingSeeder>();
         services.AddApplicationHandlers(typeof(Ordering.Application.AssemblyReference).Assembly);
         services.AddInboxHandlers<OrderingDbContext>(typeof(Ordering.Application.AssemblyReference).Assembly);
     }

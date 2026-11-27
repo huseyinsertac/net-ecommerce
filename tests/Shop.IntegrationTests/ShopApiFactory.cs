@@ -47,6 +47,8 @@ public class ShopApiFactory : WebApplicationFactory<Program>, IAsyncLifetime
         builder.UseSetting("Payments:Timeout", "00:05:00");
         builder.UseSetting("Payments:ExpiryScanInterval", "00:00:01");
         builder.UseSetting("App:PublicBaseUrl", "http://test.local");
+        // Never let a developer machine's environment schedule the nightly wipe inside a test host.
+        builder.UseSetting("DemoReset:Enabled", "false");
         builder.ConfigureServices(services => services.AddSingleton<IStartupFilter, ThrowingEndpointStartupFilter>());
     }
 

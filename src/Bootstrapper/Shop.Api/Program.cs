@@ -5,11 +5,11 @@ using Scalar.AspNetCore;
 using Serilog;
 using Serilog.Formatting.Compact;
 using Shop.Api;
+using Shop.Api.DemoReset;
 using Shop.Api.ErrorHandling;
 using Shop.Application.Abstractions;
 using Shop.Application.Abstractions.Identity;
 using Shop.Infrastructure.Common.Http;
-using Shop.Infrastructure.Common.Modules;
 using Shop.Infrastructure.Common.Persistence;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -61,11 +61,23 @@ foreach (var module in ModuleCatalog.All)
     module.Register(builder.Services, builder.Configuration);
 }
 
+// After the modules: the reset needs their DbContexts and seeders. The nightly timer is added only when enabled.
+builder.Services.AddDemoReset(builder.Configuration);
+
 var connectionString = builder.Configuration.GetConnectionString(ModuleDbContextRegistration.ConnectionStringName)
     ?? throw new InvalidOperationException($"Connection string '{ModuleDbContextRegistration.ConnectionStringName}' is not configured.");
 builder.Services.AddHealthChecks().AddNpgSql(connectionString, name: "postgres", tags: ["ready"]);
 
 var app = builder.Build();
+
+// `dotnet Shop.Api.dll reset-demo`: migrate, wipe, re-seed and exit. The host is never started, so neither the web
+// server nor any hosted service (outbox processors, expiry job, nightly timer) runs in this process.
+if (!EF.IsDesignTime && args.Contains(DemoResetCommand.Name, StringComparer.Ordinal))
+{
+    var exitCode = await DemoResetCommand.RunAsync(app.Services, CancellationToken.None);
+    await app.DisposeAsync(); // flushes the logs
+    return exitCode;
+}
 
 app.UseForwardedHeaders();
 app.UseSerilogRequestLogging();
@@ -97,69 +109,16 @@ foreach (var module in ModuleCatalog.All)
 // dotnet-ef builds the host to discover DbContexts; it must not touch the database while doing so.
 if (!EF.IsDesignTime && app.Configuration.GetValue("Database:MigrateOnStartup", false))
 {
-    await MigrateAsync(app);
+    await ModuleMigrations.RunAllAsync(app.Services, app.Services.GetRequiredService<ILogger<Program>>(), CancellationToken.None);
 }
 
 if (!EF.IsDesignTime && app.Configuration.GetValue("Database:SeedOnStartup", false))
 {
-    await SeedAsync(app);
+    // A failing seeder stops startup.
+    await ModuleSeeding.RunAllAsync(app.Services, app.Services.GetRequiredService<ILogger<Program>>(), app.Lifetime.ApplicationStopping);
 }
 
 app.Run();
-
-static async Task MigrateAsync(WebApplication app)
-{
-    const int maxAttempts = 10;
-    var registry = app.Services.GetRequiredService<ModuleDatabaseRegistry>();
-    var logger = app.Services.GetRequiredService<ILogger<Program>>();
-
-    foreach (var contextType in registry.ContextTypes)
-    {
-        for (var attempt = 1; ; attempt++)
-        {
-            try
-            {
-                // One module per DI scope (see ADR-0004): each context gets its own scope.
-                using var scope = app.Services.CreateScope();
-                var context = (DbContext)scope.ServiceProvider.GetRequiredService(contextType);
-                await context.Database.MigrateAsync();
-                logger.LogInformation("Migrated {Context}", contextType.Name);
-                break;
-            }
-            catch (Exception ex) when (attempt < maxAttempts)
-            {
-                logger.LogWarning(ex, "Migrating {Context} failed (attempt {Attempt}/{Max}); retrying in 2s", contextType.Name, attempt, maxAttempts);
-                await Task.Delay(TimeSpan.FromSeconds(2));
-            }
-        }
-    }
-}
-
-static async Task SeedAsync(WebApplication app)
-{
-    var logger = app.Services.GetRequiredService<ILogger<Program>>();
-    int count;
-    using (var probe = app.Services.CreateScope())
-    {
-        count = probe.ServiceProvider.GetServices<IModuleSeeder>().Count();
-    }
-
-    // Each seeder gets its own scope (one module per DI scope). A failing seeder must stop startup.
-    for (var i = 0; i < count; i++)
-    {
-        try
-        {
-            using var scope = app.Services.CreateScope();
-            var seeder = scope.ServiceProvider.GetServices<IModuleSeeder>().ElementAt(i);
-            await seeder.SeedAsync(app.Lifetime.ApplicationStopping);
-            logger.LogInformation("Seeded {Module}", seeder.Module);
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "Seeding failed (seeder #{Index})", i);
-            throw;
-        }
-    }
-}
+return 0;
 
 public partial class Program;

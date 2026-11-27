@@ -242,6 +242,25 @@ read-only `read:packages` personal access token.)
 - On the server: `cd /opt/voltlane && docker compose -f docker-compose.prod.yml ps` shows all four
   services running.
 
+## 8. Demo data reset
+
+The demo is public and shared, so the API wipes and re-seeds **all** data every night at 02:00 UTC
+(`DemoReset__Enabled: "true"` in `docker-compose.prod.yml`). Every module's tables are emptied, including
+registered users, sessions, orders and payments, then the demo catalog, the demo admin and the admin's
+sample orders are seeded again. Nothing outside the module schemas is touched.
+
+To reset by hand (for example after a broken demo session), run as `deploy`:
+
+```bash
+cd /opt/voltlane
+docker compose -f docker-compose.prod.yml exec api dotnet Shop.Api.dll reset-demo
+```
+
+The command migrates, resets, seeds, logs each step and exits `0` (non-zero, with an Error log, on
+failure). It runs beside the live API in the same container without starting a second web server.
+To move the nightly time, add `DemoReset__TimeOfDayUtc: "03:30"` to the `api` environment; to turn the
+nightly reset off, set `DemoReset__Enabled: "false"`.
+
 ## Troubleshooting
 
 - **Certificate not issued / browser TLS error.** Check DNS (`dig +short <YOUR_DOMAIN>` must return
