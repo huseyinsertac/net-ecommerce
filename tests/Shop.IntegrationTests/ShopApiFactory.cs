@@ -17,7 +17,8 @@ public class ShopApiFactory : WebApplicationFactory<Program>, IAsyncLifetime
 
     private readonly PostgreSqlContainer _postgres = new PostgreSqlBuilder("postgres:18-alpine").Build();
 
-    public string ConnectionString => _postgres.GetConnectionString();
+    /// <summary>With a longer open timeout than Npgsql's 15 s: several containers start in parallel under the test run.</summary>
+    public string ConnectionString => $"{_postgres.GetConnectionString()};Timeout=30";
 
     public async ValueTask InitializeAsync() => await _postgres.StartAsync();
 
@@ -30,7 +31,7 @@ public class ShopApiFactory : WebApplicationFactory<Program>, IAsyncLifetime
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
         builder.UseEnvironment("Production");
-        builder.UseSetting("ConnectionStrings:Shop", _postgres.GetConnectionString());
+        builder.UseSetting("ConnectionStrings:Shop", ConnectionString);
         builder.UseSetting("Database:SeedOnStartup", SeedOnStartup ? "true" : "false");
         builder.UseSetting("Jwt:SigningKey", TestSigningKey);
         builder.UseSetting("RateLimiting:DemoCustomerPerMinute", "1000");

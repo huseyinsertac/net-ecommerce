@@ -29,8 +29,6 @@ internal sealed class PlaceOrderHandler(
     ICatalogVariantQuery catalog,
     TimeProvider clock) : ICommandHandler<PlaceOrder, PlaceOrderResult>
 {
-    public const string OrderNumberPrefix = "VL-";
-
     /// <summary>Half a cent: anything closer is the same amount, rounded differently on the client.</summary>
     private const decimal TotalTolerance = 0.005m;
 
@@ -76,7 +74,7 @@ internal sealed class PlaceOrderHandler(
 
         var number = await orders.NextOrderNumberAsync(ct);
         var placed = Order.Place(
-            $"{OrderNumberPrefix}{number}", command.CustomerId, command.CustomerEmail, command.IdempotencyKey,
+            $"{Order.NumberPrefix}{number}", command.CustomerId, command.CustomerEmail, command.IdempotencyKey,
             address.Value, lines, clock.GetUtcNow().UtcDateTime);
         if (placed.IsFailure)
         {

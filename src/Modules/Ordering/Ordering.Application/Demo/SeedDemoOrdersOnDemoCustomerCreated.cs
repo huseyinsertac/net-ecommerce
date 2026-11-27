@@ -4,7 +4,6 @@ using Catalog.Contracts.Variants;
 using Identity.Contracts.Events;
 using Microsoft.Extensions.Logging;
 using Ordering.Application.Abstractions;
-using Ordering.Application.Checkout;
 using Ordering.Domain.Orders;
 using Shop.Application.Abstractions.Events;
 
@@ -60,7 +59,7 @@ internal sealed class SeedDemoOrdersOnDemoCustomerCreated(
             var placedAt = now - TimeSpan.FromDays(plan.DaysAgo);
             var number = await orders.NextOrderNumberAsync(ct);
             var placed = Order.PlaceHistorical(
-                $"{PlaceOrderHandler.OrderNumberPrefix}{number}", e.UserId, e.Email, key, address, lines, placedAt);
+                $"{Order.NumberPrefix}{number}", e.UserId, e.Email, key, address, lines, placedAt);
             if (placed.IsFailure)
             {
                 logger.LogWarning("Demo order {Letter} for {UserId} not seeded ({Code}).", plan.Letter, e.UserId, placed.Error.Code);

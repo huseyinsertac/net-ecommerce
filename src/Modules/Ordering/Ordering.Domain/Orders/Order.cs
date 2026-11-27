@@ -7,6 +7,9 @@ public sealed class Order : AggregateRoot<Guid>
     public const int MaxLines = 20;
     public const int MaxQuantityPerLine = 10;
 
+    /// <summary>Every order number is this prefix plus the next value of the order-number sequence.</summary>
+    public const string NumberPrefix = "VL-";
+
     private List<OrderLine> _lines = [];
     private List<StatusChange> _history = [];
 
