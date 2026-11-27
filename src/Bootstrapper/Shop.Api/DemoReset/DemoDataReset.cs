@@ -28,7 +28,7 @@ public sealed class DemoDataReset(
     TimeProvider clock,
     ILogger<DemoDataReset> logger)
 {
-    public const string MigrationsHistoryTable = "__ef_migrations_history";
+    public const string MigrationsHistoryTable = ModuleDbContext.MigrationsHistoryTable;
 
     private static readonly string[] ForbiddenSchemas = ["public", "information_schema"];
 

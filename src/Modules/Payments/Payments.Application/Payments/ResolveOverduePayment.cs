@@ -11,8 +11,7 @@ namespace Payments.Application.Payments;
 /// Ends a Pending payment whose time is up. The gateway is asked first, because a payment can succeed just before its
 /// session closes and the notification may not have arrived: Paid → Succeeded; Open → the session is closed at the
 /// gateway, then Expired; Expired → Expired; Processing (finished, money not landed) → left Pending until the gateway
-/// reports the result (logged as a warning once it is
-/// long past its deadline).
+/// reports the result (logged as a warning once it is long past its deadline).
 /// </summary>
 public sealed record ResolveOverduePayment(Guid PaymentId) : ICommand;
 

@@ -113,6 +113,7 @@ public sealed class OrderingAdminTests(ShopApiFactory factory)
 
         await ProblemAsync(await admin.GetAsync($"{Base}/orders?status=Bogus", Ct), HttpStatusCode.BadRequest, Ct);
         await ProblemAsync(await admin.GetAsync($"{Base}/orders?pageSize=51", Ct), HttpStatusCode.BadRequest, Ct);
+        await ProblemAsync(await admin.GetAsync($"{Base}/orders?page=2147483647", Ct), HttpStatusCode.BadRequest, Ct);
     }
 
     [Fact]

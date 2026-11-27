@@ -21,8 +21,8 @@ public sealed class TightLimitsApiFactory : ShopApiFactory
     }
 }
 
-/// <summary>A tiny global per-IP limit, with its own database. Used by <see cref="GlobalRateLimitTests"/> only.</summary>
-public sealed class GlobalLimitApiFactory : ShopApiFactory
+/// <summary>A tiny global per-IP limit on a Stripe-configured host (so the webhook route exists), with its own database. Used by <see cref="GlobalRateLimitTests"/> only.</summary>
+public sealed class GlobalLimitApiFactory : Payments.StripeModeApiFactory
 {
     public const int ApiPerMinute = 5;
 
@@ -33,18 +33,7 @@ public sealed class GlobalLimitApiFactory : ShopApiFactory
     }
 }
 
-/// <summary>The same tiny global limit on a Stripe-configured host, so the webhook route exists.</summary>
-public sealed class GlobalLimitStripeApiFactory : Payments.StripeModeApiFactory
-{
-    protected override void ConfigureWebHost(IWebHostBuilder builder)
-    {
-        base.ConfigureWebHost(builder);
-        builder.UseSetting("RateLimiting:ApiPerMinute", GlobalLimitApiFactory.ApiPerMinute.ToString());
-    }
-}
-
-public sealed class GlobalRateLimitTests(GlobalLimitApiFactory factory, GlobalLimitStripeApiFactory stripeFactory)
-    : IClassFixture<GlobalLimitApiFactory>, IClassFixture<GlobalLimitStripeApiFactory>
+public sealed class GlobalRateLimitTests(GlobalLimitApiFactory factory) : IClassFixture<GlobalLimitApiFactory>
 {
     private static CancellationToken Ct => TestContext.Current.CancellationToken;
 
@@ -67,7 +56,7 @@ public sealed class GlobalRateLimitTests(GlobalLimitApiFactory factory, GlobalLi
     [Fact]
     public async Task Webhook_and_health_are_not_globally_limited()
     {
-        using var client = stripeFactory.CreateClient();
+        using var client = factory.CreateClient();
 
         for (var i = 0; i < 10; i++)
         {

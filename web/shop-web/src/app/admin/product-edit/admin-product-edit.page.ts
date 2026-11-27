@@ -25,6 +25,7 @@ import {
 } from '../admin-api.service';
 import { ImagePickerComponent } from '../image-picker/image-picker.component';
 import { ProductStatusChipComponent } from '../product-status-chip/product-status-chip.component';
+import { MAX_DESCRIPTION_LENGTH, maxTwoDecimals } from '../validators';
 import { problemText, readProblem } from '../problem';
 import { SpecFieldComponent } from '../spec-field/spec-field.component';
 import { SpecForm, buildSpecForm, readSpecs } from '../spec-field/spec-form';
@@ -77,7 +78,10 @@ export class AdminProductEditPage implements OnInit {
   protected readonly form = new FormGroup({
     name: new FormControl('', { nonNullable: true, validators: [Validators.required, Validators.maxLength(200)] }),
     brand: new FormControl('', { nonNullable: true, validators: [Validators.required, Validators.maxLength(100)] }),
-    description: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
+    description: new FormControl('', {
+      nonNullable: true,
+      validators: [Validators.required, Validators.maxLength(MAX_DESCRIPTION_LENGTH)],
+    }),
     isFeatured: new FormControl(false, { nonNullable: true }),
     status: new FormControl<AdminProductStatus>('Draft', { nonNullable: true }),
   });
@@ -243,6 +247,7 @@ export class AdminProductEditPage implements OnInit {
       price: new FormControl<number | null>(price, [
         Validators.required,
         Validators.min(0.01),
+        maxTwoDecimals,
         Validators.max(100000),
       ]),
       stock: new FormControl<number | null>(stock, [

@@ -25,6 +25,7 @@ import { Router, RouterLink } from '@angular/router';
 import { Subscription, forkJoin, merge } from 'rxjs';
 import { AdminApi, AdminCategory, AdminImageKey } from '../admin-api.service';
 import { ImagePickerComponent } from '../image-picker/image-picker.component';
+import { MAX_DESCRIPTION_LENGTH, maxTwoDecimals } from '../validators';
 import { problemText, readProblem } from '../problem';
 import { SpecFieldComponent } from '../spec-field/spec-field.component';
 import { SpecForm, buildSpecForm, readSpecs } from '../spec-field/spec-form';
@@ -102,7 +103,10 @@ export class AdminProductCreatePage implements OnInit {
     category: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
     name: new FormControl('', { nonNullable: true, validators: [Validators.required, Validators.maxLength(200)] }),
     brand: new FormControl('', { nonNullable: true, validators: [Validators.required, Validators.maxLength(100)] }),
-    description: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
+    description: new FormControl('', {
+      nonNullable: true,
+      validators: [Validators.required, Validators.maxLength(MAX_DESCRIPTION_LENGTH)],
+    }),
     isFeatured: new FormControl(false, { nonNullable: true }),
   });
   protected readonly axes = new FormArray<FormGroup<{ name: FormControl<string>; values: FormControl<string> }>>([]);
@@ -245,7 +249,7 @@ export class AdminProductCreatePage implements OnInit {
       } else {
         group = new FormGroup({
           sku: new FormControl(sku, { nonNullable: true, validators: [Validators.required, Validators.maxLength(64)] }),
-          price: new FormControl<number | null>(null, [Validators.required, Validators.min(0.01), Validators.max(100000)]),
+          price: new FormControl<number | null>(null, [Validators.required, Validators.min(0.01), Validators.max(100000), maxTwoDecimals]),
           stock: new FormControl<number | null>(null, [
             Validators.required,
             Validators.min(0),

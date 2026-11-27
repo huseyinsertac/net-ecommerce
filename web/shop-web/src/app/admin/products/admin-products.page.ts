@@ -23,6 +23,8 @@ import { MoneyPipe } from '../../core/money.pipe';
 import { ProductStatusChipComponent } from '../product-status-chip/product-status-chip.component';
 import { AdminApi, AdminProductPage, AdminProductQuery } from '../admin-api.service';
 
+/** Routed inputs arrive as undefined when the query param is absent; fall back to empty. */
+const orEmpty = (v: string | undefined): string => v ?? '';
 const PAGE_SIZE = 20;
 const SEARCH_DEBOUNCE_MS = 300;
 const STATUSES = ['Draft', 'Active', 'Archived'];
@@ -51,9 +53,9 @@ export class AdminProductsPage {
   private readonly router = inject(Router);
 
   /** Query params, bound from the route. */
-  readonly status = input<string>('');
-  readonly q = input<string>('');
-  readonly page = input<string>('1');
+  readonly status = input('', { transform: orEmpty });
+  readonly q = input('', { transform: orEmpty });
+  readonly page = input('1', { transform: orEmpty });
 
   protected readonly statuses = STATUSES;
   protected readonly columns = ['name', 'category', 'status', 'variants', 'stock', 'price'];
@@ -63,8 +65,8 @@ export class AdminProductsPage {
   protected readonly result = signal<AdminProductPage | null>(null);
   protected readonly pageNumber = computed(() => Math.max(1, Number.parseInt(this.page(), 10) || 1));
   private readonly query = computed<AdminProductQuery>(() => ({
-    status: this.status() ?? '',
-    q: this.q() ?? '',
+    status: this.status(),
+    q: this.q(),
     page: this.pageNumber(),
     pageSize: PAGE_SIZE,
   }));

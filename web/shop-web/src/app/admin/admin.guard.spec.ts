@@ -1,7 +1,7 @@
 import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
-import { ActivatedRouteSnapshot, Router, RouterStateSnapshot, UrlTree } from '@angular/router';
+import { Route, Router, UrlSegment, UrlTree } from '@angular/router';
 import { Observable, firstValueFrom } from 'rxjs';
 import { AuthService } from '../core/auth/auth.service';
 import { adminGuard } from './admin.guard';
@@ -15,10 +15,14 @@ describe('adminGuard', () => {
 
   async function run(refresh: 'anonymous' | 'customer' | 'admin') {
     const auth = TestBed.inject(AuthService);
+    const router = TestBed.inject(Router);
+    vi.spyOn(router, 'currentNavigation').mockReturnValue({
+      extractedUrl: router.parseUrl('/admin/orders?page=2'),
+    } as never);
     const http = TestBed.inject(HttpTestingController);
     const result = firstValueFrom(
       TestBed.runInInjectionContext(() =>
-        adminGuard({} as ActivatedRouteSnapshot, { url: '/admin/orders?page=2' } as RouterStateSnapshot),
+        adminGuard({} as Route, [new UrlSegment('admin', {}), new UrlSegment('orders', {})], {} as never),
       ) as Observable<boolean | UrlTree>,
     );
     const init = auth.initialize();

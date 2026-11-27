@@ -24,6 +24,8 @@ import { MoneyPipe } from '../../core/money.pipe';
 import { OrderStatusChipComponent } from '../../shared/order-status-chip/order-status-chip.component';
 import { AdminApi, AdminOrderPage, AdminOrderQuery } from '../admin-api.service';
 
+/** Routed inputs arrive as undefined when the query param is absent; fall back to empty. */
+const orEmpty = (v: string | undefined): string => v ?? '';
 const PAGE_SIZE = 20;
 const SEARCH_DEBOUNCE_MS = 300;
 const STATUSES = ['Placed', 'Paid', 'Shipped', 'Delivered', 'Cancelled'];
@@ -53,9 +55,9 @@ export class AdminOrdersPage {
   private readonly router = inject(Router);
 
   /** Query params, bound from the route. */
-  readonly status = input<string>('');
-  readonly q = input<string>('');
-  readonly page = input<string>('1');
+  readonly status = input('', { transform: orEmpty });
+  readonly q = input('', { transform: orEmpty });
+  readonly page = input('1', { transform: orEmpty });
 
   protected readonly statuses = STATUSES;
   protected readonly columns = ['number', 'date', 'email', 'status', 'items', 'total'];
@@ -65,8 +67,8 @@ export class AdminOrdersPage {
   protected readonly result = signal<AdminOrderPage | null>(null);
   protected readonly pageNumber = computed(() => Math.max(1, Number.parseInt(this.page(), 10) || 1));
   private readonly query = computed<AdminOrderQuery>(() => ({
-    status: this.status() ?? '',
-    q: this.q() ?? '',
+    status: this.status(),
+    q: this.q(),
     page: this.pageNumber(),
     pageSize: PAGE_SIZE,
   }));

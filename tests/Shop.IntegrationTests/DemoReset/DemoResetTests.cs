@@ -3,12 +3,15 @@ using Catalog.Contracts.Variants;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Npgsql;
 using Ordering.Domain.Orders;
 using Ordering.Infrastructure.Persistence;
+using Shop.Api;
 using Shop.Api.DemoReset;
 using Shop.Infrastructure.Common.Modules;
+using Shop.Infrastructure.Common.Persistence;
 using Shouldly;
 using static Shop.IntegrationTests.Ordering.OrderingTestClient;
 
@@ -174,6 +177,24 @@ public sealed class DemoResetTests(DemoResetApiFactory factory) : IClassFixture<
             .ShouldBe(Enumerable.Range(100001, 24).Select(n => $"VL-{n}"));
         (await ScalarAsync<long>("SELECT count(*) FROM basket.baskets")).ShouldBe(0);
         (await ScalarAsync<long>("SELECT count(*) FROM identity.refresh_tokens")).ShouldBe(1); // the admin sign-in above
+    }
+
+    [Fact]
+    public async Task Reset_keeps_the_migrations_history_so_migrating_again_is_a_no_op()
+    {
+        await Reset.ResetAsync(Ct);
+
+        var catalogHistory = await ScalarAsync<long>($"SELECT count(*) FROM catalog.{ModuleDbContext.MigrationsHistoryTable}");
+        var orderingHistory = await ScalarAsync<long>($"SELECT count(*) FROM ordering.{ModuleDbContext.MigrationsHistoryTable}");
+        catalogHistory.ShouldBeGreaterThan(0);
+        orderingHistory.ShouldBeGreaterThan(0);
+        var before = await CountsAsync();
+
+        await ModuleMigrations.RunAllAsync(Services, Services.GetRequiredService<ILogger<DemoResetTests>>(), Ct);
+
+        (await ScalarAsync<long>($"SELECT count(*) FROM catalog.{ModuleDbContext.MigrationsHistoryTable}")).ShouldBe(catalogHistory);
+        (await ScalarAsync<long>($"SELECT count(*) FROM ordering.{ModuleDbContext.MigrationsHistoryTable}")).ShouldBe(orderingHistory);
+        (await CountsAsync()).ShouldBe(before);
     }
 
     [Fact]

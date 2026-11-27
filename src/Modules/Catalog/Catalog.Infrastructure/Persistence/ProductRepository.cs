@@ -52,7 +52,10 @@ internal sealed class ProductRepository(CatalogDbContext db, TimeProvider clock)
         // save racing another one between the load and this write is refused too.
         entry.Property<uint>(ProductConfiguration.RowVersion).OriginalValue = expectedVersion;
         // Always write the product row, so its xmin (the version) changes even when only a variant did.
-        entry.Property<DateTime?>(ProductConfiguration.UpdatedAtUtc).CurrentValue = clock.GetUtcNow().UtcDateTime;
+        var updatedAt = entry.Property<DateTime?>(ProductConfiguration.UpdatedAtUtc);
+        updatedAt.CurrentValue = clock.GetUtcNow().UtcDateTime;
+        // Even a frozen clock (same value as stored) must still produce an UPDATE, or xmin would not move.
+        updatedAt.IsModified = true;
         return SaveChangesAsync(ct);
     }
 

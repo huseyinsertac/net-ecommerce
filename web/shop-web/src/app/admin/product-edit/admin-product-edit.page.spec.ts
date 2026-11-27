@@ -211,4 +211,18 @@ describe('AdminProductEditPage', () => {
     expect(rowButtons.every((b) => b.disabled)).toBe(true);
     expect(el.querySelector<HTMLButtonElement>('button[type="submit"]')!.disabled).toBe(true);
   });
+
+  it('rejects a price with more than two decimals and an over-long description', () => {
+    const updateVariant = vi.fn();
+    const updateProduct = vi.fn();
+    const { el, button, fixture } = setup({ updateVariant, updateProduct });
+    const row = el.querySelectorAll('tr.variant-row')[0];
+    type(row.querySelector<HTMLInputElement>('input.price')!, '10.999');
+    button('Save', row).click();
+    expect(updateVariant).not.toHaveBeenCalled();
+    type(el.querySelector<HTMLTextAreaElement>('textarea[name="description"]') as unknown as HTMLInputElement, 'x'.repeat(4001));
+    button('Save changes').click();
+    fixture.detectChanges();
+    expect(updateProduct).not.toHaveBeenCalled();
+  });
 });

@@ -32,7 +32,7 @@ internal sealed class ListAdminOrdersValidator : AbstractValidator<ListAdminOrde
 {
     public ListAdminOrdersValidator()
     {
-        RuleFor(x => x.Page).GreaterThanOrEqualTo(1);
+        RuleFor(x => x.Page).InclusiveBetween(1, 100_000);
         RuleFor(x => x.PageSize).InclusiveBetween(1, ListAdminOrders.MaxPageSize);
         RuleFor(x => x.Search).MaximumLength(ListAdminOrders.MaxSearchLength);
         RuleFor(x => x.Status)

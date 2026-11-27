@@ -1,4 +1,4 @@
-# ADR-0009: Admin endpoints in each module, optimistic concurrency, and a transactional nightly demo reset
+# ADR-0009: Admin endpoints in each module, optimistic concurrency, and a nightly demo reset with a transactional wipe
 
 Status: Accepted. Date: 2026-11-27
 

@@ -465,11 +465,13 @@ public sealed class CatalogAdminTests(ShopApiFactory factory)
         var data = await CatalogTestData.SeedAsync(Services, Ct);
         await MutateProductAsync(data.Laptop.Id, p => p.Publish());
         var variant = data.Laptop.Variants[0];
+        using var admin = Admin();
+        var version = (await GetProductAsync(admin, data.Laptop.Id)).GetProperty("version").GetUInt32();
         await Services.GetRequiredService<IEventBus>().PublishAsync(
             new OrderPlaced(Guid.NewGuid(), Guid.NewGuid(), [new OrderPlacedLine(variant.Id, 3)], 100m, "USD"), Ct);
-        using var admin = Admin();
         var product = await GetProductAsync(admin, data.Laptop.Id);
-        var version = product.GetProperty("version").GetUInt32();
+        // A shopper's reservation must not bump the product version the admin is editing against.
+        product.GetProperty("version").GetUInt32().ShouldBe(version);
         product.GetProperty("variants").EnumerateArray().Single(v => v.GetProperty("id").GetGuid() == variant.Id)
             .GetProperty("stockReserved").GetInt32().ShouldBe(3);
 
@@ -480,6 +482,32 @@ public sealed class CatalogAdminTests(ShopApiFactory factory)
         var saved = await JsonAsync(await PutVariantAsync(admin, data.Laptop.Id, variant.Id, 1099.99m, 3, version));
         saved.GetProperty("variants").EnumerateArray().Single(v => v.GetProperty("id").GetGuid() == variant.Id)
             .GetProperty("stockOnHand").GetInt32().ShouldBe(3);
+    }
+
+    [Fact]
+    public async Task Version_still_bumps_on_a_variant_only_save_when_the_clock_does_not_move()
+    {
+        var data = await CatalogTestData.SeedAsync(Services, Ct);
+        var frozen = new FrozenClock(new DateTimeOffset(DateTime.UtcNow.Date.AddHours(DateTime.UtcNow.Hour), TimeSpan.Zero));
+        await using var frozenFactory = factory.WithWebHostBuilder(b =>
+            b.ConfigureServices(s => s.AddSingleton<TimeProvider>(frozen)));
+        var token = Services.GetRequiredService<ITokenIssuer>().Issue(
+            User.CreateDemoAdmin(Email.Create($"admin-{Guid.NewGuid():N}@x.test").Value, DateTime.UtcNow), DateTime.UtcNow).Value;
+        using var admin = frozenFactory.CreateClient();
+        admin.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+        var variantId = data.Laptop.Variants[0].Id;
+        var version = (await GetProductAsync(admin, data.Laptop.Id)).GetProperty("version").GetUInt32();
+
+        var first = await JsonAsync(await PutVariantAsync(admin, data.Laptop.Id, variantId, 1001m, 5, version));
+        var second = await JsonAsync(await PutVariantAsync(
+            admin, data.Laptop.Id, variantId, 1002m, 5, first.GetProperty("version").GetUInt32()));
+
+        second.GetProperty("version").GetUInt32().ShouldNotBe(first.GetProperty("version").GetUInt32());
+    }
+
+    private sealed class FrozenClock(DateTimeOffset now) : TimeProvider
+    {
+        public override DateTimeOffset GetUtcNow() => now;
     }
 
     [Fact]

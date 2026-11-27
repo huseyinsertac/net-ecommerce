@@ -26,7 +26,7 @@ internal sealed class OrderRepository(OrderingDbContext db) : IOrderRepository
         var items = await mine
             .OrderByDescending(o => o.PlacedAtUtc)
             .ThenByDescending(o => o.Id)
-            .Skip((page - 1) * pageSize)
+            .Skip((int)Math.Min((long)(page - 1) * pageSize, int.MaxValue))
             .Take(pageSize)
             .Include(o => o.Lines)
             .AsSplitQuery()
@@ -61,7 +61,7 @@ internal sealed class OrderRepository(OrderingDbContext db) : IOrderRepository
         var items = await matching
             .OrderByDescending(o => o.PlacedAtUtc)
             .ThenByDescending(o => o.Id)
-            .Skip((page - 1) * pageSize)
+            .Skip((int)Math.Min((long)(page - 1) * pageSize, int.MaxValue))
             .Take(pageSize)
             .Include(o => o.Lines)
             .AsSplitQuery()

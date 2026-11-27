@@ -76,8 +76,8 @@ Normal registration and sign-in also work.
   grace period so concurrent tabs do not log each other out.
 - **Admin area:** product management (create, edit, variants, stock, images) and order handling
   (ship, deliver), behind an admin-only authorization policy on every `/api/*/admin/*` route.
-- **Nightly demo reset:** wipes and re-seeds every module schema at 02:00 UTC in one transaction,
-  with retries; also available as the CLI command `dotnet Shop.Api.dll reset-demo`.
+- **Nightly demo reset:** wipes every module schema at 02:00 UTC in one transaction, then re-seeds
+  (with retries); also available as the CLI command `dotnet Shop.Api.dll reset-demo`.
 - **API hardening:** per-IP rate limits (including a global 300 requests per minute on `/api/*`,
   excluding health checks and the Stripe webhook), and a required `X-Requested-With` header on API
   writes.
@@ -91,8 +91,8 @@ Not built yet (Milestone 2): order cancellation and refunds from the admin.
 
 ### Admin and demo reset design
 
-Admin endpoints live in the module that owns the data, and the nightly reset is a transactional
-truncate-and-reseed; see [ADR-0009](docs/adr/0009-admin-and-nightly-reset.md).
+Admin endpoints live in the module that owns the data, and the nightly reset wipes in one
+transaction and then re-seeds, both with retries; see [ADR-0009](docs/adr/0009-admin-and-nightly-reset.md).
 
 ### Identity design
 

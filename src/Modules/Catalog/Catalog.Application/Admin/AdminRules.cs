@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using System.Text.RegularExpressions;
 using Catalog.Application.Abstractions;
 using Catalog.Domain.Categories;
@@ -25,11 +26,11 @@ internal static partial class AdminRules
 
     public static void Details<T>(
         AbstractValidator<T> v,
-        System.Linq.Expressions.Expression<Func<T, string?>> name,
-        System.Linq.Expressions.Expression<Func<T, string?>> brand,
-        System.Linq.Expressions.Expression<Func<T, string?>> description,
-        System.Linq.Expressions.Expression<Func<T, IReadOnlyList<string>?>> imageKeys,
-        System.Linq.Expressions.Expression<Func<T, IReadOnlyDictionary<string, SpecValue>?>> specs)
+        Expression<Func<T, string?>> name,
+        Expression<Func<T, string?>> brand,
+        Expression<Func<T, string?>> description,
+        Expression<Func<T, IReadOnlyList<string>?>> imageKeys,
+        Expression<Func<T, IReadOnlyDictionary<string, SpecValue>?>> specs)
     {
         v.RuleFor(name).NotEmpty().MaximumLength(Product.MaxNameLength);
         v.RuleFor(brand).NotEmpty().MaximumLength(MaxBrandLength);

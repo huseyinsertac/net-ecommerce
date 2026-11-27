@@ -12,9 +12,9 @@ namespace Shop.Api;
 /// tests can lower or raise them: <c>RateLimiting:DemoCustomerPerMinute</c> (5), <c>RateLimiting:AuthPerMinute</c> (20),
 /// <c>RateLimiting:RefreshPerMinute</c> (120; only calls that carry the refresh cookie count),
 /// <c>RateLimiting:BasketWritesPerMinute</c> (60) and <c>RateLimiting:CheckoutPerMinute</c> (10). On top of those, a global
-/// per-IP limit covers every <c>/api</c> request: <c>RateLimiting:ApiPerMinute</c> (300). It skips <c>/health</c>, the Stripe
+/// per-IP limit covers every <c>/api</c> request: <c>RateLimiting:ApiPerMinute</c> (300). It skips the Stripe
 /// webhook (Stripe's servers share a few IPs and must never be throttled by shopper traffic) and everything outside
-/// <c>/api</c> (the SPA's static files). The client address is
+/// <c>/api</c> (the SPA's static files and <c>/health</c>). The client address is
 /// <c>RemoteIpAddress</c>, which the forwarded-headers middleware (first in the pipeline) has already replaced with the real
 /// client IP from <c>X-Forwarded-For</c>.
 /// </summary>
@@ -79,7 +79,6 @@ internal static class RateLimitingConfiguration
     {
         var path = context.Request.Path;
         var excluded = !path.StartsWithSegments("/api", StringComparison.OrdinalIgnoreCase)
-            || path.StartsWithSegments("/health", StringComparison.OrdinalIgnoreCase)
             || path.Value!.TrimEnd('/').Equals(StripeWebhookPath, StringComparison.OrdinalIgnoreCase);
         return excluded
             ? RateLimitPartition.GetNoLimiter("global:excluded")
