@@ -1,0 +1,120 @@
+:host {
+  display: block;
+}
+
+.head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+
+  h1 {
+    margin: 0;
+    font: var(--mat-sys-headline-medium);
+  }
+}
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 16px;
+  margin-bottom: 16px;
+}
+
+.search {
+  flex: 1 1 280px;
+  max-width: 420px;
+}
+
+.filters {
+  flex: 1 1 auto;
+}
+
+.table-wrap {
+  overflow: hidden;
+  border: 1px solid var(--mat-sys-outline-variant);
+  border-radius: 16px;
+  background: var(--mat-sys-surface-container-low);
+}
+
+table {
+  width: 100%;
+  background: transparent;
+}
+
+.row {
+  position: relative;
+  height: 72px;
+
+  &:hover {
+    background: var(--mat-sys-surface-container);
+  }
+}
+
+.product {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  padding: 8px 0;
+}
+
+.thumb {
+  flex: none;
+  width: 48px;
+  height: 48px;
+}
+
+.order-link {
+  color: var(--mat-sys-primary);
+  font: var(--mat-sys-title-small);
+  text-decoration: none;
+  overflow-wrap: anywhere;
+
+  // The whole row is the click target.
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--mat-sys-primary);
+    outline-offset: -2px;
+  }
+}
+
+.num {
+  text-align: right;
+}
+
+.skeletons {
+  display: grid;
+  gap: 8px;
+}
+
+.sk-row {
+  height: 72px;
+  border-radius: 12px;
+}
+
+mat-paginator {
+  margin-top: 12px;
+  background: transparent;
+}
+
+@media (max-width: 899px) {
+  .col-category,
+  .col-variants {
+    display: none;
+  }
+}
+
+@media (max-width: 599px) {
+  .col-stock {
+    display: none;
+  }
+}

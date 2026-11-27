@@ -11,6 +11,8 @@ internal sealed class ProductVariantConfiguration : IEntityTypeConfiguration<Pro
     /// <summary>Shadow property mapped to PostgreSQL's <c>xmin</c> system column (no real column is created).</summary>
     public const string RowVersion = "RowVersion";
 
+    public const string SkuIndex = "ix_product_variants_sku";
+
     public void Configure(EntityTypeBuilder<ProductVariant> b)
     {
         b.ToTable("product_variants", t => t.HasCheckConstraint(

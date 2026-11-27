@@ -39,6 +39,7 @@ public class ShopApiFactory : WebApplicationFactory<Program>, IAsyncLifetime
         builder.UseSetting("RateLimiting:RefreshPerMinute", "1000");
         builder.UseSetting("RateLimiting:BasketWritesPerMinute", "1000");
         builder.UseSetting("RateLimiting:CheckoutPerMinute", "1000");
+        builder.UseSetting("RateLimiting:ApiPerMinute", "100000");
         // The simulated gateway: nothing leaves the process. Production refuses it unless explicitly allowed, as here.
         builder.UseSetting("Payments:Provider", "Fake");
         builder.UseSetting("Payments:AllowFakeProviderInProduction", "true");
@@ -46,6 +47,8 @@ public class ShopApiFactory : WebApplicationFactory<Program>, IAsyncLifetime
         builder.UseSetting("Payments:Timeout", "00:05:00");
         builder.UseSetting("Payments:ExpiryScanInterval", "00:00:01");
         builder.UseSetting("App:PublicBaseUrl", "http://test.local");
+        // Never let a developer machine's environment schedule the nightly wipe inside a test host.
+        builder.UseSetting("DemoReset:Enabled", "false");
         builder.ConfigureServices(services => services.AddSingleton<IStartupFilter, ThrowingEndpointStartupFilter>());
     }
 

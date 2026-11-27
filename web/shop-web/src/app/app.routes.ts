@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { adminGuard } from './admin/admin.guard';
 import { authGuard, guestGuard } from './core/auth/auth.guard';
 
 export const routes: Routes = [
@@ -75,6 +76,11 @@ export const routes: Routes = [
     canActivate: [authGuard],
     loadComponent: () =>
       import('./pages/simulated-pay/simulated-pay.page').then((m) => m.SimulatedPayPage),
+  },
+  {
+    path: 'admin',
+    canMatch: [adminGuard],
+    loadChildren: () => import('./admin/admin.routes').then((m) => m.adminRoutes),
   },
   {
     path: '**',

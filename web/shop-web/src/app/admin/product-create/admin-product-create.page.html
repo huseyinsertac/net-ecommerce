@@ -1,0 +1,161 @@
+@switch (view()) {
+  @case ('loading') {
+    <div class="stack" aria-busy="true" aria-label="Loading the form">
+      @for (row of skeleton; track row) {
+        <div class="sk sk-card"></div>
+      }
+    </div>
+  }
+  @case ('error') {
+    <div class="empty">
+      <h2>We couldn't load the form</h2>
+      <p>Please try again in a moment.</p>
+      <button mat-flat-button type="button" (click)="load()">Retry</button>
+    </div>
+  }
+  @case ('ready') {
+    <a class="back" routerLink="/admin/products">
+      <mat-icon fontSet="material-symbols-outlined">arrow_back</mat-icon>
+      Products
+    </a>
+    <div class="head">
+      <h1>New product</h1>
+    </div>
+
+    <form class="stack" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+      <section class="card">
+        <h2>Details</h2>
+        <div class="form-grid">
+          <mat-form-field class="span" appearance="outline" subscriptSizing="dynamic">
+            <mat-label>Category</mat-label>
+            <mat-select formControlName="category" required>
+              @for (c of categories(); track c.slug) {
+                <mat-option [value]="c.slug">{{ c.name }}</mat-option>
+              }
+            </mat-select>
+            <mat-hint>The category decides which specifications you fill in.</mat-hint>
+            <mat-error>Choose a category.</mat-error>
+          </mat-form-field>
+          <mat-form-field appearance="outline" subscriptSizing="dynamic">
+            <mat-label>Name</mat-label>
+            <input matInput name="name" formControlName="name" maxlength="200" required />
+            <mat-error>Name is required.</mat-error>
+          </mat-form-field>
+          <mat-form-field appearance="outline" subscriptSizing="dynamic">
+            <mat-label>Brand</mat-label>
+            <input matInput name="brand" formControlName="brand" maxlength="100" required />
+            <mat-error>Brand is required.</mat-error>
+          </mat-form-field>
+          <mat-form-field class="span" appearance="outline" subscriptSizing="dynamic">
+            <mat-label>Description</mat-label>
+            <textarea matInput name="description" formControlName="description" rows="4" required></textarea>
+            <mat-error>Description is required.</mat-error>
+          </mat-form-field>
+          <div class="toggle span">
+            <mat-slide-toggle formControlName="isFeatured">Featured on the home page</mat-slide-toggle>
+          </div>
+          <div class="span">
+            <app-image-picker [options]="imageOptions()" [(selected)]="images" />
+          </div>
+        </div>
+      </section>
+
+      @if (specs(); as specForm) {
+        <section class="card">
+          <h2>Specifications</h2>
+          <div class="form-grid">
+            @for (def of specSchema(); track def.key) {
+              <app-spec-field [def]="def" [control]="specForm.controls[def.key]" />
+            }
+          </div>
+        </section>
+      }
+
+      <section class="card">
+        <h2>Options</h2>
+        <p class="muted">
+          Optional. Add up to {{ maxAxes }} options such as Color or Storage, with comma-separated values.
+          Each combination becomes a variant.
+        </p>
+        <div class="stack">
+          @for (axis of axes.controls; track axis; let i = $index) {
+            <div class="form-grid axis" [formGroup]="axis">
+              <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                <mat-label>Option name</mat-label>
+                <input matInput class="axis-name" formControlName="name" placeholder="Color" />
+              </mat-form-field>
+              <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                <mat-label>Values</mat-label>
+                <input matInput class="axis-values" formControlName="values" placeholder="Black, Blue" />
+              </mat-form-field>
+              <div class="span actions">
+                <button mat-button type="button" (click)="removeAxis(i)">Remove option</button>
+              </div>
+            </div>
+          }
+        </div>
+        <div class="actions">
+          <button
+            mat-stroked-button
+            type="button"
+            [disabled]="axes.length >= maxAxes"
+            (click)="addAxis()"
+          >
+            <mat-icon fontSet="material-symbols-outlined">add</mat-icon>
+            Add option
+          </button>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>Variants</h2>
+        <div class="variants-wrap">
+          <table class="variants" aria-label="Variants">
+            <thead>
+              <tr>
+                <th>Variant</th>
+                <th>SKU</th>
+                <th>Price (USD)</th>
+                <th>Stock</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (meta of variantMeta(); track meta.key; let i = $index) {
+                <tr class="variant-row" [formGroup]="variants.at(i)">
+                  <td>{{ meta.label }}</td>
+                  <td>
+                    <mat-form-field class="sku-input" appearance="outline" subscriptSizing="dynamic">
+                      <input matInput class="sku" formControlName="sku" [attr.aria-label]="'SKU for ' + meta.label" />
+                    </mat-form-field>
+                  </td>
+                  <td>
+                    <mat-form-field class="cell-input" appearance="outline" subscriptSizing="dynamic">
+                      <input matInput class="price" type="number" step="0.01" formControlName="price" [attr.aria-label]="'Price for ' + meta.label" />
+                      <span matTextPrefix>$&nbsp;</span>
+                    </mat-form-field>
+                  </td>
+                  <td>
+                    <mat-form-field class="cell-input" appearance="outline" subscriptSizing="dynamic">
+                      <input matInput class="stock" type="number" step="1" formControlName="stock" [attr.aria-label]="'Stock for ' + meta.label" />
+                    </mat-form-field>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+        <p class="muted">SKUs are suggested from the brand, name and option values; edit them freely.</p>
+      </section>
+
+      @if (formError(); as text) {
+        <p class="field-error" role="alert">{{ text }}</p>
+      }
+      <div class="actions">
+        <a mat-button routerLink="/admin/products">Cancel</a>
+        <button mat-flat-button type="submit" [disabled]="saving()">
+          {{ saving() ? 'Creating…' : 'Create product' }}
+        </button>
+      </div>
+    </form>
+  }
+}

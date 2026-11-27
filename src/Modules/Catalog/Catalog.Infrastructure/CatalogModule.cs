@@ -25,6 +25,8 @@ public sealed class CatalogModule : IModule
         services.AddScoped<Catalog.Contracts.Variants.ICatalogVariantQuery, CatalogVariantQuery>();
         services.AddScoped<IModuleSeeder, CatalogSeeder>();
         services.AddScoped<IStockReservationRepository, StockReservationRepository>();
+        services.AddScoped<IProductRepository, ProductRepository>();
+        services.AddScoped<IAdminCatalogReader, AdminCatalogReader>();
         services.AddApplicationHandlers(typeof(Catalog.Application.AssemblyReference).Assembly);
         services.AddInboxHandlers<CatalogDbContext>(typeof(Catalog.Application.AssemblyReference).Assembly);
     }
@@ -32,5 +34,6 @@ public sealed class CatalogModule : IModule
     public void MapEndpoints(IEndpointRouteBuilder app)
     {
         CatalogEndpoints.Map(app.MapGroup($"/api/{Name}"));
+        CatalogAdminEndpoints.Map(app.MapGroup($"/api/{Name}/admin"));
     }
 }

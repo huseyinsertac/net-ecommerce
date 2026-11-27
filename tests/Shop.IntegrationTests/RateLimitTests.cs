@@ -21,6 +21,57 @@ public sealed class TightLimitsApiFactory : ShopApiFactory
     }
 }
 
+/// <summary>A tiny global per-IP limit on a Stripe-configured host (so the webhook route exists), with its own database. Used by <see cref="GlobalRateLimitTests"/> only.</summary>
+public sealed class GlobalLimitApiFactory : Payments.StripeModeApiFactory
+{
+    public const int ApiPerMinute = 5;
+
+    protected override void ConfigureWebHost(IWebHostBuilder builder)
+    {
+        base.ConfigureWebHost(builder);
+        builder.UseSetting("RateLimiting:ApiPerMinute", ApiPerMinute.ToString());
+    }
+}
+
+public sealed class GlobalRateLimitTests(GlobalLimitApiFactory factory) : IClassFixture<GlobalLimitApiFactory>
+{
+    private static CancellationToken Ct => TestContext.Current.CancellationToken;
+
+    [Fact]
+    public async Task Api_requests_over_the_global_limit_get_429()
+    {
+        using var client = factory.CreateClient();
+
+        for (var i = 0; i < GlobalLimitApiFactory.ApiPerMinute; i++)
+        {
+            (await client.GetAsync("/api/catalog/categories", Ct)).StatusCode.ShouldBe(HttpStatusCode.OK);
+        }
+
+        var limited = await client.GetAsync("/api/catalog/categories", Ct);
+        limited.StatusCode.ShouldBe(HttpStatusCode.TooManyRequests);
+        JsonDocument.Parse(await limited.Content.ReadAsStringAsync(Ct)).RootElement
+            .GetProperty("type").GetString().ShouldBe("rate_limited");
+    }
+
+    [Fact]
+    public async Task Webhook_and_health_are_not_globally_limited()
+    {
+        using var client = factory.CreateClient();
+
+        for (var i = 0; i < 10; i++)
+        {
+            (await client.GetAsync("/health", Ct)).StatusCode.ShouldNotBe(HttpStatusCode.TooManyRequests);
+
+            using var webhook = new HttpRequestMessage(HttpMethod.Post, "/api/payments/stripe/webhook")
+            {
+                Content = new StringContent("{}", System.Text.Encoding.UTF8, "application/json"),
+            };
+            webhook.Headers.Add("Stripe-Signature", "t=1,v1=bad");
+            (await client.SendAsync(webhook, Ct)).StatusCode.ShouldNotBe(HttpStatusCode.TooManyRequests);
+        }
+    }
+}
+
 public sealed class RateLimitTests(TightLimitsApiFactory factory) : IClassFixture<TightLimitsApiFactory>
 {
     private static CancellationToken Ct => TestContext.Current.CancellationToken;

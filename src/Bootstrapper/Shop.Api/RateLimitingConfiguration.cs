@@ -11,7 +11,10 @@ namespace Shop.Api;
 /// Per-client-IP fixed-window limits on the account endpoints, basket writes and checkout. Limits come from configuration so
 /// tests can lower or raise them: <c>RateLimiting:DemoCustomerPerMinute</c> (5), <c>RateLimiting:AuthPerMinute</c> (20),
 /// <c>RateLimiting:RefreshPerMinute</c> (120; only calls that carry the refresh cookie count),
-/// <c>RateLimiting:BasketWritesPerMinute</c> (60) and <c>RateLimiting:CheckoutPerMinute</c> (10). The client address is
+/// <c>RateLimiting:BasketWritesPerMinute</c> (60) and <c>RateLimiting:CheckoutPerMinute</c> (10). On top of those, a global
+/// per-IP limit covers every <c>/api</c> request: <c>RateLimiting:ApiPerMinute</c> (300). It skips the Stripe
+/// webhook (Stripe's servers share a few IPs and must never be throttled by shopper traffic) and everything outside
+/// <c>/api</c> (the SPA's static files and <c>/health</c>). The client address is
 /// <c>RemoteIpAddress</c>, which the forwarded-headers middleware (first in the pipeline) has already replaced with the real
 /// client IP from <c>X-Forwarded-For</c>.
 /// </summary>
@@ -22,6 +25,8 @@ internal static class RateLimitingConfiguration
     private const int DefaultRefreshPerMinute = 120;
     private const int DefaultBasketWritesPerMinute = 60;
     private const int DefaultCheckoutPerMinute = 10;
+    private const int DefaultApiPerMinute = 300;
+    private const string StripeWebhookPath = "/api/payments/stripe/webhook";
 
     public static IServiceCollection AddShopRateLimiting(this IServiceCollection services)
     {
@@ -49,6 +54,8 @@ internal static class RateLimitingConfiguration
                     cancellationToken: ct);
             };
 
+            options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(GlobalPartition);
+
             options.AddPolicy(RateLimitPolicies.DemoCustomer, context =>
                 PerIp(context, RateLimitPolicies.DemoCustomer, "RateLimiting:DemoCustomerPerMinute", DefaultDemoCustomerPerMinute));
             options.AddPolicy(RateLimitPolicies.AuthStrict, context =>
@@ -66,6 +73,16 @@ internal static class RateLimitingConfiguration
         });
 
         return services;
+    }
+
+    private static RateLimitPartition<string> GlobalPartition(HttpContext context)
+    {
+        var path = context.Request.Path;
+        var excluded = !path.StartsWithSegments("/api", StringComparison.OrdinalIgnoreCase)
+            || path.Value!.TrimEnd('/').Equals(StripeWebhookPath, StringComparison.OrdinalIgnoreCase);
+        return excluded
+            ? RateLimitPartition.GetNoLimiter("global:excluded")
+            : PerIp(context, "global", "RateLimiting:ApiPerMinute", DefaultApiPerMinute);
     }
 
     private static RateLimitPartition<string> PerIp(HttpContext context, string policy, string configKey, int fallback)

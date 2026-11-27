@@ -40,7 +40,7 @@ internal sealed class SearchProductsValidator : AbstractValidator<SearchProducts
 
     public SearchProductsValidator()
     {
-        RuleFor(x => x.Page).GreaterThanOrEqualTo(1);
+        RuleFor(x => x.Page).InclusiveBetween(1, 100_000);
         RuleFor(x => x.PageSize).InclusiveBetween(1, SearchProducts.MaxPageSize);
         RuleFor(x => x.Text).MaximumLength(200);
         RuleFor(x => x.MinPrice).GreaterThanOrEqualTo(0m).When(x => x.MinPrice.HasValue);

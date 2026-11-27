@@ -288,6 +288,28 @@ public sealed class StripeWebhookTests(StripeModeApiFactory factory) : IClassFix
     }
 
     [Fact]
+    public async Task Processing_payment_long_past_deadline_logs_a_warning()
+    {
+        var processing = await SeedPendingAsync(Services, "Stripe", NewSessionId(), Ct);
+        factory.Gateway.States[processing.ProviderSessionId] = GatewaySessionState.Processing;
+
+        await using (var scope = Services.CreateAsyncScope())
+        {
+            var db = scope.ServiceProvider.GetRequiredService<PaymentsDbContext>();
+            await db.Payments
+                .Where(p => p.Id == processing.Id)
+                .ExecuteUpdateAsync(s => s.SetProperty(p => p.ExpiresAtUtc, DateTime.UtcNow.AddHours(-2)), Ct);
+        }
+
+        var id = processing.Id.ToString();
+        await factory.Logs.WaitForAsync(
+            e => e.Message.Contains(id) && e.Level == LogLevel.Warning, TimeSpan.FromSeconds(20), Ct);
+
+        (await PaymentAsync(processing.OrderId)).Status.ShouldBe(PaymentStatus.Pending);
+        factory.Logs.Entries.ShouldContain(e => e.Level == LogLevel.Warning && e.Message.Contains(id) && e.Message.Contains("still processing"));
+    }
+
+    [Fact]
     public async Task Paid_event_for_an_expired_payment_logs_an_error_for_a_refund()
     {
         var payment = await SeedPendingAsync(Services, "Stripe", NewSessionId(), Ct);

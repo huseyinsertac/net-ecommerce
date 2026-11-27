@@ -19,6 +19,9 @@ public abstract class ModuleDbContext(
     PendingIntegrationEvents pendingEvents,
     IntegrationEventTypeRegistry registry) : DbContext(options)
 {
+    /// <summary>The per-module migrations history table (in the module schema); the demo reset must leave it alone.</summary>
+    public const string MigrationsHistoryTable = "__ef_migrations_history";
+
     /// <summary>Guards against handlers that keep raising events forever.</summary>
     private const int MaxDispatchRounds = 10;
 
@@ -32,7 +35,7 @@ public abstract class ModuleDbContext(
     {
         // Schema is an instance member, so the per-module migrations history table is configured here rather than at
         // registration. UseNpgsql without a connection string amends the already-registered Npgsql options in place.
-        optionsBuilder.UseNpgsql(o => o.MigrationsHistoryTable("__ef_migrations_history", Schema));
+        optionsBuilder.UseNpgsql(o => o.MigrationsHistoryTable(MigrationsHistoryTable, Schema));
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)

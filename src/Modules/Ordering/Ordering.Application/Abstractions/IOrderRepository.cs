@@ -18,6 +18,12 @@ public interface IOrderRepository
     /// <summary>One page of the customer's orders, newest first. Read-only (not tracked).</summary>
     Task<PagedResult<Order>> GetPageForCustomerAsync(Guid customerId, int page, int pageSize, CancellationToken ct);
 
+    /// <summary>Any customer's order, read-only (not tracked); null when it does not exist.</summary>
+    Task<Order?> GetReadOnlyAsync(Guid orderId, CancellationToken ct);
+
+    /// <summary>One page of every customer's orders matching the filter, newest first. Read-only (not tracked).</summary>
+    Task<PagedResult<Order>> GetPageForAdminAsync(AdminOrderFilter filter, int page, int pageSize, CancellationToken ct);
+
     /// <summary>The next value of <c>ordering.order_number_seq</c>. Values are never reused, even if the order is not saved.</summary>
     Task<long> NextOrderNumberAsync(CancellationToken ct);
 
@@ -25,5 +31,9 @@ public interface IOrderRepository
 
     /// <summary>Saves all changes, plus the outbox rows published by domain-event handlers, in one transaction.</summary>
     /// <exception cref="DuplicateIdempotencyKeyException">Another request placed an order with the same key first.</exception>
+    /// <exception cref="OrderConcurrencyException">Another request changed a loaded order first.</exception>
     Task SaveChangesAsync(CancellationToken ct);
 }
+
+/// <summary>Admin list filter. The number prefix and email fragment are raw user text; the repository escapes them.</summary>
+public sealed record AdminOrderFilter(OrderStatus? Status, string? OrderNumberPrefix, string? EmailContains);

@@ -18,7 +18,7 @@ internal sealed class GetMyOrdersValidator : AbstractValidator<GetMyOrders>
 {
     public GetMyOrdersValidator()
     {
-        RuleFor(x => x.Page).GreaterThanOrEqualTo(1);
+        RuleFor(x => x.Page).InclusiveBetween(1, 100_000);
         RuleFor(x => x.PageSize).InclusiveBetween(1, GetMyOrders.MaxPageSize);
     }
 }

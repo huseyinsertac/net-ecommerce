@@ -12,15 +12,51 @@ front end, with a CI/CD pipeline that deploys to a single server.
 No credentials are needed. On the home page:
 
 - **Try as customer** creates a private, temporary account just for you.
-- **Try as admin** signs into a shared admin account. Admin tools are coming soon (Plan 5), and
-  the shared admin cannot use the cart.
+- **Try as admin** signs into a shared admin account and opens the admin area at `/admin`. The
+  admin can:
+  - **Products:** search and filter the list, create a product (pick a category, fill the specs from
+    its schema, define up to two option axes and get a variant grid, choose images from the existing
+    photos), edit details, specs, status and images, and set each variant's price and stock. Edits
+    use optimistic concurrency, so two people saving the same product get a conflict instead of
+    overwriting each other, and stock can never go below what is reserved.
+  - **Orders:** list, filter and search orders, open one, mark a Paid order as shipped and a
+    Shipped order as delivered. Cancel and refund are Milestone 2.
+
+  The shared admin cannot use the cart.
+
+**The demo resets every night at 02:00 UTC.** All data (including accounts and orders you create) is
+wiped, then the catalog, the demo admin and 24 sample orders from 8 fictional customers are seeded
+again, so feel free to change things.
 
 Each demo customer starts with three historical orders, so the order history is not empty.
 To try checkout, add something to the cart and place the order. On Stripe's page, pay with the
 test card `4242 4242 4242 4242`, any future expiry date and any CVC. No real money moves: the
 site only accepts Stripe test-mode keys.
 
-Normal registration and sign-in also work. Screenshots: coming soon (Plan 5).
+Normal registration and sign-in also work.
+
+## Screenshots
+
+![Home page](docs/screenshots/home.jpg)
+*Home page with the one-click demo panel.*
+
+![Product page](docs/screenshots/product.jpg)
+*Product detail with the variant picker and live price.*
+
+![Cart](docs/screenshots/cart.jpg)
+*Cart with live prices and stock flags.*
+
+![Checkout](docs/screenshots/checkout.jpg)
+*Checkout with the order summary and a pre-filled demo address.*
+
+![Order detail](docs/screenshots/order-detail.jpg)
+*A paid order right after checkout.*
+
+![Admin orders](docs/screenshots/admin-orders.jpg)
+*Admin order list with filters and ship/deliver actions.*
+
+![Admin product editor](docs/screenshots/admin-product.jpg)
+*Admin product editor with specs, variants and images.*
 
 ## Features
 
@@ -38,14 +74,25 @@ Normal registration and sign-in also work. Screenshots: coming soon (Plan 5).
   (15 minutes, kept in memory only) plus rotating refresh tokens in an HttpOnly, SameSite=Strict
   cookie. Reuse of a refresh token revokes its whole token family, with a 30 second single-use
   grace period so concurrent tabs do not log each other out.
-- **API hardening:** per-IP rate limits, and a required `X-Requested-With` header on API writes.
+- **Admin area:** product management (create, edit, variants, stock, images) and order handling
+  (ship, deliver), behind an admin-only authorization policy on every `/api/*/admin/*` route.
+- **Nightly demo reset:** wipes every module schema at 02:00 UTC in one transaction, then re-seeds
+  (with retries); also available as the CLI command `dotnet Shop.Api.dll reset-demo`.
+- **API hardening:** per-IP rate limits (including a global 300 requests per minute on `/api/*`,
+  excluding health checks and the Stripe webhook), and a required `X-Requested-With` header on API
+  writes.
 - **Cart:** works for anonymous and signed-in users, with live prices and stock flags, and is
   merged into your account when you sign in.
 - **Checkout and payments:** place an order from the cart, then pay on Stripe's hosted Checkout page
   (test mode only). Stock is reserved first, the order moves through a status timeline to `Paid`
   (or is cancelled and the stock released), and the order history lists every order.
 
-Not built yet: admin tools, the nightly demo reset and screenshots (Plan 5), and refunds (Milestone 2).
+Not built yet (Milestone 2): order cancellation and refunds from the admin.
+
+### Admin and demo reset design
+
+Admin endpoints live in the module that owns the data, and the nightly reset wipes in one
+transaction and then re-seeds, both with retries; see [ADR-0009](docs/adr/0009-admin-and-nightly-reset.md).
 
 ### Identity design
 
@@ -127,6 +174,7 @@ Decisions are recorded as ADRs:
 - [0006 Catalog search: Postgres FTS, JSONB specs, SQL read side](docs/adr/0006-catalog-search-postgres-fts-jsonb-sql-read-side.md)
 - [0007 Identity: own user model, JWT and refresh cookie](docs/adr/0007-identity-own-user-model-jwt-refresh-cookie.md)
 - [0008 Payments: Stripe Checkout, webhooks and the fake gateway](docs/adr/0008-payments-stripe-checkout-choreography.md)
+- [0009 Admin endpoints per module and the nightly demo reset](docs/adr/0009-admin-and-nightly-reset.md)
 
 ## Run locally
 
@@ -213,7 +261,9 @@ Server setup: [deploy/SERVER_SETUP.md](deploy/SERVER_SETUP.md).
 - [x] **Plan 2:** Catalog and storefront
 - [x] **Plan 3:** Identity and Basket
 - [x] **Plan 4:** Ordering and Payments (Stripe test mode)
-- [ ] **Plan 5:** Admin, nightly demo reset, rate limiting, polish
+- [x] **Plan 5:** Admin, nightly demo reset, rate limiting, polish
+- [x] **Milestone 1:** a complete, deployed demo shop
+- [ ] **Milestone 2:** order cancellation and refunds
 
 ## License
 

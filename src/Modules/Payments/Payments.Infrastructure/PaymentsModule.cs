@@ -42,7 +42,7 @@ public sealed class PaymentsModule : IModule
         services.AddSingleton(sp =>
         {
             var o = sp.GetRequiredService<IOptions<PaymentsOptions>>().Value;
-            return new PaymentSessionSettings(o.Timeout, o.PublicBaseUrl);
+            return new PaymentSessionSettings(o.Timeout, o.PublicBaseUrl, o.ProcessingAlertAfter);
         });
 
         // Exactly one gateway, chosen by configuration. An unknown provider registers none and fails validation on start.

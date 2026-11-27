@@ -72,6 +72,12 @@
           </span>
         }
       </div>
+      @if (auth.isAdmin()) {
+        <a mat-menu-item routerLink="/admin">
+          <mat-icon fontSet="material-symbols-outlined">admin_panel_settings</mat-icon>
+          Admin
+        </a>
+      }
       <a mat-menu-item routerLink="/orders">
         <mat-icon fontSet="material-symbols-outlined">receipt_long</mat-icon>
         My orders

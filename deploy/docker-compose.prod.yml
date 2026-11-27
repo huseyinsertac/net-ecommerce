@@ -33,6 +33,8 @@ services:
       Stripe__SecretKey: ${STRIPE_SECRET_KEY:?STRIPE_SECRET_KEY is required (see deploy/SERVER_SETUP.md)}
       Stripe__WebhookSecret: ${STRIPE_WEBHOOK_SECRET:?STRIPE_WEBHOOK_SECRET is required (see deploy/SERVER_SETUP.md)}
       App__PublicBaseUrl: https://${SITE_ADDRESS}
+      # The public demo is shared: wipe and re-seed every night at 02:00 UTC (DemoReset__TimeOfDayUtc to change it).
+      DemoReset__Enabled: "true"
     depends_on:
       postgres:
         condition: service_healthy

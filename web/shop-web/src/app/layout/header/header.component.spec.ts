@@ -171,5 +171,35 @@ describe('HeaderComponent', () => {
       const link = document.querySelector<HTMLAnchorElement>('a[href="/orders"]');
       expect(link?.textContent).toContain('My orders');
     });
+
+    async function openMenu(admin: boolean) {
+      TestBed.overrideProvider(AuthService, {
+        useValue: { user, isAdmin: () => admin, logout: vi.fn(), signedIn: new Subject() },
+      });
+      user.set({
+        id: '1',
+        email: 'a@x.io',
+        displayName: 'ada',
+        roles: admin ? ['Admin'] : [],
+        isDemo: false,
+      });
+      const fixture = TestBed.createComponent(HeaderComponent);
+      await fixture.whenStable();
+      (fixture.nativeElement as HTMLElement)
+        .querySelector<HTMLButtonElement>('.account-button')!
+        .click();
+      await fixture.whenStable();
+    }
+
+    it('shows an Admin menu item for admins', async () => {
+      await openMenu(true);
+      const link = document.querySelector<HTMLAnchorElement>('a[href="/admin"]');
+      expect(link?.textContent).toContain('Admin');
+    });
+
+    it('hides the Admin menu item for customers', async () => {
+      await openMenu(false);
+      expect(document.querySelector('a[href="/admin"]')).toBeNull();
+    });
   });
 });

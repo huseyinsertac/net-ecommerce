@@ -1,0 +1,17 @@
+<ol class="timeline">
+  @for (step of steps(); track step.label) {
+    <li [class]="step.state" [class.reached]="step.state === 'reached'">
+      <span class="dot" aria-hidden="true">
+        <mat-icon fontSet="material-symbols-outlined">{{
+          step.state === 'reached' ? 'check' : step.state === 'cancelled' ? 'close' : ''
+        }}</mat-icon>
+      </span>
+      <span class="step-body">
+        <span class="step-label">{{ step.label }}</span>
+        @if (step.at) {
+          <time [attr.datetime]="step.at">{{ step.at | date: 'mediumDate' }}, {{ step.at | date: 'shortTime' }}</time>
+        }
+      </span>
+    </li>
+  }
+</ol>

@@ -16,6 +16,9 @@ public sealed class PaymentsOptions
     /// <summary>How often the expiry job looks for Pending payments past their timeout.</summary>
     public TimeSpan ExpiryScanInterval { get; set; } = TimeSpan.FromSeconds(60);
 
+    /// <summary>A payment still Processing at the gateway this long after its deadline is logged as a warning.</summary>
+    public TimeSpan ProcessingAlertAfter { get; set; } = TimeSpan.FromHours(1);
+
     /// <summary>
     /// Lets the Fake provider run in Production. Only for hosts that never face real shoppers: the test host and the
     /// local Docker Compose stack. The deployed site leaves it false, so it must use Stripe (in test mode).
