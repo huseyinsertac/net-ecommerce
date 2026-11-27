@@ -39,6 +39,7 @@ public class ShopApiFactory : WebApplicationFactory<Program>, IAsyncLifetime
         builder.UseSetting("RateLimiting:RefreshPerMinute", "1000");
         builder.UseSetting("RateLimiting:BasketWritesPerMinute", "1000");
         builder.UseSetting("RateLimiting:CheckoutPerMinute", "1000");
+        builder.UseSetting("RateLimiting:ApiPerMinute", "100000");
         // The simulated gateway: nothing leaves the process. Production refuses it unless explicitly allowed, as here.
         builder.UseSetting("Payments:Provider", "Fake");
         builder.UseSetting("Payments:AllowFakeProviderInProduction", "true");

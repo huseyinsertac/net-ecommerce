@@ -11,7 +11,8 @@ namespace Payments.Application.Payments;
 /// Ends a Pending payment whose time is up. The gateway is asked first, because a payment can succeed just before its
 /// session closes and the notification may not have arrived: Paid → Succeeded; Open → the session is closed at the
 /// gateway, then Expired; Expired → Expired; Processing (finished, money not landed) → left Pending until the gateway
-/// reports the result.
+/// reports the result (logged as a warning once it is
+/// long past its deadline).
 /// </summary>
 public sealed record ResolveOverduePayment(Guid PaymentId) : ICommand;
 
@@ -19,6 +20,7 @@ internal sealed class ResolveOverduePaymentHandler(
     IPaymentRepository payments,
     IPaymentGateway gateway,
     TimeProvider clock,
+    PaymentSessionSettings settings,
     ILogger<ResolveOverduePaymentHandler> logger) : ICommandHandler<ResolveOverduePayment>
 {
     public async Task<Result> Handle(ResolveOverduePayment command, CancellationToken ct)
@@ -57,9 +59,20 @@ internal sealed class ResolveOverduePaymentHandler(
                 case GatewaySessionState.Processing:
                     // Finished by the shopper, money not landed yet: the session can no longer be closed, and the result
                     // arrives as a notification. Ask again on the next scan.
-                    logger.LogInformation(
-                        "Overdue payment {PaymentId} for order {OrderId} is still processing at the gateway; leaving it Pending.",
-                        payment.Id, payment.OrderId);
+                    var age = now - payment.ExpiresAtUtc;
+                    if (age > settings.ProcessingAlertAfter)
+                    {
+                        logger.LogWarning(
+                            "Payment {PaymentId} for order {OrderId} still processing at the gateway {Age} after its deadline; leaving it Pending.",
+                            payment.Id, payment.OrderId, age);
+                    }
+                    else
+                    {
+                        logger.LogInformation(
+                            "Overdue payment {PaymentId} for order {OrderId} is still processing at the gateway; leaving it Pending.",
+                            payment.Id, payment.OrderId);
+                    }
+
                     return Result.Success();
                 default:
                     throw new InvalidOperationException($"Unknown gateway session state {state}.");

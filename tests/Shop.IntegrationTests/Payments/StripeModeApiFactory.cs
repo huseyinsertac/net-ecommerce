@@ -12,7 +12,7 @@ namespace Shop.IntegrationTests.Payments;
 /// <see cref="StubStripeGateway"/> so nothing leaves the process. Own database container. Logs go to
 /// <see cref="Logs"/> (Information and up) instead of Serilog, so tests can assert on them.
 /// </summary>
-public sealed class StripeModeApiFactory : ShopApiFactory
+public class StripeModeApiFactory : ShopApiFactory
 {
     /// <summary>Deliberately NON-SECRET values that only pass the prefix checks.</summary>
     public const string SecretKey = "sk_test_dummy";
